@@ -9,6 +9,6 @@
     <%- body %>
     
     <%- include('partials/footer') %>
-    <%- include('partials/scripts', { pageScripts: pageScripts || [] }) %>
+    <%- include('partials/scripts', { pageScripts: typeof pageScripts !== 'undefined' ? pageScripts : [] }) %>
 </body>
 </html>

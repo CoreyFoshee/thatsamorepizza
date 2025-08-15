@@ -2,7 +2,7 @@
 <script src="/js/script.js"></script>
 
 <!-- Page-specific scripts can be added here -->
-<% if (typeof pageScripts !== 'undefined' && pageScripts) { %>
+<% if (typeof pageScripts !== 'undefined' && pageScripts && pageScripts.length > 0) { %>
     <% pageScripts.forEach(function(script) { %>
         <script src="<%= script %>"></script>
     <% }); %>
