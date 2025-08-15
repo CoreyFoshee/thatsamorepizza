@@ -1,0 +1,45 @@
+{
+  "name": "thats-amore-pizzeria-website",
+  "version": "1.0.0",
+  "description": "Modern, animated, mobile-responsive website for That's Amore Pizzeria featuring the Great Pizza Debate theme",
+  "main": "index.html",
+  "scripts": {
+    "start": "./deploy.sh serve",
+    "build": "./deploy.sh build",
+    "production": "./deploy.sh production",
+    "status": "./deploy.sh status",
+    "test": "./deploy.sh build"
+  },
+  "keywords": [
+    "pizzeria",
+    "restaurant",
+    "pizza",
+    "chicago-style",
+    "new-york-style",
+    "responsive",
+    "tailwind-css",
+    "vanilla-javascript",
+    "metairie",
+    "louisiana"
+  ],
+  "author": "That's Amore Pizzeria",
+  "license": "PROPRIETARY",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/thats-amore-pizzeria-website.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/thats-amore-pizzeria-website/issues"
+  },
+  "homepage": "https://github.com/your-username/thats-amore-pizzeria-website#readme",
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
