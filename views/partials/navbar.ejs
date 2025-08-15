@@ -1,9 +1,8 @@
 <nav class="bg-white shadow-lg border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
+        <div class="flex justify-between items-center h-20">
             <div class="flex items-center space-x-3">
-                <img src="/Logo/TA_LOGO_Final_black.png" alt="That's Amore Logo" class="h-10 w-auto">
-                <h1 class="text-2xl font-heading font-bold text-primary">That's Amore</h1>
+                <img src="/Logo/TA_LOGO_Final_black.png" alt="That's Amore Logo" class="h-12 w-auto">
             </div>
             
             <div class="hidden md:block">
@@ -22,24 +21,119 @@
             
             <!-- Mobile menu button -->
             <div class="md:hidden">
-                <button id="mobile-menu-btn" class="text-gray-600 hover:text-primary focus:outline-none focus:text-primary">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
+                <button id="mobile-menu-btn" class="relative w-8 h-8 focus:outline-none focus:text-primary">
+                    <span class="absolute inset-0 transform transition-all duration-300 ease-in-out">
+                        <span class="absolute top-0 left-0 w-8 h-0.5 bg-gray-600 transform transition-all duration-300 ease-in-out hamburger-line-1"></span>
+                        <span class="absolute top-4 left-0 w-8 h-0.5 bg-gray-600 transform transition-all duration-300 ease-in-out hamburger-line-2"></span>
+                        <span class="absolute top-8 left-0 w-8 h-0.5 bg-gray-600 transform transition-all duration-300 ease-in-out hamburger-line-3"></span>
+                    </span>
                 </button>
-            </div>
-        </div>
-        
-        <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden md:hidden">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Home</a>
-                <a href="/menu" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Menu</a>
-                <a href="https://www.thatsamorepizzametairie.com/#/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Order</a>
-                <a href="/catering" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Catering</a>
-                <a href="/franchise" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Franchise</a>
-                <a href="/contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50">Contact</a>
             </div>
         </div>
     </div>
 </nav>
+
+<!-- Full Screen Mobile Menu Modal -->
+<div id="mobile-menu-modal" class="fixed inset-0 bg-primary z-50 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden">
+    <div class="flex flex-col h-full">
+        <!-- Header with close button -->
+        <div class="flex justify-between items-center p-6">
+            <img src="/Logo/TA_LOGO_Final_black.png" alt="That's Amore Logo" class="h-12 w-auto">
+            <button id="mobile-menu-close" class="text-white hover:text-accent transition-colors duration-300">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Navigation Links -->
+        <div class="flex-1 flex items-center justify-center px-8">
+            <div class="flex flex-col space-y-8 text-center">
+                <a href="/" class="mobile-nav-link <%= currentPage === 'home' ? 'text-accent' : 'text-white' %>" data-page="home">
+                    <span class="text-3xl font-heading font-bold">Home</span>
+                </a>
+                <a href="/menu" class="mobile-nav-link <%= currentPage === 'menu' ? 'text-accent' : 'text-white' %>" data-page="menu">
+                    <span class="text-3xl font-heading font-bold">Menu</span>
+                </a>
+                <a href="https://www.thatsamorepizzametairie.com/#/" class="mobile-nav-link text-white" data-page="order">
+                    <span class="text-3xl font-heading font-bold">Order</span>
+                </a>
+                <a href="/catering" class="mobile-nav-link <%= currentPage === 'catering' ? 'text-accent' : 'text-white' %>" data-page="catering">
+                    <span class="text-3xl font-heading font-bold">Catering</span>
+                </a>
+                <a href="/franchise" class="mobile-nav-link <%= currentPage === 'franchise' ? 'text-accent' : 'text-white' %>" data-page="franchise">
+                    <span class="text-3xl font-heading font-bold">Franchise</span>
+                </a>
+                <a href="/contact" class="mobile-nav-link <%= currentPage === 'contact' ? 'text-accent' : 'text-white' %>" data-page="contact">
+                    <span class="text-3xl font-heading font-bold">Contact</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Bottom CTA -->
+        <div class="p-8 text-center">
+            <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-accent text-dark px-8 py-4 rounded-full text-xl font-medium hover:bg-accent/90 transition-all duration-300 transform hover:scale-105 inline-block">
+                Order Now
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenuModal = document.getElementById('mobile-menu-modal');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    const hamburgerLines = document.querySelectorAll('.hamburger-line-1, .hamburger-line-2, .hamburger-line-3');
+    
+    // Toggle mobile menu
+    function toggleMobileMenu() {
+        const isOpen = mobileMenuModal.classList.contains('translate-x-0');
+        
+        if (isOpen) {
+            // Close menu
+            mobileMenuModal.classList.remove('translate-x-0');
+            mobileMenuModal.classList.add('translate-x-full');
+            // Reset hamburger
+            hamburgerLines.forEach(line => line.classList.remove('rotate-45', '-rotate-45', 'opacity-0'));
+        } else {
+            // Open menu
+            mobileMenuModal.classList.remove('translate-x-full');
+            mobileMenuModal.classList.add('translate-x-0');
+            // Animate hamburger to X
+            hamburgerLines[0].classList.add('rotate-45', 'top-4');
+            hamburgerLines[1].classList.add('opacity-0');
+            hamburgerLines[2].classList.add('-rotate-45', 'top-4');
+        }
+    }
+    
+    // Event listeners
+    mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    mobileMenuClose.addEventListener('click', toggleMobileMenu);
+    
+    // Close menu when clicking on a link
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+    mobileNavLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            // Close menu after a short delay to allow navigation
+            setTimeout(() => {
+                toggleMobileMenu();
+            }, 100);
+        });
+    });
+    
+    // Close menu when clicking outside
+    mobileMenuModal.addEventListener('click', function(e) {
+        if (e.target === mobileMenuModal) {
+            toggleMobileMenu();
+        }
+    });
+    
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && mobileMenuModal.classList.contains('translate-x-0')) {
+            toggleMobileMenu();
+        }
+    });
+});
+</script>
