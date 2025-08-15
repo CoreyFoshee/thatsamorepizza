@@ -109,12 +109,13 @@
                 </div>
             </div>
             
-            <!-- VS Battle Center -->
-            <div class="text-center relative" data-aos="fade-up">
+            <!-- VS Battle Center - Desktop Only -->
+            <div class="text-center relative hidden md:block" data-aos="fade-up">
                 <div class="bg-gradient-to-br from-accent/20 to-accent/40 rounded-full w-32 h-32 flex items-center justify-center mx-auto mb-8">
                     <div class="text-4xl font-heading font-bold text-dark">VS</div>
                 </div>
                 
+                <!-- Desktop Voting Section -->
                 <div class="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-6 border-2 border-primary/20">
                     <h4 class="text-xl font-heading font-bold text-primary mb-3">Choose Your Side</h4>
                     <p class="text-gray-600 mb-4">Vote for your favorite style!</p>
@@ -190,6 +191,47 @@
                         <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-red-600 text-white px-6 py-3 rounded-full font-medium hover:bg-red-700 transition-all duration-300 transform hover:scale-105">
                             Order Chicago Style
                         </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Voting Section - Below Chicago Style -->
+        <div class="mt-12 md:hidden" data-aos="fade-up">
+            <div class="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-6 border-2 border-primary/20 max-w-md mx-auto">
+                <h4 class="text-xl font-heading font-bold text-primary mb-3 text-center">Choose Your Side</h4>
+                <p class="text-gray-600 mb-4 text-center">Vote for your favorite style!</p>
+                
+                <!-- Poll Buttons -->
+                <div class="space-y-3">
+                    <button class="vote-btn-ny w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300">
+                        🗽 Vote NY Style
+                    </button>
+                    <button class="vote-btn-chicago w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors duration-300">
+                        🏙️ Vote Chicago Style
+                    </button>
+                </div>
+                
+                <!-- Poll Results -->
+                <div class="mt-4 space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span>NY Style: <span id="ny-votes-mobile">0</span> votes</span>
+                        <span id="ny-percentage-mobile">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="ny-progress-mobile" class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="flex justify-between text-sm">
+                        <span>Chicago Style: <span id="chicago-votes-mobile">0</span> votes</span>
+                        <span id="chicago-percentage-mobile">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="chicago-progress-mobile" class="bg-red-600 h-2 rounded-full" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="text-xs text-gray-500 mt-2 text-center">
+                        Total votes: <span id="total-votes-mobile">0</span>
                     </div>
                 </div>
             </div>
@@ -438,9 +480,8 @@
 </section>
 
 <!-- Floating Order Button -->
-<div id="floating-order" class="fixed bottom-8 right-8 z-50 opacity-0 pointer-events-none transition-all duration-300">
-    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white p-4 rounded-full shadow-lg hover:bg-primary/90 transition-all duration-300 transform hover:scale-110">
-        <div class="text-2xl">🍕</div>
-        <div class="text-xs font-medium">Order Now</div>
+<div id="floating-order" class="fixed bottom-8 right-8 z-[9999] opacity-0 pointer-events-none transition-all duration-300 transform translate-y-0">
+    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white rounded-full shadow-2xl hover:bg-primary/90 transition-all duration-300 transform hover:scale-110 flex flex-col items-center justify-center">
+        <div class="text-sm font-medium text-center leading-tight">Order Now</div>
     </a>
 </div>
