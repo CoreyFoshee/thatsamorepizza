@@ -1,4 +1,4 @@
-/* Custom CSS for That's Amore Pizzeria */
+/* Custom CSS for That's Amore Pizzeria - Classic Italian Restaurant Theme */
 
 /* Base Styles */
 * {
@@ -13,6 +13,24 @@ body {
     font-family: 'Inter', sans-serif;
     line-height: 1.6;
     overflow-x: hidden;
+    background: linear-gradient(135deg, #F5E6D3 0%, #FFF8DC 100%);
+    color: #2C1810;
+}
+
+/* Classic Italian Restaurant Background Pattern */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(139, 0, 0, 0.03) 2px, transparent 2px),
+        radial-gradient(circle at 75% 75%, rgba(139, 0, 0, 0.03) 2px, transparent 2px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: -1;
 }
 
 /* Typography */
@@ -24,9 +42,10 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
-/* Navigation Styles */
+/* Navigation Styles - Classic Italian */
 .nav-link {
-    @apply text-gray-700 hover:text-primary transition-colors duration-300 font-medium relative;
+    @apply text-dark hover:text-primary transition-colors duration-300 font-medium relative;
+    text-shadow: 0 1px 2px rgba(44, 24, 16, 0.1);
 }
 
 .nav-link::after {
@@ -35,9 +54,11 @@ body {
     bottom: -4px;
     left: 0;
     width: 0;
-    height: 2px;
-    background: #A31E22;
+    height: 3px;
+    background: linear-gradient(90deg, #8B0000, #DAA520);
+    border-radius: 2px;
     transition: width 0.3s ease;
+    box-shadow: 0 2px 4px rgba(139, 0, 0, 0.3);
 }
 
 .nav-link:hover::after {
