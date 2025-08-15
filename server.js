@@ -14,7 +14,6 @@ app.use(expressLayouts);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'Logo')));
 
 // Parse JSON bodies
 app.use(express.json());
