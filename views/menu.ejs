@@ -24,13 +24,336 @@
     </div>
 </section>
 
-<!-- Menu content will go here -->
+<!-- Menu Navigation -->
 <section class="py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-4xl font-heading font-bold text-dark mb-8">Menu Coming Soon</h2>
-        <p class="text-xl text-gray-600">We're working on converting the full menu to the new system.</p>
-        <a href="/" class="inline-block mt-6 bg-primary text-white px-8 py-4 rounded-full text-xl font-medium hover:bg-primary/90 transition-all duration-300">
-            Back to Home
-        </a>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="text-4xl font-heading font-bold text-dark mb-4">
+                Choose Your <span class="text-primary">Category</span>
+            </h2>
+            <p class="text-xl text-gray-600">Explore our delicious offerings</p>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" data-aos="fade-up" data-aos-delay="200">
+            <button class="menu-nav-btn bg-primary text-white p-6 rounded-2xl font-medium hover:bg-primary/90 transition-all duration-300 transform hover:scale-105" data-category="pizza">
+                <div class="text-4xl mb-2">🍕</div>
+                <div>Pizza</div>
+            </button>
+            <button class="menu-nav-btn bg-secondary text-dark p-6 rounded-2xl font-medium hover:bg-secondary/80 transition-all duration-300 transform hover:scale-105" data-category="pasta">
+                <div class="text-4xl mb-2">🍝</div>
+                <div>Pasta</div>
+            </button>
+            <button class="menu-nav-btn bg-secondary text-dark p-6 rounded-2xl font-medium hover:bg-secondary/80 transition-all duration-300 transform hover:scale-105" data-category="appetizers">
+                <div class="text-4xl mb-2">🥖</div>
+                <div>Appetizers</div>
+            </button>
+            <button class="menu-nav-btn bg-secondary text-dark p-6 rounded-2xl font-medium hover:bg-secondary/80 transition-all duration-300 transform hover:scale-105" data-category="salads">
+                <div class="text-4xl mb-2">🥗</div>
+                <div>Salads</div>
+            </button>
+        </div>
     </div>
 </section>
+
+<!-- Pizza Section -->
+<section id="pizza" class="py-16 bg-gray-50 menu-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="text-4xl font-heading font-bold text-dark mb-4">
+                <span class="text-primary">Pizza</span> - The Heart of Our Menu
+            </h2>
+            <p class="text-xl text-gray-600">From thin crust to deep dish, every pizza is made with love</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Pepperoni Pizza -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-center mb-4">
+                    <div class="text-5xl mb-3">🍕</div>
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-2">Pepperoni Pizza</h3>
+                    <p class="text-gray-600 mb-4">Our most popular pizza!</p>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors duration-300 w-full block">
+                        Order Online
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Supreme Pizza -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" data-aos="fade-up" data-aos-delay="300">
+                <div class="text-center mb-4">
+                    <div class="text-5xl mb-3">🍕</div>
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-2">Supreme Pizza</h3>
+                    <p class="text-gray-600 mb-4">Loaded with all your favorite toppings</p>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors duration-300 w-full block">
+                        Order Online
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Build Your Own -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" data-aos="fade-up" data-aos-delay="400">
+                <div class="text-center mb-4">
+                    <div class="text-5xl mb-3">🍕</div>
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-2">Build Your Own</h3>
+                    <p class="text-gray-600 mb-4">Create your perfect pizza combination</p>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors duration-300 w-full block">
+                        Order Online
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pasta Section -->
+<section id="pasta" class="py-16 bg-white menu-section hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="text-4xl font-heading font-bold text-dark mb-4">
+                <span class="text-primary">Pasta</span> - Italian Classics
+            </h2>
+            <p class="text-xl text-gray-600">Authentic Italian pasta dishes made fresh daily</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Spaghetti & Meatballs -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-center mb-4">
+                    <div class="text-5xl mb-3">🍝</div>
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-2">Spaghetti & Meatballs</h3>
+                    <p class="text-gray-600 mb-4">Our most popular pasta dish!</p>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors duration-300 w-full block">
+                        Order Online
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Chicken Parmesan -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" data-aos="fade-up" data-aos-delay="300">
+                <div class="text-center mb-4">
+                    <div class="text-5xl mb-3">🍝</div>
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-2">Chicken Parmesan</h3>
+                    <p class="text-gray-600 mb-4">Breaded chicken with marinara and cheese</p>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors duration-300 w-full block">
+                        Order Online
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Appetizers Section -->
+<section id="appetizers" class="py-16 bg-gray-50 menu-section hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="text-4xl font-heading font-bold text-dark mb-4">
+                <span class="text-primary">Appetizers</span> - Start Your Meal Right
+            </h2>
+            <p class="text-xl text-gray-600">Perfect starters to share with friends and family</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Garlic Knots -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-center mb-4">
+                    <div class="text-5xl mb-3">🥖</div>
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-2">Garlic Knots</h3>
+                    <p class="text-gray-600 mb-4">Soft, buttery knots brushed with garlic and herbs</p>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors duration-300 w-full block">
+                        Order Online
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Mozzarella Sticks -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" data-aos="fade-up" data-aos-delay="300">
+                <div class="text-center mb-4">
+                    <div class="text-5xl mb-3">🧀</div>
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-2">Mozzarella Sticks</h3>
+                    <p class="text-gray-600 mb-4">Crispy breaded mozzarella with marinara sauce</p>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors duration-300 w-full block">
+                        Order Online
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Bruschetta -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" data-aos="fade-up" data-aos-delay="400">
+                <div class="text-center mb-4">
+                    <div class="text-5xl mb-3">🍅</div>
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-2">Bruschetta</h3>
+                    <p class="text-gray-600 mb-4">Toasted bread topped with fresh tomatoes and basil</p>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors duration-300 w-full block">
+                        Order Online
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Salads Section -->
+<section id="salads" class="py-16 bg-white menu-section hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="text-4xl font-heading font-bold text-dark mb-4">
+                <span class="text-primary">Salads</span> - Fresh & Healthy
+            </h2>
+            <p class="text-xl text-gray-600">Crisp, fresh salads made with premium ingredients</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- House Salad -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-center mb-4">
+                    <div class="text-5xl mb-3">🥗</div>
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-2">House Salad</h3>
+                    <p class="text-gray-600 mb-4">Mixed greens with tomatoes, cucumbers, and house dressing</p>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors duration-300 w-full block">
+                        Order Online
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Caesar Salad -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" data-aos="fade-up" data-aos-delay="300">
+                <div class="text-center mb-4">
+                    <div class="text-5xl mb-3">🥗</div>
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-2">Caesar Salad</h3>
+                    <p class="text-gray-600 mb-4">Romaine lettuce, parmesan cheese, and caesar dressing</p>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors duration-300 w-full block">
+                        Order Online
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Greek Salad -->
+            <div class="bg-white rounded-2xl p-6 shadow-lg border border-gray-200" data-aos="fade-up" data-aos-delay="400">
+                <div class="text-center mb-4">
+                    <div class="text-5xl mb-3">🥗</div>
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-2">Greek Salad</h3>
+                    <p class="text-gray-600 mb-4">Fresh vegetables with feta cheese and olive oil dressing</p>
+                </div>
+                <div class="text-center">
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors duration-300 w-full block">
+                        Order Online
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- More Menu Items Notice -->
+<section class="py-16 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="fade-up" data-aos-delay="100">
+        <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-heading font-bold text-primary mb-4">More Menu Items Available Online!</h2>
+            <p class="text-xl text-gray-600 mb-6">
+                This is just a taste of what we offer! We have a full menu including sandwiches, wings, desserts, drinks, and much more available online.
+            </p>
+            <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-8 py-4 rounded-full text-xl font-medium hover:bg-primary/90 transition-all duration-300 transform hover:scale-105">
+                View Complete Menu
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-16 bg-primary text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl font-heading font-bold mb-6" data-aos="fade-up" data-aos-delay="100">
+            Ready to Settle the <span class="text-accent">Great Pizza Debate?</span>
+        </h2>
+        <p class="text-xl mb-8" data-aos="fade-up" data-aos-delay="200">
+            Order both styles online and decide for yourself which reigns supreme!
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center" data-aos="fade-up" data-aos-delay="300">
+            <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-accent text-dark px-8 py-4 rounded-full text-xl font-medium hover:bg-accent/90 transition-all duration-300 transform hover:scale-105">
+                Order Online
+            </a>
+            <a href="tel:504-463-5384" class="bg-white text-primary px-8 py-4 rounded-full text-xl font-medium hover:bg-gray-100 transition-all duration-300">
+                Call to Order
+            </a>
+        </div>
+        
+        <div class="mt-12 bg-white/10 rounded-2xl p-8" data-aos="fade-up" data-aos-delay="400">
+            <h3 class="text-2xl font-heading font-bold mb-4">Why Order Online?</h3>
+            <div class="grid md:grid-cols-3 gap-6 text-left">
+                <div class="flex items-start space-x-3">
+                    <div class="text-2xl">⚡</div>
+                    <div>
+                        <h4 class="font-semibold mb-1">Faster Service</h4>
+                        <p class="text-sm text-gray-200">Skip the wait and get your order faster</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <div class="text-2xl">💳</div>
+                    <div>
+                        <h4 class="font-semibold mb-1">Easy Payment</h4>
+                        <p class="text-sm text-gray-200">Secure online payment with multiple options</p>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <div class="text-2xl">📱</div>
+                    <div>
+                        <h4 class="font-semibold mb-1">Mobile Friendly</h4>
+                        <p class="text-sm text-gray-200">Order from your phone, tablet, or computer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Menu navigation functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuNavBtns = document.querySelectorAll('.menu-nav-btn');
+        const menuSections = document.querySelectorAll('.menu-section');
+        
+        // Show pizza section by default
+        document.getElementById('pizza').classList.remove('hidden');
+        
+        menuNavBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const category = this.dataset.category;
+                
+                // Update button styles
+                menuNavBtns.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white');
+                    b.classList.add('bg-secondary', 'text-dark');
+                });
+                this.classList.remove('bg-secondary', 'text-dark');
+                this.classList.add('bg-primary', 'text-white');
+                
+                // Show/hide sections
+                menuSections.forEach(section => {
+                    section.classList.add('hidden');
+                });
+                document.getElementById(category).classList.remove('hidden');
+            });
+        });
+    });
+</script>
