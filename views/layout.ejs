@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+</head>
+<body class="font-body text-dark bg-white">
+    <%- include('partials/navbar', { currentPage: currentPage || 'home' }) %>
+    
+    <%- body %>
+    
+    <%- include('partials/footer') %>
+    <%- include('partials/scripts', { pageScripts: pageScripts || [] }) %>
+</body>
+</html>
