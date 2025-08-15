@@ -9,15 +9,15 @@
   "routes": [
     {
       "src": "/css/(.*)",
-      "dest": "/public/css/$1"
+      "dest": "/css/$1"
     },
     {
       "src": "/js/(.*)",
-      "dest": "/public/js/$1"
+      "dest": "/js/$1"
     },
     {
       "src": "/Logo/(.*)",
-      "dest": "/public/Logo/$1"
+      "dest": "/Logo/$1"
     },
     {
       "src": "/(.*)",
