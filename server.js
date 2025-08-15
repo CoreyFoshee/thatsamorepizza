@@ -12,8 +12,8 @@ app.set('layout', 'layout');
 // Use express-ejs-layouts
 app.use(expressLayouts);
 
-// Serve static files from root directory
-app.use(express.static(__dirname));
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Debug middleware
 app.use((req, res, next) => {

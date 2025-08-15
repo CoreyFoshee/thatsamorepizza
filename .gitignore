@@ -92,7 +92,7 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-# public (removed - static files now in root)
+# public folder now contains static files for Vercel
 
 # Storybook build outputs
 .out
