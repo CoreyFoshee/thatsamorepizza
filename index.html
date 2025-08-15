@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>That's Amore Pizzeria - Settle the Great Debate: Chicago vs New York Pizza in Metairie</title>
+    <meta name="description" content="The ultimate pizza showdown! Chicago Deep Dish vs New York Thin Crust - both made fresh daily at That's Amore Pizzeria in Metairie, Louisiana. Order online, catering, and franchise opportunities available.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#A31E22',
+                        secondary: '#F4E6D9',
+                        accent: '#FFD700',
+                        dark: '#1F1F1F'
+                    },
+                    fontFamily: {
+                        'heading': ['Playfair Display', 'serif'],
+                        'body': ['Inter', 'sans-serif']
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.8s ease-out',
+                        'slide-up': 'slideUp 0.8s ease-out',
+                        'slide-left': 'slideLeft 0.8s ease-out',
+                        'slide-right': 'slideRight 0.8s ease-out',
+                        'scale-in': 'scaleIn 0.6s ease-out',
+                        'float': 'float 3s ease-in-out infinite',
+                        'gradient': 'gradient 8s ease infinite',
+                        'typewriter': 'typewriter 3s steps(40) infinite',
+                        'count-up': 'countUp 2s ease-out',
+                        'battle': 'battle 2s ease-in-out infinite'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-body text-dark bg-white overflow-x-hidden">
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/90 backdrop-blur-md border-b border-gray-200/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <div class="flex items-center space-x-3">
+                        <img src="Logo/TA_LOGO_Final_black.png" alt="That's Amore Logo" class="h-10 w-auto">
+                        <h1 class="text-2xl font-heading font-bold text-primary">That's Amore</h1>
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#home" class="nav-link">Home</a>
+                        <a href="#menu" class="nav-link">Menu</a>
+                        <a href="https://www.thatsamorepizzaonline.com" class="nav-link">Order</a>
+                        <a href="#catering" class="nav-link">Catering</a>
+                        <a href="#franchise" class="nav-link">Franchise</a>
+                        <a href="#contact" class="nav-link">Contact</a>
+                        <a href="https://www.thatsamorepizzaonline.com" class="bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary/90 transition-all duration-300 transform hover:scale-105">
+                            Order Now
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-primary transition-colors duration-200">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#home" class="mobile-nav-link">Home</a>
+                <a href="#menu" class="mobile-nav-link">Menu</a>
+                <a href="https://www.thatsamorepizzaonline.com" class="mobile-nav-link">Order</a>
+                <a href="#catering" class="mobile-nav-link">Catering</a>
+                <a href="#franchise" class="mobile-nav-link">Franchise</a>
+                <a href="#contact" class="mobile-nav-link">Contact</a>
+                <a href="https://www.thatsamorepizzaonline.com" class="block bg-primary text-white px-4 py-2 rounded-full font-medium text-center mt-4">
+                    Order Now
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Floating Order Button -->
+    <div id="floating-order" class="fixed bottom-8 right-8 z-40 opacity-0 pointer-events-none transition-all duration-500">
+        <a href="https://www.thatsamorepizzaonline.com" class="bg-primary text-white px-6 py-3 rounded-full font-medium shadow-lg hover:bg-primary/90 transition-all duration-300 transform hover:scale-110 flex items-center space-x-2">
+            <span>🍕</span>
+            <span>Order Now</span>
+        </a>
+    </div>
+
+    <!-- Home Section - The Great Pizza Debate -->
+    <section id="home" class="min-h-screen relative overflow-hidden">
+        <!-- Animated Background -->
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/30 to-accent/20 animate-gradient"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,215,0,0.1),transparent_50%)]"></div>
+        
+        <!-- Floating Elements -->
+        <div class="absolute top-20 left-10 w-20 h-20 bg-primary/10 rounded-full animate-float"></div>
+        <div class="absolute top-40 right-20 w-16 h-16 bg-accent/20 rounded-full animate-float" style="animation-delay: 1s;"></div>
+        <div class="absolute bottom-40 left-20 w-24 h-24 bg-secondary/30 rounded-full animate-float" style="animation-delay: 2s;"></div>
+        
+        <!-- Hero Content - The Ultimate Showdown -->
+        <div class="relative z-10 flex items-center justify-center min-h-screen px-4">
+            <div class="text-center max-w-6xl mx-auto">
+                <!-- Main Headline -->
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-dark mb-6 leading-tight">
+                    <span class="block">The Ultimate</span>
+                    <span class="block text-primary animate-battle">Pizza Showdown</span>
+                </h1>
+                
+                <!-- Debate Subtitle -->
+                <div class="text-xl md:text-2xl lg:text-3xl font-body text-gray-700 mb-8">
+                    <span class="typewriter-text">Chicago Deep Dish vs New York Thin Crust</span>
+                </div>
+                
+                <!-- Battle Call to Action -->
+                <div class="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                    <p class="mb-4">Two legendary pizza styles. One incredible experience.</p>
+                    <p class="font-semibold text-primary">Choose your side or try both - the choice is yours!</p>
+                </div>
+                
+                <!-- CTA Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+                    <a href="https://www.thatsamorepizzaonline.com" class="bg-primary text-white px-8 py-4 rounded-full text-xl font-medium hover:bg-primary/90 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        Order Online
+                    </a>
+                    <a href="#catering" class="bg-white text-primary border-2 border-primary px-8 py-4 rounded-full text-xl font-medium hover:bg-primary hover:text-white transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        View Catering
+                    </a>
+                </div>
+                
+                <!-- Scroll to see the battle -->
+                <div class="text-sm text-gray-500">
+                    Scroll down to witness the great pizza debate...
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <div class="w-6 h-10 border-2 border-primary rounded-full flex justify-center">
+                <div class="w-1 h-3 bg-primary rounded-full mt-2 animate-pulse"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Great Pizza Debate Section -->
+    <section class="py-20 bg-white relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-dark mb-4">
+                    The Great <span class="text-primary">Pizza Debate</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    For decades, pizza lovers have argued: Chicago Deep Dish or New York Thin Crust? 
+                    At That's Amore, we don't take sides - we serve both with equal passion and authenticity.
+                </p>
+            </div>
+            
+            <!-- Battle Arena - Three Columns -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                <!-- New York Style - Left Side -->
+                <div class="text-center" data-aos="fade-right">
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-8 border-2 border-blue-200 relative">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <div class="bg-blue-600 text-white px-6 py-2 rounded-full text-lg font-bold">
+                                🗽 NEW YORK STYLE
+                            </div>
+                        </div>
+                        
+                        <div class="text-8xl mb-6">🍕</div>
+                        <h3 class="text-3xl font-heading font-bold text-blue-800 mb-4">Thin Crust Perfection</h3>
+                        
+                        <div class="space-y-4 text-left">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                <span class="font-medium">Paper-thin, crispy crust</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                <span class="font-medium">Foldable slices for authentic NYC experience</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                <span class="font-medium">Quick bake at high temperatures</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                <span class="font-medium">Perfect for on-the-go eating</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <a href="https://www.thatsamorepizzaonline.com" class="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-all duration-300 transform hover:scale-105">
+                                Order NY Style
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- VS Battle Center -->
+                <div class="text-center relative" data-aos="fade-up">
+                    <div class="bg-gradient-to-br from-accent/20 to-accent/40 rounded-full w-32 h-32 flex items-center justify-center mx-auto mb-8">
+                        <div class="text-4xl font-heading font-bold text-dark">VS</div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="text-2xl font-heading font-bold text-primary">The Ultimate Showdown</div>
+                        <p class="text-gray-600">Two legendary styles. One incredible experience.</p>
+                        <div class="text-6xl">⚔️</div>
+                    </div>
+                </div>
+                
+                <!-- Chicago Style - Right Side -->
+                <div class="text-center" data-aos="fade-left">
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-3xl p-8 border-2 border-red-200 relative">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <div class="bg-red-600 text-white px-6 py-2 rounded-full text-lg font-bold">
+                                🏙️ CHICAGO STYLE
+                            </div>
+                        </div>
+                        
+                        <div class="text-8xl mb-6">🍕</div>
+                        <h3 class="text-3xl font-heading font-bold text-red-800 mb-4">Deep Dish Delight</h3>
+                        
+                        <div class="space-y-4 text-left">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-red-600 rounded-full"></div>
+                                <span class="font-medium">Thick, buttery crust with high sides</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-red-600 rounded-full"></div>
+                                <span class="font-medium">Layers of cheese, toppings, and sauce</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-red-600 rounded-full"></div>
+                                <span class="font-medium">Slow-baked for maximum flavor</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-red-600 rounded-full"></div>
+                                <span class="font-medium">A meal in itself - hearty and satisfying</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <a href="https://www.thatsamorepizzaonline.com" class="bg-red-600 text-white px-6 py-3 rounded-full font-medium hover:bg-red-700 transition-all duration-300 transform hover:scale-105">
+                                Order Chicago Style
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- The Verdict -->
+            <div class="text-center mt-16" data-aos="fade-up">
+                <div class="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-3xl p-8 border-2 border-accent/30">
+                    <h3 class="text-3xl font-heading font-bold text-dark mb-4">🏆 The Verdict?</h3>
+                    <p class="text-xl text-gray-700 mb-6">
+                        <span class="font-bold text-primary">Both are winners!</span> 
+                        That's why we're the only pizzeria in Metairie serving both legendary styles with equal passion.
+                    </p>
+                    <div class="text-2xl font-heading font-bold text-accent">
+                        "Why choose when you can have both?"
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section - Updated for the Debate Theme -->
+    <section class="py-20 bg-secondary/30 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6" data-aos="fade-right">
+                    <h2 class="text-4xl md:text-5xl font-heading font-bold text-dark">
+                        We Don't <span class="text-primary">Take Sides</span>
+                    </h2>
+                    <p class="text-xl text-gray-600 leading-relaxed">
+                        In the great Chicago vs New York pizza debate, we're Switzerland - neutral territory where both styles 
+                        are celebrated equally. Our family recipes honor the traditions of both pizza capitals, bringing you 
+                        authentic flavors from the Windy City and the Big Apple, right here in Metairie.
+                    </p>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-primary rounded-full"></div>
+                            <span class="font-medium">Authentic Chicago Deep Dish</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-accent rounded-full"></div>
+                            <span class="font-medium">Classic New York Thin Crust</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative" data-aos="fade-left">
+                    <div class="bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                        <div class="bg-white rounded-2xl p-6 shadow-xl">
+                            <div class="text-center space-y-4">
+                                <div class="text-6xl">🍕</div>
+                                <h3 class="text-2xl font-heading font-bold text-primary">The Great Unifier</h3>
+                                <p class="text-gray-600">Bringing pizza lovers together since 1995</p>
+                                <div class="text-sm text-gray-500">
+                                    "Where Chicago and New York finally agree"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section - Updated for the Debate Theme -->
+    <section id="menu" class="py-20 bg-white relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-dark mb-4">
+                    Choose Your <span class="text-primary">Side</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    From the thin crust perfection of New York to the deep dish decadence of Chicago, 
+                    every dish is crafted with love and the finest ingredients. Which style will you try first?
+                </p>
+            </div>
+            
+            <!-- Style Selection Header -->
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <div class="text-center p-6 bg-blue-50 rounded-2xl border-2 border-blue-200 relative overflow-hidden" data-aos="fade-right">
+                    <div class="text-4xl mb-4">🗽</div>
+                    <h3 class="text-2xl font-heading font-bold text-blue-800 mb-2">New York Style</h3>
+                    <p class="text-gray-600 mb-4">Thin, crispy, foldable perfection</p>
+                    
+                    <!-- Poll Button -->
+                    <button class="vote-btn-ny bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 mb-3">
+                        Vote for NY Style 🗽
+                    </button>
+                    
+                    <!-- Vote Counter -->
+                    <div class="vote-counter-ny text-center">
+                        <div class="text-2xl font-bold text-blue-800 mb-1">
+                            <span id="ny-votes">0</span>
+                        </div>
+                        <div class="text-sm text-gray-600">votes</div>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mt-3 bg-gray-200 rounded-full h-2">
+                        <div id="ny-progress" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="text-center p-6 bg-red-50 rounded-2xl border-2 border-red-200 relative overflow-hidden" data-aos="fade-left">
+                    <div class="text-4xl mb-4">🏙️</div>
+                    <h3 class="text-2xl font-heading font-bold text-red-800 mb-2">Chicago Style</h3>
+                    <p class="text-gray-600 mb-4">Thick, hearty, deep dish delight</p>
+                    
+                    <!-- Poll Button -->
+                    <button class="vote-btn-chicago bg-red-600 text-white px-6 py-3 rounded-full font-medium hover:bg-red-700 transition-all duration-300 transform hover:scale-105 mb-3">
+                        Vote for Chicago Style 🏙️
+                    </button>
+                    
+                    <!-- Vote Counter -->
+                    <div class="vote-counter-chicago text-center">
+                        <div class="text-2xl font-bold text-red-800 mb-1">
+                            <span id="chicago-votes">0</span>
+                        </div>
+                        <div class="text-sm text-gray-600">votes</div>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mt-3 bg-gray-200 rounded-full h-2">
+                        <div id="chicago-progress" class="bg-red-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Poll Results Summary -->
+            <div class="text-center mb-8" data-aos="fade-up">
+                <div class="bg-gradient-to-r from-blue-50 to-red-50 rounded-2xl p-6 border-2 border-gray-200">
+                    <h4 class="text-xl font-heading font-bold text-gray-800 mb-3">Current Poll Results</h4>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="flex items-center justify-center space-x-3">
+                            <span class="text-blue-600 font-bold">🗽 NY Style:</span>
+                            <span id="ny-percentage" class="text-lg font-bold">0%</span>
+                        </div>
+                        <div class="flex items-center justify-center space-x-3">
+                            <span class="text-red-600 font-bold">🏙️ Chicago Style:</span>
+                            <span id="chicago-percentage" class="text-lg font-bold">0%</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-600">
+                        <span id="total-votes">0</span> total votes cast
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Pizza -->
+                <div class="menu-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="text-6xl mb-4 text-center">🍕</div>
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-4 text-center">The Great Debate</h3>
+                        <div class="space-y-3 mb-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-blue-600 font-medium">NY Thin Crust</span>
+                                <span class="text-gray-400">vs</span>
+                                <span class="text-red-600 font-medium">Chicago Deep Dish</span>
+                            </div>
+                        </div>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Pepperoni Pizza (Both Styles)</li>
+                            <li>• Margherita Pizza (Both Styles)</li>
+                            <li>• Supreme Pizza (Both Styles)</li>
+                            <li>• BBQ Chicken Pizza (Both Styles)</li>
+                            <li>• Build Your Own (Both Styles)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Pasta -->
+                <div class="menu-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="text-6xl mb-4 text-center">🍝</div>
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-4 text-center">Italian Classics</h3>
+                        <p class="text-gray-500 text-center mb-4">No debate here - just pure deliciousness</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Spaghetti & Meatballs</li>
+                            <li>• Fettuccine Alfredo</li>
+                            <li>• Baked Ziti</li>
+                            <li>• Chicken Parmesan</li>
+                            <li>• Eggplant Parmesan</li>
+                            <li>• Lasagna</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Appetizers -->
+                <div class="menu-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="text-6xl mb-4 text-center">🥖</div>
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-4 text-center">Pre-Battle Fuel</h3>
+                        <p class="text-gray-500 text-center mb-4">Fuel up before the pizza showdown</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Garlic Knots (6 pieces)</li>
+                            <li>• Mozzarella Sticks (6 pieces)</li>
+                            <li>• Fried Calamari</li>
+                            <li>• Bruschetta</li>
+                            <li>• Stuffed Mushrooms</li>
+                            <li>• Onion Rings</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Salads -->
+                <div class="menu-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="text-6xl mb-4 text-center">🥗</div>
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-4 text-center">Fresh & Light</h3>
+                        <p class="text-gray-500 text-center mb-4">The perfect balance to your pizza choice</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• House Salad</li>
+                            <li>• Caesar Salad</li>
+                            <li>• Greek Salad</li>
+                            <li>• Antipasto Salad</li>
+                            <li>• Garden Salad</li>
+                            <li>• Spinach Salad</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Sandwiches -->
+                <div class="menu-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="text-6xl mb-4 text-center">🥪</div>
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-4 text-center">Italian Sandwiches</h3>
+                        <p class="text-gray-500 text-center mb-4">Classic Italian sandwiches & hoagies</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Italian Beef Sandwich</li>
+                            <li>• Meatball Sub</li>
+                            <li>• Chicken Parmesan Sub</li>
+                            <li>• Italian Combo</li>
+                            <li>• Turkey & Provolone</li>
+                            <li>• Veggie Delight</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Desserts -->
+                <div class="menu-card" data-aos="fade-up" data-aos-delay="600">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="text-6xl mb-4 text-center">🍰</div>
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-4 text-center">Sweet Victory</h3>
+                        <p class="text-gray-500 text-center mb-4">Celebrate your pizza choice with dessert</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Tiramisu</li>
+                            <li>• Cannoli</li>
+                            <li>• New York Cheesecake</li>
+                            <li>• Chocolate Lava Cake</li>
+                            <li>• Italian Ice</li>
+                            <li>• Gelato (Various Flavors)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Drinks -->
+                <div class="menu-card" data-aos="fade-up" data-aos-delay="700">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="text-6xl mb-4 text-center">🥤</div>
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-4 text-center">Battle Beverages</h3>
+                        <p class="text-gray-500 text-center mb-4">Wash down your pizza choice</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Soft Drinks (Coke, Sprite, etc.)</li>
+                            <li>• Italian Sodas</li>
+                            <li>• Fresh Brewed Iced Tea</li>
+                            <li>• Coffee & Espresso</li>
+                            <li>• Domestic & Import Beer</li>
+                            <li>• House Wine Selection</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Wings -->
+                <div class="menu-card" data-aos="fade-up" data-aos-delay="800">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="text-6xl mb-4 text-center">🍗</div>
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-4 text-center">Wings & More</h3>
+                        <p class="text-gray-500 text-center mb-4">Perfect side to your pizza choice</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Buffalo Wings (6, 12, 24)</li>
+                            <li>• BBQ Wings</li>
+                            <li>• Garlic Parmesan Wings</li>
+                            <li>• Honey Mustard Wings</li>
+                            <li>• Boneless Wings</li>
+                            <li>• Wing Dips (Ranch, Blue Cheese)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Sides -->
+                <div class="menu-card" data-aos="fade-up" data-aos-delay="900">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                        <div class="text-6xl mb-4 text-center">🍟</div>
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-4 text-center">Sides & Extras</h3>
+                        <p class="text-gray-500 text-center mb-4">Complete your meal</p>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• French Fries</li>
+                            <li>• Onion Rings</li>
+                            <li>• Mozzarella Sticks</li>
+                            <li>• Breadsticks</li>
+                            <li>• Side of Marinara</li>
+                            <li>• Extra Cheese</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Final Call to Action -->
+            <div class="text-center mt-12" data-aos="fade-up">
+                <div class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-3xl p-8 border-2 border-primary/20">
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-4">Ready to Settle the Debate?</h3>
+                    <p class="text-gray-600 mb-6">Order both styles and decide for yourself which reigns supreme!</p>
+                    <a href="https://www.thatsamorepizzaonline.com" class="bg-primary text-white px-8 py-4 rounded-full text-xl font-medium hover:bg-primary/90 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                        Order Both Styles & Decide
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Catering Section -->
+    <section id="catering" class="py-20 bg-white relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8" data-aos="fade-right">
+                    <h2 class="text-4xl md:text-5xl font-heading font-bold text-dark">
+                        Catering That <span class="text-primary">Brings People Together</span>
+                    </h2>
+                    <p class="text-xl text-gray-600 leading-relaxed">
+                        Perfect for offices, parties, family gatherings, and special events. Let us handle the food while you enjoy the celebration.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <h3 class="text-2xl font-heading font-bold text-primary">Catering Options:</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-primary rounded-full"></div>
+                                <span class="text-lg">Pizza Trays (Feeds 8-12 people)</span>
+                            </li>
+                            <li class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-primary rounded-full"></div>
+                                <span class="text-lg">Pasta Trays with Bread</span>
+                            </li>
+                            <li class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-primary rounded-full"></div>
+                                <span class="text-lg">Garlic Knot Platters</span>
+                            </li>
+                            <li class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-primary rounded-full"></div>
+                                <span class="text-lg">Dessert Boxes</span>
+                            </li>
+                            <li class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-primary rounded-full"></div>
+                                <span class="text-lg">Complete Meal Packages</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="space-y-6" data-aos="fade-left">
+                    <div class="bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl p-8">
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-6 text-center">Request Catering Quote</h3>
+                        <form class="space-y-4">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <input type="text" placeholder="Name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <input type="email" placeholder="Email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <input type="tel" placeholder="Phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <input type="date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <input type="number" placeholder="Number of Guests" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <textarea placeholder="Special Requests or Details" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                            <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-300">
+                                Get Catering Quote
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Franchise Section -->
+    <section id="franchise" class="py-20 bg-gradient-to-br from-dark to-primary relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,215,0,0.1),transparent_50%)]"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-white mb-6">
+                    Own a Slice of <span class="text-accent">Something Great</span>
+                </h2>
+                <p class="text-xl text-gray-200 max-w-3xl mx-auto leading-relaxed">
+                    Start your own That's Amore location today. Join our family and bring authentic pizza to your community.
+                </p>
+            </div>
+            
+            <!-- Stats -->
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="text-center" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-5xl font-heading font-bold text-accent mb-2" data-count="25">0</div>
+                    <div class="text-white text-lg">Years in Business</div>
+                </div>
+                <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-5xl font-heading font-bold text-accent mb-2" data-count="15">0</div>
+                    <div class="text-white text-lg">Franchise Locations</div>
+                </div>
+                <div class="text-center" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-5xl font-heading font-bold text-accent mb-2" data-count="85">0</div>
+                    <div class="text-white text-lg">Average ROI %</div>
+                </div>
+            </div>
+            
+            <!-- Benefits -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+                <div class="text-center" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 h-full">
+                        <div class="text-4xl mb-4">🎓</div>
+                        <h3 class="text-xl font-heading font-bold text-white mb-2">Comprehensive Training</h3>
+                        <p class="text-gray-200">Full training program for you and your team</p>
+                    </div>
+                </div>
+                <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 h-full">
+                        <div class="text-4xl mb-4">📢</div>
+                        <h3 class="text-xl font-heading font-bold text-white mb-2">Marketing Support</h3>
+                        <p class="text-gray-200">Proven marketing strategies and materials</p>
+                    </div>
+                </div>
+                <div class="text-center" data-aos="fade-up" data-aos-delay="300">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 h-full">
+                        <div class="text-4xl mb-4">🛡️</div>
+                        <h3 class="text-xl font-heading font-bold text-white mb-2">Territory Protection</h3>
+                        <p class="text-gray-200">Exclusive territory rights for your area</p>
+                    </div>
+                </div>
+                <div class="text-center" data-aos="fade-up" data-aos-delay="400">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 h-full">
+                        <div class="text-4xl mb-4">🏗️</div>
+                        <h3 class="text-xl font-heading font-bold text-white mb-2">Flexible Layouts</h3>
+                        <p class="text-gray-200">Adaptable designs for various spaces</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Franchise Form -->
+            <div class="max-w-2xl mx-auto" data-aos="fade-up">
+                <div class="bg-white rounded-3xl p-8 shadow-2xl">
+                    <h3 class="text-3xl font-heading font-bold text-primary mb-6 text-center">Start the Franchise Conversation</h3>
+                    <form class="space-y-4">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <input type="text" placeholder="Name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <input type="email" placeholder="Email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <input type="tel" placeholder="Phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <input type="text" placeholder="Preferred Location" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <textarea placeholder="Tell us about your interest in franchising" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                        <button type="submit" class="w-full bg-primary text-white py-4 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-300 text-lg">
+                            Request Franchise Information
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gray-50 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold text-dark mb-4">
+                    Get in <span class="text-primary">Touch</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Visit us, call us, or send us a message. We'd love to hear from you!
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12">
+                <div class="space-y-8" data-aos="fade-right">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg">
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-6">Visit Us</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-4">
+                                <div class="text-2xl">📍</div>
+                                <div>
+                                    <p class="font-medium text-lg">4441 West Metairie Ave</p>
+                                    <p class="text-gray-600">Metairie, Louisiana</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="text-2xl">📞</div>
+                                <div>
+                                    <p class="font-medium text-lg">(504) 463-5384</p>
+                                    <p class="text-gray-600">Call for orders & reservations</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="text-2xl">✉️</div>
+                                <div>
+                                    <p class="font-medium text-lg">kennedyda24@att.net</p>
+                                    <p class="text-gray-600">General inquiries</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-8 shadow-lg">
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-6">Hours</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span>Monday - Thursday</span>
+                                <span>11:00 AM - 10:00 PM</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Friday - Saturday</span>
+                                <span>11:00 AM - 11:00 PM</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Sunday</span>
+                                <span>12:00 PM - 9:00 PM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-6" data-aos="fade-left">
+                    <div class="bg-white rounded-2xl p-8 shadow-lg">
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-6">Send Us a Message</h3>
+                        <form class="space-y-4">
+                            <input type="text" placeholder="Name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <input type="email" placeholder="Email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <input type="text" placeholder="Subject" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <textarea placeholder="Your message" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                            <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-300">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-8 shadow-lg">
+                        <h3 class="text-2xl font-heading font-bold text-primary mb-6">Newsletter</h3>
+                        <p class="text-gray-600 mb-4">Stay updated with our latest specials and events!</p>
+                        <form class="space-y-4">
+                            <input type="email" placeholder="Enter your email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <button type="submit" class="w-full bg-accent text-dark py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors duration-300">
+                                Subscribe
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="col-span-2">
+                    <h3 class="text-3xl font-heading font-bold text-primary mb-4">That's Amore Pizzeria</h3>
+                    <p class="text-gray-300 mb-6 max-w-md">
+                        Serving authentic New York thin crust and Chicago deep dish pizza in Metairie, Louisiana since 1995.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-accent transition-colors duration-300 text-2xl">📱</a>
+                        <a href="#" class="text-gray-400 hover:text-accent transition-colors duration-300 text-2xl">📘</a>
+                        <a href="#" class="text-gray-400 hover:text-accent transition-colors duration-300 text-2xl">🔍</a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#menu" class="text-gray-300 hover:text-accent transition-colors duration-300">Menu</a></li>
+                        <li><a href="#catering" class="text-gray-300 hover:text-accent transition-colors duration-300">Catering</a></li>
+                        <li><a href="#franchise" class="text-gray-300 hover:text-accent transition-colors duration-300">Franchise</a></li>
+                        <li><a href="#contact" class="text-gray-300 hover:text-accent transition-colors duration-300">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Info</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>4441 West Metairie Ave</li>
+                        <li>Metairie, LA</li>
+                        <li>(504) 463-5384</li>
+                        <li>kennedyda24@att.net</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-12 pt-8 text-center">
+                <p class="text-gray-400">
+                    © 2024 That's Amore Pizzeria. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>

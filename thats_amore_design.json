@@ -1,0 +1,224 @@
+{
+  "branding": {
+    "name": "That\u2019s Amore Pizzeria",
+    "logo": "thatsamore-logo.svg",
+    "primaryColor": "#A31E22",
+    "secondaryColor": "#F4E6D9",
+    "accentColor": "#FFD700",
+    "textColor": "#1F1F1F",
+    "backgroundColor": "#FFFFFF"
+  },
+  "fonts": {
+    "heading": "Playfair Display, serif",
+    "body": "Inter, sans-serif"
+  },
+  "layout": {
+    "maxWidth": "1200px",
+    "containerPadding": "2rem",
+    "spacingUnit": "1.5rem",
+    "sectionSpacing": "6rem",
+    "borderRadius": "0.5rem"
+  },
+  "animations": {
+    "scrollFade": true,
+    "hoverGrow": true,
+    "parallax": true,
+    "slideIn": true,
+    "typewriter": true,
+    "countUp": true,
+    "imageReveal": "clip-path",
+    "backgroundVideo": true,
+    "layeredScroll": true
+  },
+  "hero": {
+    "type": "backgroundVideo",
+    "videoURL": "looping-pizza-footage.mp4",
+    "headline": "New York Thin. Chicago Deep Dish.",
+    "subheadline": "Made Fresh in Metairie.",
+    "typewriter": true,
+    "buttons": [
+      {
+        "label": "Order Online",
+        "link": "https://www.thatsamorepizzaonline.com",
+        "style": "primary"
+      },
+      {
+        "label": "View Catering",
+        "link": "#catering",
+        "style": "secondary"
+      }
+    ]
+  },
+  "navigation": {
+    "sticky": true,
+    "animatedEntrance": true,
+    "backgroundTransparencyOnScroll": true,
+    "items": [
+      {
+        "label": "Home",
+        "link": "#home"
+      },
+      {
+        "label": "Menu",
+        "link": "#menu"
+      },
+      {
+        "label": "Order",
+        "link": "https://www.thatsamorepizzaonline.com"
+      },
+      {
+        "label": "Catering",
+        "link": "#catering"
+      },
+      {
+        "label": "Franchise",
+        "link": "#franchise"
+      },
+      {
+        "label": "Contact",
+        "link": "#contact"
+      }
+    ],
+    "ctaButton": {
+      "label": "Order Now",
+      "link": "https://www.thatsamorepizzaonline.com",
+      "style": "primary"
+    }
+  },
+  "pages": {
+    "home": {
+      "sections": [
+        {
+          "type": "hero",
+          "background": "video",
+          "headline": "The Pizza Everyone Can Agree On.",
+          "typewriterText": [
+            "New York Thin",
+            "Chicago Deep Dish",
+            "Made Fresh in Metairie"
+          ]
+        },
+        {
+          "type": "splitSection",
+          "layout": "rightImageLeftText",
+          "animation": "slideInLeft",
+          "content": {
+            "headline": "Two Styles. One Pizzeria.",
+            "text": "Whether you're a thin crust lover or deep dish devotee, That\u2019s Amore delivers the best of both worlds\u2014with family recipes made fresh every day."
+          },
+          "image": "pizza-split.jpg"
+        },
+        {
+          "type": "menuGallery",
+          "animation": "clipReveal",
+          "items": [
+            {
+              "label": "Pepperoni Slice",
+              "image": "pepperoni.jpg"
+            },
+            {
+              "label": "Deep Dish Sausage",
+              "image": "deepdish.jpg"
+            },
+            {
+              "label": "Garlic Knots",
+              "image": "knots.jpg"
+            },
+            {
+              "label": "Tiramisu",
+              "image": "tiramisu.jpg"
+            }
+          ]
+        },
+        {
+          "type": "ctaBanner",
+          "animation": "parallaxSlide",
+          "headline": "Hungry Yet?",
+          "button": {
+            "label": "Order Online",
+            "link": "https://www.thatsamorepizzaonline.com"
+          }
+        }
+      ]
+    },
+    "catering": {
+      "hero": {
+        "image": "catering-hero.jpg",
+        "headline": "Catering That Brings People Together",
+        "parallax": true,
+        "subheadline": "Perfect for offices, parties, and family gatherings."
+      },
+      "menu": {
+        "animation": "slideIn",
+        "items": [
+          "Pizza Trays",
+          "Pasta Trays",
+          "Garlic Knot Platters",
+          "Dessert Boxes"
+        ]
+      },
+      "form": {
+        "fields": [
+          "Name",
+          "Email",
+          "Phone",
+          "Event Date",
+          "Guest Count",
+          "Message"
+        ]
+      }
+    },
+    "franchise": {
+      "hero": {
+        "video": "franchise-bts.mp4",
+        "headline": "Own a Slice of Something Great",
+        "subheadline": "Start your own That\u2019s Amore location today.",
+        "buttons": [
+          {
+            "label": "Request Info",
+            "link": "#franchiseForm"
+          },
+          {
+            "label": "Why Franchise With Us",
+            "link": "#benefits"
+          }
+        ]
+      },
+      "features": {
+        "animatedIcons": true,
+        "items": [
+          "Comprehensive Training",
+          "Marketing Support",
+          "Territory Protection",
+          "Flexible Layouts"
+        ]
+      },
+      "form": {
+        "headline": "Start the Franchise Conversation",
+        "fields": [
+          "Name",
+          "Email",
+          "Phone",
+          "Location",
+          "Message"
+        ]
+      }
+    }
+  },
+  "footer": {
+    "background": "#1F1F1F",
+    "textColor": "#FFFFFF",
+    "links": [
+      "Menu",
+      "Catering",
+      "Franchise",
+      "Contact"
+    ],
+    "social": [
+      "Instagram",
+      "Facebook",
+      "Google"
+    ],
+    "newsletter": true
+  }
+}
