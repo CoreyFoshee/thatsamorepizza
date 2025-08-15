@@ -15,9 +15,35 @@ app.use(expressLayouts);
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Add debugging for static files
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+app.use('/js', express.static(path.join(__dirname, 'public/js')));
+app.use('/Logo', express.static(path.join(__dirname, 'public/Logo')));
+
+// Debug middleware
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
+
 // Parse JSON bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Add error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err.stack);
+    res.status(500).send('Something broke!');
+});
+
+// Add a test route to verify the server is working
+app.get('/test', (req, res) => {
+    res.json({ 
+        message: 'Server is running!', 
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
 
 // Routes
 app.get('/', (req, res) => {
