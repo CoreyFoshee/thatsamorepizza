@@ -1,19 +1,19 @@
 <nav class="bg-gradient-to-r from-maroon to-primary shadow-2xl border-b-4 border-accent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
+        <div class="flex justify-between items-center py-4">
             <div class="flex items-center space-x-3">
-                <img src="/Logo/TA_LOGO_Final_black.png" alt="That's Amore Logo" class="h-12 w-auto">
+                <img src="/Logo/TA_LOGO_Final_white.png" alt="That's Amore Logo" class="h-20 w-auto">
             </div>
             
             <div class="hidden md:block">
                 <div class="ml-10 flex items-baseline space-x-8">
-                    <a href="/" class="nav-link <%= currentPage === 'home' ? 'text-primary' : '' %>">Home</a>
-                    <a href="/menu" class="nav-link <%= currentPage === 'menu' ? 'text-primary' : '' %>">Menu</a>
-                    <a href="https://www.thatsamorepizzametairie.com/#/" class="nav-link">Order</a>
-                    <a href="/catering" class="nav-link <%= currentPage === 'catering' ? 'text-primary' : '' %>">Catering</a>
-                    <a href="/franchise" class="nav-link <%= currentPage === 'franchise' ? 'text-primary' : '' %>">Franchise</a>
-                    <a href="/contact" class="nav-link <%= currentPage === 'contact' ? 'text-primary' : '' %>">Contact</a>
-                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary/90 transition-all duration-300 transform hover:scale-105">
+                    <a href="/" class="nav-link <%= currentPage === 'home' ? 'text-accent' : 'text-white' %>">Home</a>
+                    <a href="/menu" class="nav-link <%= currentPage === 'menu' ? 'text-accent' : 'text-white' %>">Menu</a>
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="nav-link text-white">Order</a>
+                    <a href="/catering" class="nav-link <%= currentPage === 'catering' ? 'text-accent' : 'text-white' %>">Catering</a>
+                    <a href="/franchise" class="nav-link <%= currentPage === 'franchise' ? 'text-accent' : 'text-white' %>">Franchise</a>
+                    <a href="/contact" class="nav-link <%= currentPage === 'contact' ? 'text-accent' : 'text-white' %>">Contact</a>
+                    <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-accent text-dark px-6 py-2 rounded-full font-medium hover:bg-accent/90 transition-all duration-300 transform hover:scale-105">
                         Order Now
                     </a>
                 </div>
@@ -21,11 +21,11 @@
             
             <!-- Mobile menu button -->
             <div class="md:hidden">
-                <button id="mobile-menu-btn" class="relative w-8 h-8 focus:outline-none focus:text-primary">
+                <button id="mobile-menu-btn" class="relative w-8 h-8 focus:outline-none focus:text-accent">
                     <span class="absolute inset-0 transform transition-all duration-300 ease-in-out">
-                        <span class="absolute top-0 left-0 w-8 h-0.5 bg-gray-600 transform transition-all duration-300 ease-in-out hamburger-line-1"></span>
-                        <span class="absolute top-4 left-0 w-8 h-0.5 bg-gray-600 transform transition-all duration-300 ease-in-out hamburger-line-2"></span>
-                        <span class="absolute top-8 left-0 w-8 h-0.5 bg-gray-600 transform transition-all duration-300 ease-in-out hamburger-line-3"></span>
+                        <span class="absolute top-0 left-0 w-8 h-0.5 bg-white transform transition-all duration-300 ease-in-out hamburger-line-1"></span>
+                        <span class="absolute top-4 left-0 w-8 h-0.5 bg-white transform transition-all duration-300 ease-in-out hamburger-line-2"></span>
+                        <span class="absolute top-8 left-0 w-8 h-0.5 bg-white transform transition-all duration-300 ease-in-out hamburger-line-3"></span>
                     </span>
                 </button>
             </div>
@@ -38,7 +38,7 @@
     <div class="flex flex-col h-full">
         <!-- Header with close button -->
         <div class="flex justify-between items-center p-6">
-            <img src="/Logo/TA_LOGO_Final_black.png" alt="That's Amore Logo" class="h-12 w-auto">
+            <img src="/Logo/TA_LOGO_Final_white.png" alt="That's Amore Logo" class="h-20 w-auto">
             <button id="mobile-menu-close" class="text-white hover:text-accent transition-colors duration-300">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
