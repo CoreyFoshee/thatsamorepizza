@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <meta name="description" content="<%= description %>">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Socket.io Client -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+        }
+        
+        .tv-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .voting-results {
+            text-align: center;
+            max-width: 90vw;
+        }
+        
+        .pizza-style {
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            transition: width 0.8s ease-in-out;
+            border-radius: 20px;
+        }
+        
+        .ny-progress {
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+        }
+        
+        .chicago-progress {
+            background: linear-gradient(90deg, #dc2626, #991b1b);
+        }
+        
+        .vote-count {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        
+        .percentage {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        
+        .total-votes {
+            font-size: 1.5rem;
+            margin: 2rem 0;
+            color: #fbbf24;
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            color: #fbbf24;
+        }
+        
+        .live-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .last-vote {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: bold;
+            transform: translateX(-100%);
+            transition: transform 0.5s ease-in-out;
+        }
+        
+        .last-vote.show {
+            transform: translateX(0);
+        }
+        
+        @media (max-width: 768px) {
+            .title { font-size: 2rem; }
+            .vote-count { font-size: 2.5rem; }
+            .percentage { font-size: 1.5rem; }
+            .pizza-style { margin: 1rem 0; padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="live-indicator">🔴 LIVE</div>
+    
+    <div class="tv-container">
+        <div class="voting-results">
+            <h1 class="title">🍕 The Great Pizza Debate</h1>
+            <p class="subtitle">Live Voting Results</p>
+            
+            <div class="pizza-style">
+                <h2 class="text-3xl font-bold text-blue-400 mb-4">🗽 New York Style</h2>
+                <div class="vote-count" id="ny-votes">0</div>
+                <div class="percentage" id="ny-percentage">0%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill ny-progress" id="ny-progress" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="pizza-style">
+                <h2 class="text-3xl font-bold text-red-400 mb-4">🏙️ Chicago Style</h2>
+                <div class="vote-count" id="chicago-votes">0</div>
+                <div class="percentage" id="chicago-percentage">0%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill chicago-progress" id="chicago-progress" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="total-votes">
+                Total Votes: <span id="total-votes">0</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="last-vote" id="last-vote">
+        New vote received!
+    </div>
+    
+    <script>
+        // Connect to WebSocket server
+        const socket = io();
+        
+        // DOM elements
+        const nyVotesEl = document.getElementById('ny-votes');
+        const chicagoVotesEl = document.getElementById('chicago-votes');
+        const nyPercentageEl = document.getElementById('ny-percentage');
+        const chicagoPercentageEl = document.getElementById('chicago-percentage');
+        const nyProgressEl = document.getElementById('ny-progress');
+        const chicagoProgressEl = document.getElementById('chicago-progress');
+        const totalVotesEl = document.getElementById('total-votes');
+        const lastVoteEl = document.getElementById('last-vote');
+        
+        // Update display with voting data
+        function updateDisplay(data) {
+            nyVotesEl.textContent = data.nyVotes;
+            chicagoVotesEl.textContent = data.chicagoVotes;
+            totalVotesEl.textContent = data.totalVotes;
+            
+            // Calculate percentages
+            const nyPercentage = data.totalVotes > 0 ? Math.round((data.nyVotes / data.totalVotes) * 100) : 0;
+            const chicagoPercentage = data.totalVotes > 0 ? Math.round((data.chicagoVotes / data.totalVotes) * 100) : 0;
+            
+            nyPercentageEl.textContent = nyPercentage + '%';
+            chicagoPercentageEl.textContent = chicagoPercentage + '%';
+            
+            // Update progress bars
+            nyProgressEl.style.width = nyPercentage + '%';
+            chicagoProgressEl.style.width = chicagoPercentage + '%';
+        }
+        
+        // Show last vote notification
+        function showLastVote(choice) {
+            const style = choice === 'ny' ? 'New York Style' : 'Chicago Style';
+            lastVoteEl.textContent = `New vote for ${style}!`;
+            lastVoteEl.classList.add('show');
+            
+            setTimeout(() => {
+                lastVoteEl.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Socket event handlers
+        socket.on('voting-data', (data) => {
+            console.log('Received initial voting data:', data);
+            updateDisplay(data);
+        });
+        
+        socket.on('voting-update', (data) => {
+            console.log('Received voting update:', data);
+            updateDisplay(data);
+            
+            // Show notification for new vote
+            if (data.nyVotes > parseInt(nyVotesEl.textContent)) {
+                showLastVote('ny');
+            } else if (data.chicagoVotes > parseInt(chicagoVotesEl.textContent)) {
+                showLastVote('chicago');
+            }
+        });
+        
+        // Auto-refresh every 30 seconds to ensure sync
+        setInterval(() => {
+            socket.emit('request-update');
+        }, 30000);
+        
+        // Fullscreen toggle on click
+        document.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Fullscreen request failed:', err);
+                });
+            }
+        });
+        
+        // Auto-enter fullscreen on load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Auto-fullscreen failed:', err);
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

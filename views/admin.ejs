@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <meta name="description" content="<%= description %>">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Socket.io Client -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <style>
+        .admin-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .stats-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1rem 0;
+        }
+        
+        .reset-btn {
+            background: #ef4444;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .reset-btn:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+        
+        .export-btn {
+            background: #10b981;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            background: #059669;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold mb-4">🍕 Admin Panel</h1>
+                <p class="text-xl text-gray-300">Manage The Great Pizza Debate Voting Results</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- NY Style Stats -->
+                <div class="stats-card">
+                    <h2 class="text-2xl font-bold text-blue-400 mb-4">🗽 New York Style</h2>
+                    <div class="text-4xl font-bold mb-2" id="ny-votes">0</div>
+                    <div class="text-lg text-gray-300" id="ny-percentage">0%</div>
+                </div>
+                
+                <!-- Chicago Style Stats -->
+                <div class="stats-card">
+                    <h2 class="text-2xl font-bold text-red-400 mb-4">🏙️ Chicago Style</h2>
+                    <div class="text-4xl font-bold mb-2" id="chicago-votes">0</div>
+                    <div class="text-lg text-gray-300" id="chicago-percentage">0%</div>
+                </div>
+            </div>
+            
+            <!-- Total Stats -->
+            <div class="stats-card text-center">
+                <h2 class="text-2xl font-bold text-yellow-400 mb-4">📊 Total Statistics</h2>
+                <div class="text-3xl font-bold mb-4" id="total-votes">0</div>
+                <div class="text-lg text-gray-300">Total Votes Cast</div>
+            </div>
+            
+            <!-- Admin Actions -->
+            <div class="stats-card text-center">
+                <h2 class="text-2xl font-bold text-green-400 mb-6">⚙️ Admin Actions</h2>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button id="reset-votes" class="reset-btn">
+                        🔄 Reset All Votes
+                    </button>
+                    <button id="export-data" class="export-btn">
+                        📥 Export Results
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Real-time Updates -->
+            <div class="stats-card text-center">
+                <h2 class="text-2xl font-bold text-purple-400 mb-4">📡 Connection Status</h2>
+                <div class="flex items-center justify-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div id="connection-status" class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <span id="status-text">Disconnected</span>
+                    </div>
+                </div>
+                <div class="mt-4 text-sm text-gray-400">
+                    Last update: <span id="last-update">Never</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Connect to WebSocket server
+        const socket = io();
+        
+        // DOM elements
+        const nyVotesEl = document.getElementById('ny-votes');
+        const chicagoVotesEl = document.getElementById('chicago-votes');
+        const nyPercentageEl = document.getElementById('ny-percentage');
+        const chicagoPercentageEl = document.getElementById('chicago-percentage');
+        const totalVotesEl = document.getElementById('total-votes');
+        const connectionStatusEl = document.getElementById('connection-status');
+        const statusTextEl = document.getElementById('status-text');
+        const lastUpdateEl = document.getElementById('last-update');
+        
+        // Update display with voting data
+        function updateDisplay(data) {
+            nyVotesEl.textContent = data.nyVotes;
+            chicagoVotesEl.textContent = data.chicagoVotes;
+            totalVotesEl.textContent = data.totalVotes;
+            
+            // Calculate percentages
+            const nyPercentage = data.totalVotes > 0 ? Math.round((data.nyVotes / data.totalVotes) * 100) : 0;
+            const chicagoPercentage = data.totalVotes > 0 ? Math.round((data.chicagoVotes / data.totalVotes) * 100) : 0;
+            
+            nyPercentageEl.textContent = nyPercentage + '%';
+            chicagoPercentageEl.textContent = chicagoPercentage + '%';
+            
+            // Update timestamp
+            lastUpdateEl.textContent = new Date().toLocaleTimeString();
+        }
+        
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            if (connected) {
+                connectionStatusEl.className = 'w-3 h-3 rounded-full bg-green-500';
+                statusTextEl.textContent = 'Connected';
+            } else {
+                connectionStatusEl.className = 'w-3 h-3 rounded-full bg-red-500';
+                statusTextEl.textContent = 'Disconnected';
+            }
+        }
+        
+        // Socket event handlers
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            updateConnectionStatus(true);
+        });
+        
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+            updateConnectionStatus(false);
+        });
+        
+        socket.on('voting-data', (data) => {
+            console.log('Received initial voting data:', data);
+            updateDisplay(data);
+        });
+        
+        socket.on('voting-update', (data) => {
+            console.log('Received voting update:', data);
+            updateDisplay(data);
+        });
+        
+        // Admin actions
+        document.getElementById('reset-votes').addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset all votes? This action cannot be undone.')) {
+                // In a real implementation, you'd send this to the server
+                alert('Vote reset functionality would be implemented here. For now, votes are stored in memory.');
+            }
+        });
+        
+        document.getElementById('export-data').addEventListener('click', () => {
+            // Export current voting data
+            const data = {
+                nyVotes: parseInt(nyVotesEl.textContent),
+                chicagoVotes: parseInt(chicagoVotesEl.textContent),
+                totalVotes: parseInt(totalVotesEl.textContent),
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pizza-voting-results-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('Voting results exported successfully!');
+        });
+        
+        // Handle connection errors
+        socket.on('connect_error', (error) => {
+            console.error('Connection error:', error);
+            updateConnectionStatus(false);
+        });
+    </script>
+</body>
+</html>

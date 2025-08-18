@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initPizzaPoll(); // Initialize the pizza style poll
 });
 
-// Pizza Style Poll functionality
+// Pizza Style Poll functionality with WebSocket real-time updates
 function initPizzaPoll() {
     // Get poll elements
     const nyVoteBtn = document.querySelector('.vote-btn-ny');
@@ -27,54 +27,38 @@ function initPizzaPoll() {
     const chicagoPercentage = document.getElementById('chicago-percentage');
     const totalVotes = document.getElementById('total-votes');
     
-    // Load saved votes from localStorage
-    let votes = JSON.parse(localStorage.getItem('pizzaPollVotes')) || { ny: 0, chicago: 0 };
+    // Initialize Socket.io connection
+    const socket = io();
     
-    // Update display with current votes
-    updatePollDisplay();
+    // Current voting data
+    let currentVotes = { ny: 0, chicago: 0, total: 0 };
     
-    // NY Style vote button
-    if (nyVoteBtn) {
-        nyVoteBtn.addEventListener('click', function() {
-            votes.ny++;
-            localStorage.setItem('pizzaPollVotes', JSON.stringify(votes));
-            updatePollDisplay();
-            showVoteConfirmation('NY Style', '🗽');
-        });
-    }
-    
-    // Chicago Style vote button
-    if (chicagoVoteBtn) {
-        chicagoVoteBtn.addEventListener('click', function() {
-            votes.chicago++;
-            localStorage.setItem('pizzaPollVotes', JSON.stringify(votes));
-            updatePollDisplay();
-            showVoteConfirmation('Chicago Style', '🏙️');
-        });
-    }
-    
-    // Update poll display
-    function updatePollDisplay() {
-        const total = votes.ny + votes.chicago;
-        const nyPercent = total > 0 ? Math.round((votes.ny / total) * 100) : 0;
-        const chicagoPercent = total > 0 ? Math.round((votes.chicago / total) * 100) : 0;
+    // Update display with voting data
+    function updatePollDisplay(data) {
+        if (!data) return;
+        
+        currentVotes = data;
+        const nyPercent = data.total > 0 ? Math.round((data.nyVotes / data.totalVotes) * 100) : 0;
+        const chicagoPercent = data.total > 0 ? Math.round((data.chicagoVotes / data.totalVotes) * 100) : 0;
         
         // Update vote counts
-        if (nyVotes) nyVotes.textContent = votes.ny;
-        if (chicagoVotes) chicagoVotes.textContent = votes.chicago;
-        if (totalVotes) totalVotes.textContent = total;
+        if (nyVotes) nyVotes.textContent = data.nyVotes;
+        if (chicagoVotes) chicagoVotes.textContent = data.chicagoVotes;
+        if (totalVotes) totalVotes.textContent = data.totalVotes;
         
         // Update percentages
         if (nyPercentage) nyPercentage.textContent = nyPercent + '%';
         if (chicagoPercentage) chicagoPercentage.textContent = chicagoPercent + '%';
         
-        // Update progress bars
-        if (nyProgress) nyProgress.style.width = nyPercent + '%';
-        if (chicagoProgress) chicagoProgress.style.width = chicagoPercent + '%';
-        
-        // Add animation to progress bars
-        if (nyProgress) nyProgress.style.transition = 'width 1s ease-in-out';
-        if (chicagoProgress) chicagoProgress.style.transition = 'width 1s ease-in-out';
+        // Update progress bars with animation
+        if (nyProgress) {
+            nyProgress.style.transition = 'width 0.8s ease-in-out';
+            nyProgress.style.width = nyPercent + '%';
+        }
+        if (chicagoProgress) {
+            chicagoProgress.style.transition = 'width 0.8s ease-in-out';
+            chicagoProgress.style.width = chicagoPercent + '%';
+        }
     }
     
     // Show vote confirmation
@@ -112,6 +96,47 @@ function initPizzaPoll() {
             }, 300);
         }, 3000);
     }
+    
+    // NY Style vote button
+    if (nyVoteBtn) {
+        nyVoteBtn.addEventListener('click', function() {
+            // Send vote to server via WebSocket
+            socket.emit('vote', { choice: 'ny' });
+            showVoteConfirmation('NY Style', '🗽');
+        });
+    }
+    
+    // Chicago Style vote button
+    if (chicagoVoteBtn) {
+        chicagoVoteBtn.addEventListener('click', function() {
+            // Send vote to server via WebSocket
+            socket.emit('vote', { choice: 'chicago' });
+            showVoteConfirmation('Chicago Style', '🏙️');
+        });
+    }
+    
+    // WebSocket event handlers
+    socket.on('voting-data', (data) => {
+        console.log('Received initial voting data:', data);
+        updatePollDisplay(data);
+    });
+    
+    socket.on('voting-update', (data) => {
+        console.log('Received voting update:', data);
+        updatePollDisplay(data);
+    });
+    
+    // Handle connection errors
+    socket.on('connect_error', (error) => {
+        console.error('WebSocket connection error:', error);
+        // Fallback to local storage if WebSocket fails
+        const localVotes = JSON.parse(localStorage.getItem('pizzaPollVotes')) || { ny: 0, chicago: 0 };
+        updatePollDisplay({
+            nyVotes: localVotes.ny,
+            chicagoVotes: localVotes.chicago,
+            totalVotes: localVotes.ny + localVotes.chicago
+        });
+    });
 }
 
 // Navigation functionality

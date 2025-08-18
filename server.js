@@ -1,8 +1,19 @@
 const express = require('express');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
+const http = require('http');
+const socketIo = require('socket.io');
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
 const PORT = process.env.PORT || 3000;
+
+// In-memory storage for voting data (in production, use a database)
+let votingData = {
+    nyVotes: 0,
+    chicagoVotes: 0,
+    totalVotes: 0
+};
 
 // Set EJS as templating engine
 app.set('view engine', 'ejs');
@@ -86,10 +97,57 @@ app.get('/contact', (req, res) => {
     });
 });
 
+app.get('/tv', (req, res) => {
+    res.render('tv', { 
+        title: "Live Voting Results - That's Amore Pizzeria",
+        description: "Live real-time voting results for the great pizza debate",
+        currentPage: 'tv',
+        pageScripts: ['/js/tv-display.js']
+    });
+});
+
+app.get('/admin', (req, res) => {
+    res.render('admin', { 
+        title: "Admin Panel - That's Amore Pizzeria",
+        description: "Admin panel for managing voting results",
+        currentPage: 'admin',
+        pageScripts: ['/js/admin.js']
+    });
+});
+
+// WebSocket event handlers
+io.on('connection', (socket) => {
+    console.log('New client connected:', socket.id);
+    
+    // Send current voting data to new clients
+    socket.emit('voting-data', votingData);
+    
+    // Handle votes
+    socket.on('vote', (data) => {
+        if (data.choice === 'ny') {
+            votingData.nyVotes++;
+        } else if (data.choice === 'chicago') {
+            votingData.chicagoVotes++;
+        }
+        votingData.totalVotes = votingData.nyVotes + votingData.chicagoVotes;
+        
+        // Broadcast updated voting data to all connected clients
+        io.emit('voting-update', votingData);
+        
+        console.log(`Vote received: ${data.choice}. NY: ${votingData.nyVotes}, Chicago: ${votingData.chicagoVotes}`);
+    });
+    
+    // Handle disconnection
+    socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id);
+    });
+});
+
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`🚀 That's Amore Pizzeria website running on http://localhost:3000`);
     console.log(`🍕 The great pizza debate is ready!`);
+    console.log(`📡 WebSocket server active for real-time voting!`);
 });
 
 module.exports = app;
