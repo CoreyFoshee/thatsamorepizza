@@ -102,7 +102,8 @@ app.get('/tv', (req, res) => {
         title: "Live Voting Results - That's Amore Pizzeria",
         description: "Live real-time voting results for the great pizza debate",
         currentPage: 'tv',
-        pageScripts: ['/js/tv-display.js']
+        pageScripts: ['/js/tv-display.js'],
+        layout: false
     });
 });
 
@@ -111,7 +112,8 @@ app.get('/admin', (req, res) => {
         title: "Admin Panel - That's Amore Pizzeria",
         description: "Admin panel for managing voting results",
         currentPage: 'admin',
-        pageScripts: ['/js/admin.js']
+        pageScripts: ['/js/admin.js'],
+        layout: false
     });
 });
 
