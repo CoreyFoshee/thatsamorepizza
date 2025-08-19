@@ -92,12 +92,30 @@
             <!-- Admin Actions -->
             <div class="stats-card text-center">
                 <h2 class="text-2xl font-bold text-green-400 mb-6">⚙️ Admin Actions</h2>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
                     <button id="reset-votes" class="reset-btn">
                         🔄 Reset All Votes
                     </button>
                     <button id="export-data" class="export-btn">
                         📥 Export Results
+                    </button>
+                </div>
+                
+                <!-- Manual Vote Setting -->
+                <div class="mt-6 p-4 bg-gray-800 rounded-lg">
+                    <h3 class="text-lg font-semibold text-yellow-400 mb-4">Set Vote Counts Manually</h3>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm text-gray-300 mb-2">NY Style Votes:</label>
+                            <input type="number" id="ny-votes-input" min="0" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-300 mb-2">Chicago Style Votes:</label>
+                            <input type="number" id="chicago-votes-input" min="0" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white" placeholder="0">
+                        </div>
+                    </div>
+                    <button id="set-votes" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors duration-300">
+                        📊 Set Vote Counts
                     </button>
                 </div>
             </div>
@@ -182,10 +200,65 @@
         });
         
         // Admin actions
-        document.getElementById('reset-votes').addEventListener('click', () => {
+        document.getElementById('reset-votes').addEventListener('click', async () => {
             if (confirm('Are you sure you want to reset all votes? This action cannot be undone.')) {
-                // In a real implementation, you'd send this to the server
-                alert('Vote reset functionality would be implemented here. For now, votes are stored in memory.');
+                try {
+                    const response = await fetch('/api/admin/reset-votes', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        alert('Votes reset successfully!');
+                        // Update display with reset data
+                        updateDisplay(result.data);
+                    } else {
+                        alert('Error resetting votes: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error resetting votes:', error);
+                    alert('Error resetting votes. Please try again.');
+                }
+            }
+        });
+        
+        document.getElementById('set-votes').addEventListener('click', async () => {
+            const nyVotes = parseInt(document.getElementById('ny-votes-input').value);
+            const chicagoVotes = parseInt(document.getElementById('chicago-votes-input').value);
+            
+            if (isNaN(nyVotes) || isNaN(chicagoVotes) || nyVotes < 0 || chicagoVotes < 0) {
+                alert('Please enter valid vote counts (non-negative numbers).');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to set NY Style to ${nyVotes} votes and Chicago Style to ${chicagoVotes} votes?`)) {
+                try {
+                    const response = await fetch('/api/admin/set-votes', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ nyVotes, chicagoVotes })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        alert('Vote counts set successfully!');
+                        // Update display with new data
+                        updateDisplay(result.data);
+                        // Clear input fields
+                        document.getElementById('ny-votes-input').value = '';
+                        document.getElementById('chicago-votes-input').value = '';
+                    } else {
+                        alert('Error setting votes: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error setting votes:', error);
+                    alert('Error setting votes. Please try again.');
+                }
             }
         });
         
@@ -195,6 +268,7 @@
                 nyVotes: parseInt(nyVotesEl.textContent),
                 chicagoVotes: parseInt(chicagoVotesEl.textContent),
                 totalVotes: parseInt(totalVotesEl.textContent),
+                lastReset: new Date().toISOString(),
                 timestamp: new Date().toISOString()
             };
             
@@ -209,6 +283,17 @@
             URL.revokeObjectURL(url);
             
             alert('Voting results exported successfully!');
+        });
+        
+        // Handle admin notifications
+        socket.on('votes-reset', (data) => {
+            console.log('Votes reset notification:', data);
+            alert('Votes have been reset by admin: ' + data.message);
+        });
+        
+        socket.on('votes-manually-set', (data) => {
+            console.log('Votes manually set notification:', data);
+            alert('Votes have been manually set by admin: ' + data.message);
         });
         
         // Handle connection errors

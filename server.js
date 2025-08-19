@@ -3,17 +3,66 @@ const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const http = require('http');
 const socketIo = require('socket.io');
+const fs = require('fs');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const PORT = process.env.PORT || 3000;
 
-// In-memory storage for voting data (in production, use a database)
+// Data file path
+const DATA_FILE = path.join(__dirname, 'data', 'voting-data.json');
+
+// Ensure data directory exists
+const dataDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir);
+}
+
+// Load voting data from file or create default
 let votingData = {
     nyVotes: 0,
     chicagoVotes: 0,
-    totalVotes: 0
+    totalVotes: 0,
+    lastReset: new Date().toISOString(),
+    sessionVotes: new Set() // Track session IDs that have voted
 };
+
+// Load data from file if it exists
+function loadVotingData() {
+    try {
+        if (fs.existsSync(DATA_FILE)) {
+            const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+            votingData = { ...votingData, ...data };
+            // Convert sessionVotes back to Set if it was stored as array
+            if (Array.isArray(votingData.sessionVotes)) {
+                votingData.sessionVotes = new Set(votingData.sessionVotes);
+            } else {
+                votingData.sessionVotes = new Set();
+            }
+            console.log('Voting data loaded from file');
+        }
+    } catch (error) {
+        console.error('Error loading voting data:', error);
+    }
+}
+
+// Save voting data to file
+function saveVotingData() {
+    try {
+        // Convert Set to Array for JSON serialization
+        const dataToSave = {
+            ...votingData,
+            sessionVotes: Array.from(votingData.sessionVotes)
+        };
+        fs.writeFileSync(DATA_FILE, JSON.stringify(dataToSave, null, 2));
+        console.log('Voting data saved to file');
+    } catch (error) {
+        console.error('Error saving voting data:', error);
+    }
+}
+
+// Load data on startup
+loadVotingData();
 
 // Set EJS as templating engine
 app.set('view engine', 'ejs');
@@ -117,6 +166,70 @@ app.get('/admin', (req, res) => {
     });
 });
 
+// Admin API endpoints
+app.post('/api/admin/reset-votes', (req, res) => {
+    try {
+        votingData.nyVotes = 0;
+        votingData.chicagoVotes = 0;
+        votingData.totalVotes = 0;
+        votingData.lastReset = new Date().toISOString();
+        votingData.sessionVotes.clear();
+        
+        saveVotingData();
+        
+        // Broadcast reset to all connected clients
+        io.emit('voting-update', votingData);
+        io.emit('votes-reset', { message: 'Votes have been reset by admin' });
+        
+        res.json({ success: true, message: 'Votes reset successfully', data: votingData });
+        console.log('Votes reset by admin');
+    } catch (error) {
+        console.error('Error resetting votes:', error);
+        res.status(500).json({ success: false, message: 'Error resetting votes' });
+    }
+});
+
+app.post('/api/admin/set-votes', (req, res) => {
+    try {
+        const { nyVotes, chicagoVotes } = req.body;
+        
+        if (typeof nyVotes !== 'number' || typeof chicagoVotes !== 'number' || 
+            nyVotes < 0 || chicagoVotes < 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid vote counts. Must be non-negative numbers.' 
+            });
+        }
+        
+        votingData.nyVotes = nyVotes;
+        votingData.chicagoVotes = chicagoVotes;
+        votingData.totalVotes = nyVotes + chicagoVotes;
+        votingData.lastReset = new Date().toISOString();
+        
+        saveVotingData();
+        
+        // Broadcast update to all connected clients
+        io.emit('voting-update', votingData);
+        io.emit('votes-manually-set', { message: 'Votes have been manually set by admin' });
+        
+        res.json({ success: true, message: 'Votes set successfully', data: votingData });
+        console.log(`Votes manually set by admin: NY=${nyVotes}, Chicago=${chicagoVotes}`);
+    } catch (error) {
+        console.error('Error setting votes:', error);
+        res.status(500).json({ success: false, message: 'Error setting votes' });
+    }
+});
+
+app.get('/api/admin/voting-data', (req, res) => {
+    res.json({
+        success: true,
+        data: {
+            ...votingData,
+            sessionVotes: Array.from(votingData.sessionVotes)
+        }
+    });
+});
+
 // WebSocket event handlers
 io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
@@ -126,15 +239,35 @@ io.on('connection', (socket) => {
     
     // Handle votes
     socket.on('vote', (data) => {
+        const sessionId = data.sessionId;
+        
+        // Check if this session has already voted
+        if (votingData.sessionVotes.has(sessionId)) {
+            socket.emit('vote-error', { message: 'You have already voted in this session' });
+            return;
+        }
+        
+        // Record the vote
         if (data.choice === 'ny') {
             votingData.nyVotes++;
         } else if (data.choice === 'chicago') {
             votingData.chicagoVotes++;
         }
+        
         votingData.totalVotes = votingData.nyVotes + votingData.chicagoVotes;
+        votingData.sessionVotes.add(sessionId);
+        
+        // Save data to file
+        saveVotingData();
         
         // Broadcast updated voting data to all connected clients
         io.emit('voting-update', votingData);
+        
+        // Send success confirmation to the voter
+        socket.emit('vote-success', { 
+            choice: data.choice, 
+            message: 'Vote recorded successfully!' 
+        });
         
         console.log(`Vote received: ${data.choice}. NY: ${votingData.nyVotes}, Chicago: ${votingData.chicagoVotes}`);
     });

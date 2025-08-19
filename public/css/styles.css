@@ -98,6 +98,29 @@ body::before {
     object-fit: cover;
 }
 
+/* Voting Button States */
+.vote-btn-ny:disabled,
+.vote-btn-chicago:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.vote-btn-ny:disabled:hover,
+.vote-btn-chicago:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Vote Confirmation and Error Messages */
+.vote-confirmation,
+.vote-error {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.8);
+    transition: all 0.3s ease;
+    z-index: 9999;
+}
+
 /* Mobile video optimization */
 @media (max-width: 768px) {
     .hero-video {

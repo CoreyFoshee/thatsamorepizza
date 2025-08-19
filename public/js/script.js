@@ -98,21 +98,79 @@ function initPizzaPoll() {
         }, 3000);
     }
     
+    // Show vote error
+    function showVoteError(message) {
+        // Create error message
+        const error = document.createElement('div');
+        error.className = 'vote-error fixed top-20 left-1/2 transform -translate-x-1/2 bg-white border-2 border-red-500 rounded-lg px-6 py-4 shadow-lg z-50';
+        error.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <div class="text-2xl">⚠️</div>
+                <div>
+                    <div class="font-bold text-red-600">Vote Error</div>
+                    <div class="text-sm text-gray-600">${message}</div>
+                </div>
+            </div>
+        `;
+        
+        // Add to page
+        document.body.appendChild(error);
+        
+        // Animate in
+        setTimeout(() => {
+            error.style.opacity = '1';
+            error.style.transform = 'translate(-50%, 0) scale(1)';
+        }, 100);
+        
+        // Remove after delay
+        setTimeout(() => {
+            error.style.opacity = '0';
+            error.style.transform = 'translate(-50%, 0) scale(0.8)';
+            setTimeout(() => {
+                if (error.parentNode) {
+                    error.parentNode.removeChild(error);
+                }
+            }, 300);
+        }, 3000);
+    }
+    
     // NY Style vote button
     if (nyVoteBtn) {
         nyVoteBtn.addEventListener('click', function() {
-            // Send vote to server via WebSocket
-            socket.emit('vote', { choice: 'ny' });
-            showVoteConfirmation('NY Style', '🗽');
+            if (hasVoted) {
+                showVoteError('You have already voted in this session');
+                return;
+            }
+            
+            // Send vote to server via WebSocket with session ID
+            socket.emit('vote', { choice: 'ny', sessionId: sessionId });
+            hasVoted = true;
+            
+            // Disable both buttons after voting
+            nyVoteBtn.disabled = true;
+            chicagoVoteBtn.disabled = true;
+            nyVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            chicagoVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
         });
     }
     
     // Chicago Style vote button
     if (chicagoVoteBtn) {
         chicagoVoteBtn.addEventListener('click', function() {
-            // Send vote to server via WebSocket
-            socket.emit('vote', { choice: 'chicago' });
-            showVoteConfirmation('Chicago Style', '🏙️');
+            if (hasVoted) {
+                showVoteError('You have already voted in this session');
+                return;
+            }
+            
+            // Send vote to server via WebSocket with session ID
+            socket.emit('vote', { choice: 'chicago', sessionId: sessionId });
+            hasVoted = true;
+            
+            // Disable both buttons after voting
+            nyVoteBtn.disabled = true;
+            chicagoVoteBtn.disabled = true;
+            nyVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            chicagoVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
         });
     }
     
@@ -125,6 +183,32 @@ function initPizzaPoll() {
     socket.on('voting-update', (data) => {
         console.log('Received voting update:', data);
         updatePollDisplay(data);
+    });
+    
+    // Handle vote success
+    socket.on('vote-success', (data) => {
+        console.log('Vote recorded successfully:', data);
+        if (data.choice === 'ny') {
+            showVoteConfirmation('NY Style', '🗽');
+        } else if (data.choice === 'chicago') {
+            showVoteConfirmation('Chicago Style', '🏙️');
+        }
+    });
+    
+    // Handle vote errors
+    socket.on('vote-error', (data) => {
+        console.log('Vote error:', data);
+        showVoteError(data.message);
+        // Re-enable voting if there was an error
+        hasVoted = false;
+        if (nyVoteBtn) {
+            nyVoteBtn.disabled = false;
+            nyVoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+        if (chicagoVoteBtn) {
+            chicagoVoteBtn.disabled = false;
+            chicagoVoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
     });
     
     // Handle connection errors
