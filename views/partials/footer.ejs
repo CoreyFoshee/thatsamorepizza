@@ -19,6 +19,16 @@
             </div>
             <div>
                 <h4 class="text-lg font-semibold mb-4">Business Hours</h4>
+                
+                <!-- Today's Hours Section -->
+                <div class="mb-4 p-3 bg-primary/20 rounded-lg border border-primary/30">
+                    <h5 class="text-sm font-semibold text-accent mb-2">Today's Hours</h5>
+                    <div id="today-hours" class="text-sm text-white font-medium">
+                        <!-- JavaScript will populate this -->
+                    </div>
+                </div>
+                
+                <!-- Full Week Schedule -->
                 <div class="space-y-1 text-sm text-gray-300">
                     <div class="flex justify-between">
                         <span>Monday:</span>
@@ -47,7 +57,7 @@
                     <div class="flex justify-between">
                         <span>Sunday:</span>
                         <span>11:00 AM - 8:00 PM</span>
-                    </div>
+                        </div>
                 </div>
             </div>
             <div>
@@ -63,3 +73,40 @@
         </div>
     </div>
 </footer>
+
+<script>
+// Business Hours Logic
+document.addEventListener('DOMContentLoaded', function() {
+    const todayHoursElement = document.getElementById('today-hours');
+    
+    // Business hours data
+    const businessHours = {
+        0: { day: 'Sunday', hours: '11:00 AM - 8:00 PM', open: true },
+        1: { day: 'Monday', hours: 'Closed', open: false },
+        2: { day: 'Tuesday', hours: '11:00 AM - 8:00 PM', open: true },
+        3: { day: 'Wednesday', hours: '11:00 AM - 8:00 PM', open: true },
+        4: { day: 'Thursday', hours: '11:00 AM - 8:00 PM', open: true },
+        5: { day: 'Friday', hours: '11:00 AM - 9:00 PM', open: true },
+        6: { day: 'Saturday', hours: '11:00 AM - 9:00 PM', open: true }
+    };
+    
+    // Get current day (0 = Sunday, 1 = Monday, etc.)
+    const today = new Date().getDay();
+    const todayInfo = businessHours[today];
+    
+    // Display today's hours
+    if (todayInfo) {
+        if (todayInfo.open) {
+            todayHoursElement.innerHTML = `
+                <div class="text-green-400">${todayInfo.day}: ${todayInfo.hours}</div>
+                <div class="text-xs text-gray-300 mt-1">We're open today!</div>
+            `;
+        } else {
+            todayHoursElement.innerHTML = `
+                <div class="text-red-400">${todayInfo.day}: ${todayInfo.hours}</div>
+                <div class="text-xs text-gray-300 mt-1">We're closed today</div>
+            `;
+        }
+    }
+});
+</script>
