@@ -615,32 +615,21 @@ function initVideoBackground() {
         }
     });
     
-    // Pause video on mobile to save bandwidth (optional)
-    if (window.innerWidth <= 768) {
-        heroVideo.pause();
-        heroVideo.style.display = 'none';
-        const fallbackImg = heroVideo.querySelector('img');
-        if (fallbackImg) {
-            fallbackImg.style.display = 'block';
-        }
+    // Show video on all devices including mobile
+    heroVideo.style.display = 'block';
+    heroVideo.play().catch(e => console.log('Video autoplay prevented:', e));
+    const fallbackImg = heroVideo.querySelector('img');
+    if (fallbackImg) {
+        fallbackImg.style.display = 'none';
     }
     
-    // Resume video on larger screens
+    // Handle resize events to ensure video stays visible
     window.addEventListener('resize', function() {
-        if (window.innerWidth > 768) {
-            heroVideo.style.display = 'block';
-            heroVideo.play().catch(e => console.log('Video autoplay prevented:', e));
-            const fallbackImg = heroVideo.querySelector('img');
-            if (fallbackImg) {
-                fallbackImg.style.display = 'none';
-            }
-        } else {
-            heroVideo.pause();
-            heroVideo.style.display = 'none';
-            const fallbackImg = heroVideo.querySelector('img');
-            if (fallbackImg) {
-                fallbackImg.style.display = 'block';
-            }
+        heroVideo.style.display = 'block';
+        heroVideo.play().catch(e => console.log('Video autoplay prevented:', e));
+        const fallbackImg = heroVideo.querySelector('img');
+        if (fallbackImg) {
+            fallbackImg.style.display = 'none';
         }
     });
 }
