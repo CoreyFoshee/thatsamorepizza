@@ -12,8 +12,9 @@ const PORT = process.env.PORT || 3000;
 // Check if we're running on Vercel (serverless environment)
 const isVercel = process.env.VERCEL === '1';
 
-// Data file path (only used in non-Vercel environments)
+// Data file paths (only used in non-Vercel environments)
 const DATA_FILE = path.join(__dirname, 'data', 'voting-data.json');
+const ADMIN_DATA_FILE = path.join(__dirname, 'data', 'admin-data.json');
 
 // Ensure data directory exists (only in non-Vercel environments)
 if (!isVercel) {
@@ -30,6 +31,44 @@ let votingData = {
     totalVotes: 0,
     lastReset: new Date().toISOString(),
     sessionVotes: new Set() // Track session IDs that have voted
+};
+
+// Load admin data from file or create default
+let adminData = {
+    restaurantStatus: {
+        manualClosed: false,
+        lastUpdated: new Date().toISOString()
+    },
+    hours: {
+        header: "Mon-Fri: 11AM-10PM | Sat-Sun: 12PM-11PM",
+        footer: "Open Daily | Mon-Fri: 11AM-10PM | Sat-Sun: 12PM-11PM",
+        lastUpdated: new Date().toISOString()
+    },
+    scheduledClosures: [],
+    cateringMenu: [
+        { id: '1', name: 'Homemade Lasagna', smallPrice: 70.00, largePrice: 105.00, singlePrice: null },
+        { id: '2', name: 'Chicken Alfredo Pasta', smallPrice: 60.00, largePrice: 85.00, singlePrice: null },
+        { id: '3', name: 'Shrimp Alfredo Pasta', smallPrice: 65.00, largePrice: 95.00, singlePrice: null },
+        { id: '4', name: 'Chicken Tenders', smallPrice: null, largePrice: null, singlePrice: 25.00 },
+        { id: '5', name: 'Chicken Wings with Sauce', smallPrice: null, largePrice: null, singlePrice: 50.00 },
+        { id: '6', name: 'Caesar Salad', smallPrice: 25.00, largePrice: 45.00, singlePrice: null },
+        { id: '7', name: 'Italian Salad', smallPrice: 35.00, largePrice: 55.00, singlePrice: null },
+        { id: '8', name: 'House Salad', smallPrice: 25.00, largePrice: 45.00, singlePrice: null },
+        { id: '9', name: 'Muffaletta', smallPrice: null, largePrice: null, singlePrice: 75.00 },
+        { id: '10', name: 'Spaghetti & Meatballs', smallPrice: null, largePrice: null, singlePrice: 40.00 },
+        { id: '11', name: 'Fried Ravioli with Marinara', smallPrice: null, largePrice: null, singlePrice: 40.00 },
+        { id: '12', name: 'Catfish Strips', smallPrice: null, largePrice: null, singlePrice: 80.00 },
+        { id: '13', name: 'Waffle Fries', smallPrice: null, largePrice: null, singlePrice: 15.00 },
+        { id: '14', name: 'Pizza Beignets with Dipping Sauce', smallPrice: null, largePrice: null, singlePrice: 30.00 },
+        { id: '15', name: 'Gallon Iced Tea', smallPrice: null, largePrice: null, singlePrice: 8.00 }
+    ],
+    tvControls: {
+        piesSold: 0,
+        nyVotes: 0,
+        chicagoVotes: 0,
+        lastUpdated: new Date().toISOString()
+    },
+    lastUpdated: new Date().toISOString()
 };
 
 // Load data from file if it exists (only in non-Vercel environments)
@@ -56,6 +95,23 @@ function loadVotingData() {
     }
 }
 
+function loadAdminData() {
+    if (isVercel) {
+        console.log('Running on Vercel - using in-memory admin storage only');
+        return;
+    }
+    
+    try {
+        if (fs.existsSync(ADMIN_DATA_FILE)) {
+            const data = JSON.parse(fs.readFileSync(ADMIN_DATA_FILE, 'utf8'));
+            adminData = { ...adminData, ...data };
+            console.log('Admin data loaded from file');
+        }
+    } catch (error) {
+        console.error('Error loading admin data:', error);
+    }
+}
+
 // Save voting data to file (only in non-Vercel environments)
 function saveVotingData() {
     if (isVercel) {
@@ -76,8 +132,23 @@ function saveVotingData() {
     }
 }
 
+function saveAdminData() {
+    if (isVercel) {
+        console.log('Running on Vercel - skipping admin file save');
+        return;
+    }
+    
+    try {
+        fs.writeFileSync(ADMIN_DATA_FILE, JSON.stringify(adminData, null, 2));
+        console.log('Admin data saved to file');
+    } catch (error) {
+        console.error('Error saving admin data:', error);
+    }
+}
+
 // Load data on startup
 loadVotingData();
+loadAdminData();
 
 // Set EJS as templating engine
 app.set('view engine', 'ejs');
@@ -232,6 +303,294 @@ app.post('/api/admin/set-votes', (req, res) => {
     } catch (error) {
         console.error('Error setting votes:', error);
         res.status(500).json({ success: false, message: 'Error setting votes' });
+    }
+});
+
+// New Admin API endpoints
+app.get('/api/admin/data', (req, res) => {
+    try {
+        res.json({
+            success: true,
+            data: {
+                restaurantStatus: adminData.restaurantStatus,
+                hours: adminData.hours,
+                scheduledClosures: adminData.scheduledClosures,
+                cateringMenu: adminData.cateringMenu,
+                tvControls: adminData.tvControls,
+                votingData: {
+                    nyVotes: votingData.nyVotes,
+                    chicagoVotes: votingData.chicagoVotes,
+                    totalVotes: votingData.totalVotes
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching admin data:', error);
+        res.status(500).json({ success: false, message: 'Error fetching admin data' });
+    }
+});
+
+app.post('/api/admin/restaurant-status', (req, res) => {
+    try {
+        const { manualClosed } = req.body;
+        
+        if (typeof manualClosed !== 'boolean') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid manualClosed value. Must be boolean.' 
+            });
+        }
+        
+        adminData.restaurantStatus.manualClosed = manualClosed;
+        adminData.restaurantStatus.lastUpdated = new Date().toISOString();
+        adminData.lastUpdated = new Date().toISOString();
+        
+        saveAdminData();
+        
+        res.json({ 
+            success: true, 
+            message: 'Restaurant status updated successfully', 
+            data: adminData.restaurantStatus 
+        });
+        console.log(`Restaurant status updated: manualClosed=${manualClosed}`);
+    } catch (error) {
+        console.error('Error updating restaurant status:', error);
+        res.status(500).json({ success: false, message: 'Error updating restaurant status' });
+    }
+});
+
+app.post('/api/admin/hours', (req, res) => {
+    try {
+        const { header, footer } = req.body;
+        
+        if (typeof header !== 'string' || typeof footer !== 'string') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid hours data. Header and footer must be strings.' 
+            });
+        }
+        
+        adminData.hours.header = header;
+        adminData.hours.footer = footer;
+        adminData.hours.lastUpdated = new Date().toISOString();
+        adminData.lastUpdated = new Date().toISOString();
+        
+        saveAdminData();
+        
+        res.json({ 
+            success: true, 
+            message: 'Hours updated successfully', 
+            data: adminData.hours 
+        });
+        console.log('Hours updated successfully');
+    } catch (error) {
+        console.error('Error updating hours:', error);
+        res.status(500).json({ success: false, message: 'Error updating hours' });
+    }
+});
+
+app.post('/api/admin/closures', (req, res) => {
+    try {
+        const { date, reason } = req.body;
+        
+        if (!date) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Date is required.' 
+            });
+        }
+        
+        // Check if closure already exists
+        const existingIndex = adminData.scheduledClosures.findIndex(c => c.date === date);
+        if (existingIndex !== -1) {
+            // Update existing closure
+            adminData.scheduledClosures[existingIndex] = { date, reason: reason || '' };
+        } else {
+            // Add new closure
+            adminData.scheduledClosures.push({ date, reason: reason || '' });
+        }
+        
+        // Sort closures by date
+        adminData.scheduledClosures.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        adminData.lastUpdated = new Date().toISOString();
+        saveAdminData();
+        
+        res.json({ 
+            success: true, 
+            message: 'Closure added successfully', 
+            data: adminData.scheduledClosures 
+        });
+        console.log(`Closure added/updated: ${date}`);
+    } catch (error) {
+        console.error('Error adding closure:', error);
+        res.status(500).json({ success: false, message: 'Error adding closure' });
+    }
+});
+
+app.delete('/api/admin/closures/:date', (req, res) => {
+    try {
+        const { date } = req.params;
+        
+        const initialLength = adminData.scheduledClosures.length;
+        adminData.scheduledClosures = adminData.scheduledClosures.filter(c => c.date !== date);
+        
+        if (adminData.scheduledClosures.length === initialLength) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Closure not found' 
+            });
+        }
+        
+        adminData.lastUpdated = new Date().toISOString();
+        saveAdminData();
+        
+        res.json({ 
+            success: true, 
+            message: 'Closure deleted successfully', 
+            data: adminData.scheduledClosures 
+        });
+        console.log(`Closure deleted: ${date}`);
+    } catch (error) {
+        console.error('Error deleting closure:', error);
+        res.status(500).json({ success: false, message: 'Error deleting closure' });
+    }
+});
+
+app.post('/api/admin/catering-menu', (req, res) => {
+    try {
+        const { menu } = req.body;
+        
+        if (!Array.isArray(menu)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid menu data. Must be an array.' 
+            });
+        }
+        
+        // Process menu items
+        adminData.cateringMenu = menu.map(item => ({
+            id: item.id || `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            name: item.name || '',
+            smallPrice: item.smallPrice || null,
+            largePrice: item.largePrice || null,
+            singlePrice: item.singlePrice || null
+        }));
+        
+        adminData.lastUpdated = new Date().toISOString();
+        saveAdminData();
+        
+        res.json({ 
+            success: true, 
+            message: 'Catering menu updated successfully', 
+            data: adminData.cateringMenu 
+        });
+        console.log('Catering menu updated successfully');
+    } catch (error) {
+        console.error('Error updating catering menu:', error);
+        res.status(500).json({ success: false, message: 'Error updating catering menu' });
+    }
+});
+
+app.delete('/api/admin/catering-menu/:id', (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const initialLength = adminData.cateringMenu.length;
+        adminData.cateringMenu = adminData.cateringMenu.filter(item => item.id !== id);
+        
+        if (adminData.cateringMenu.length === initialLength) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Menu item not found' 
+            });
+        }
+        
+        adminData.lastUpdated = new Date().toISOString();
+        saveAdminData();
+        
+        res.json({ 
+            success: true, 
+            message: 'Menu item deleted successfully', 
+            data: adminData.cateringMenu 
+        });
+        console.log(`Menu item deleted: ${id}`);
+    } catch (error) {
+        console.error('Error deleting menu item:', error);
+        res.status(500).json({ success: false, message: 'Error deleting menu item' });
+    }
+});
+
+app.post('/api/admin/tv-controls', (req, res) => {
+    try {
+        const { piesSold, nyVotes, chicagoVotes } = req.body;
+        
+        if (piesSold !== undefined) {
+            if (typeof piesSold !== 'number' || piesSold < 0) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Invalid pies sold value. Must be non-negative number.' 
+                });
+            }
+            adminData.tvControls.piesSold = piesSold;
+        }
+        
+        if (nyVotes !== undefined || chicagoVotes !== undefined) {
+            if (nyVotes !== undefined && (typeof nyVotes !== 'number' || nyVotes < 0)) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Invalid NY votes value. Must be non-negative number.' 
+                });
+            }
+            if (chicagoVotes !== undefined && (typeof chicagoVotes !== 'number' || chicagoVotes < 0)) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Invalid Chicago votes value. Must be non-negative number.' 
+                });
+            }
+            
+            if (nyVotes !== undefined) {
+                adminData.tvControls.nyVotes = nyVotes;
+                votingData.nyVotes = nyVotes;
+            }
+            if (chicagoVotes !== undefined) {
+                adminData.tvControls.chicagoVotes = chicagoVotes;
+                votingData.chicagoVotes = chicagoVotes;
+            }
+            
+            votingData.totalVotes = votingData.nyVotes + votingData.chicagoVotes;
+            saveVotingData();
+            
+            // Broadcast update to all connected clients
+            io.emit('voting-update', votingData);
+        }
+        
+        adminData.tvControls.lastUpdated = new Date().toISOString();
+        adminData.lastUpdated = new Date().toISOString();
+        saveAdminData();
+        
+        // Emit admin update for TV controls
+        io.emit('admin-update', {
+            type: 'tv-controls',
+            data: adminData.tvControls
+        });
+        
+        res.json({ 
+            success: true, 
+            message: 'TV controls updated successfully', 
+            data: {
+                tvControls: adminData.tvControls,
+                votingData: {
+                    nyVotes: votingData.nyVotes,
+                    chicagoVotes: votingData.chicagoVotes,
+                    totalVotes: votingData.totalVotes
+                }
+            }
+        });
+        console.log('TV controls updated successfully');
+    } catch (error) {
+        console.error('Error updating TV controls:', error);
+        res.status(500).json({ success: false, message: 'Error updating TV controls' });
     }
 });
 
