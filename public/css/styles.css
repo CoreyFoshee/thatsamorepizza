@@ -85,19 +85,7 @@ body::before {
     z-index: -1;
 }
 
-/* Enhanced text readability over video */
-#home h1,
-#home .typewriter-text,
-#home p,
-#home .text-gray-700,
-#home .text-gray-600,
-#home .text-gray-500 {
-    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
-}
-
-#home h1 {
-    text-shadow: 3px 3px 6px rgba(255, 255, 255, 0.9);
-}
+/* Enhanced text readability over video - removed text shadows for cleaner look */
 
 /* Ensure video covers the entire hero section */
 .hero-video-container {
