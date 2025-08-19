@@ -1,3 +1,13 @@
+<!-- Today's Hours Infobar -->
+<div id="hours-infobar" class="bg-dark text-white py-2 px-4 text-center text-sm">
+    <div class="max-w-7xl mx-auto flex items-center justify-center space-x-2">
+        <span class="text-accent">🕒</span>
+        <span id="infobar-hours">Loading hours...</span>
+        <span class="text-accent">•</span>
+        <span id="infobar-status">Loading...</span>
+    </div>
+</div>
+
 <nav class="bg-gradient-to-r from-maroon to-primary shadow-2xl border-b-4 border-accent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-4">
@@ -81,10 +91,47 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize hours infobar
+    initHoursInfobar();
+    
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenuModal = document.getElementById('mobile-menu-modal');
     const mobileMenuClose = document.getElementById('mobile-menu-close');
     const hamburgerLines = document.querySelectorAll('.hamburger-line-1, .hamburger-line-2, .hamburger-line-3');
+    
+    // Hours infobar functionality
+    function initHoursInfobar() {
+        const infobarHours = document.getElementById('infobar-hours');
+        const infobarStatus = document.getElementById('infobar-status');
+        
+        // Business hours data
+        const businessHours = {
+            0: { day: 'Sunday', hours: '11:00 AM - 8:00 PM', open: true },
+            1: { day: 'Monday', hours: 'Closed', open: false },
+            2: { day: 'Tuesday', hours: '11:00 AM - 8:00 PM', open: true },
+            3: { day: 'Wednesday', hours: '11:00 AM - 8:00 PM', open: true },
+            4: { day: 'Thursday', hours: '11:00 AM - 8:00 PM', open: true },
+            5: { day: 'Friday', hours: '11:00 AM - 9:00 PM', open: true },
+            6: { day: 'Saturday', hours: '11:00 AM - 9:00 PM', open: true }
+        };
+        
+        // Get current day (0 = Sunday, 1 = Monday, etc.)
+        const today = new Date().getDay();
+        const todayInfo = businessHours[today];
+        
+        // Display today's hours in infobar
+        if (todayInfo) {
+            infobarHours.textContent = `${todayInfo.day}: ${todayInfo.hours}`;
+            
+            if (todayInfo.open) {
+                infobarStatus.textContent = 'Open Today';
+                infobarStatus.className = 'text-green-400 font-medium';
+            } else {
+                infobarStatus.textContent = 'Closed Today';
+                infobarStatus.className = 'text-red-400 font-medium';
+            }
+        }
+    }
     
     // Toggle mobile menu
     function toggleMobileMenu() {
