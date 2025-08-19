@@ -28,36 +28,45 @@
                     </div>
                 </div>
                 
-                <!-- Full Week Schedule -->
-                <div class="space-y-1 text-sm text-gray-300">
-                    <div class="flex justify-between">
-                        <span>Monday:</span>
-                        <span class="text-red-400">Closed</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Tuesday:</span>
-                        <span>11:00 AM - 8:00 PM</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Wednesday:</span>
-                        <span>11:00 AM - 8:00 PM</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Thursday:</span>
-                        <span>11:00 AM - 8:00 PM</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Friday:</span>
-                        <span>11:00 AM - 9:00 PM</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Saturday:</span>
-                        <span>11:00 AM - 9:00 PM</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Sunday:</span>
-                        <span>11:00 AM - 8:00 PM</span>
+                <!-- Full Week Schedule Dropdown -->
+                <div class="border-t border-gray-600 pt-3">
+                    <button id="hours-toggle" class="w-full text-left text-sm text-gray-300 hover:text-accent transition-colors duration-300 flex items-center justify-between">
+                        <span>View Full Week Schedule</span>
+                        <svg id="hours-arrow" class="w-4 h-4 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    
+                    <div id="full-hours" class="hidden mt-3 space-y-1 text-sm text-gray-300">
+                        <div class="flex justify-between">
+                            <span>Monday:</span>
+                            <span class="text-red-400">Closed</span>
                         </div>
+                        <div class="flex justify-between">
+                            <span>Tuesday:</span>
+                            <span>11:00 AM - 8:00 PM</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Wednesday:</span>
+                            <span>11:00 AM - 8:00 PM</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Thursday:</span>
+                            <span>11:00 AM - 8:00 PM</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Friday:</span>
+                            <span>11:00 AM - 9:00 PM</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Saturday:</span>
+                            <span>11:00 AM - 9:00 PM</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Sunday:</span>
+                            <span>11:00 AM - 8:00 PM</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div>
@@ -78,6 +87,9 @@
 // Business Hours Logic
 document.addEventListener('DOMContentLoaded', function() {
     const todayHoursElement = document.getElementById('today-hours');
+    const hoursToggle = document.getElementById('hours-toggle');
+    const fullHours = document.getElementById('full-hours');
+    const hoursArrow = document.getElementById('hours-arrow');
     
     // Business hours data
     const businessHours = {
@@ -108,5 +120,20 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }
     }
+    
+    // Toggle full hours dropdown
+    hoursToggle.addEventListener('click', function() {
+        const isHidden = fullHours.classList.contains('hidden');
+        
+        if (isHidden) {
+            // Show hours
+            fullHours.classList.remove('hidden');
+            hoursArrow.classList.add('rotate-180');
+        } else {
+            // Hide hours
+            fullHours.classList.add('hidden');
+            hoursArrow.classList.remove('rotate-180');
+        }
+    });
 });
 </script>
