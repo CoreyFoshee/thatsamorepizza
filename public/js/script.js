@@ -136,41 +136,93 @@ function initPizzaPoll() {
     
     // NY Style vote button
     if (nyVoteBtn) {
-        nyVoteBtn.addEventListener('click', function() {
+        nyVoteBtn.addEventListener('click', async function() {
             if (hasVoted) {
                 showVoteError('You have already voted in this session');
                 return;
             }
             
-            // Send vote to server via WebSocket with session ID
-            socket.emit('vote', { choice: 'ny', sessionId: sessionId });
-            hasVoted = true;
-            
-            // Disable both buttons after voting
-            nyVoteBtn.disabled = true;
-            chicagoVoteBtn.disabled = true;
-            nyVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            chicagoVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            try {
+                if (useWebSocket && socket && socket.connected) {
+                    // Send vote to server via WebSocket with session ID
+                    socket.emit('vote', { choice: 'ny', sessionId: sessionId });
+                } else {
+                    // Fallback to API endpoint
+                    const response = await fetch('/api/vote', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ choice: 'ny', sessionId: sessionId })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        updatePollDisplay(result.data);
+                        showVoteConfirmation('NY Style', '🗽');
+                    } else {
+                        showVoteError(result.message);
+                        return;
+                    }
+                }
+                
+                hasVoted = true;
+                
+                // Disable both buttons after voting
+                nyVoteBtn.disabled = true;
+                chicagoVoteBtn.disabled = true;
+                nyVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                chicagoVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } catch (error) {
+                console.error('Error casting vote:', error);
+                showVoteError('Error casting vote. Please try again.');
+            }
         });
     }
     
     // Chicago Style vote button
     if (chicagoVoteBtn) {
-        chicagoVoteBtn.addEventListener('click', function() {
+        chicagoVoteBtn.addEventListener('click', async function() {
             if (hasVoted) {
                 showVoteError('You have already voted in this session');
                 return;
             }
             
-            // Send vote to server via WebSocket with session ID
-            socket.emit('vote', { choice: 'chicago', sessionId: sessionId });
-            hasVoted = true;
-            
-            // Disable both buttons after voting
-            nyVoteBtn.disabled = true;
-            chicagoVoteBtn.disabled = true;
-            nyVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            chicagoVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            try {
+                if (useWebSocket && socket && socket.connected) {
+                    // Send vote to server via WebSocket with session ID
+                    socket.emit('vote', { choice: 'chicago', sessionId: sessionId });
+                } else {
+                    // Fallback to API endpoint
+                    const response = await fetch('/api/vote', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ choice: 'chicago', sessionId: sessionId })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        updatePollDisplay(result.data);
+                        showVoteConfirmation('Chicago Style', '🏙️');
+                    } else {
+                        showVoteError(result.message);
+                        return;
+                    }
+                }
+                
+                hasVoted = true;
+                
+                // Disable both buttons after voting
+                nyVoteBtn.disabled = true;
+                chicagoVoteBtn.disabled = true;
+                nyVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                chicagoVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } catch (error) {
+                console.error('Error casting vote:', error);
+                showVoteError('Error casting vote. Please try again.');
+            }
         });
     }
     

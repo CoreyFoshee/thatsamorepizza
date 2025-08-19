@@ -9,13 +9,18 @@ const server = http.createServer(app);
 const io = socketIo(server);
 const PORT = process.env.PORT || 3000;
 
-// Data file path
+// Check if we're running on Vercel (serverless environment)
+const isVercel = process.env.VERCEL === '1';
+
+// Data file path (only used in non-Vercel environments)
 const DATA_FILE = path.join(__dirname, 'data', 'voting-data.json');
 
-// Ensure data directory exists
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
+// Ensure data directory exists (only in non-Vercel environments)
+if (!isVercel) {
+    const dataDir = path.join(__dirname, 'data');
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir);
+    }
 }
 
 // Load voting data from file or create default
@@ -27,15 +32,20 @@ let votingData = {
     sessionVotes: new Set() // Track session IDs that have voted
 };
 
-// Load data from file if it exists
+// Load data from file if it exists (only in non-Vercel environments)
 function loadVotingData() {
+    if (isVercel) {
+        console.log('Running on Vercel - using in-memory storage only');
+        return;
+    }
+    
     try {
         if (fs.existsSync(DATA_FILE)) {
             const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
             votingData = { ...votingData, ...data };
             // Convert sessionVotes back to Set if it was stored as array
             if (Array.isArray(votingData.sessionVotes)) {
-                votingData.sessionVotes = new Set(votingData.sessionVotes);
+                votingData.sessionVotes = new Set(data.sessionVotes);
             } else {
                 votingData.sessionVotes = new Set();
             }
@@ -46,8 +56,13 @@ function loadVotingData() {
     }
 }
 
-// Save voting data to file
+// Save voting data to file (only in non-Vercel environments)
 function saveVotingData() {
+    if (isVercel) {
+        console.log('Running on Vercel - skipping file save');
+        return;
+    }
+    
     try {
         // Convert Set to Array for JSON serialization
         const dataToSave = {
@@ -230,6 +245,79 @@ app.get('/api/admin/voting-data', (req, res) => {
     });
 });
 
+// Fallback voting endpoint for environments without WebSocket support
+app.post('/api/vote', (req, res) => {
+    try {
+        const { choice, sessionId } = req.body;
+        
+        if (!choice || !sessionId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Missing choice or sessionId' 
+            });
+        }
+        
+        if (choice !== 'ny' && choice !== 'chicago') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid choice. Must be "ny" or "chicago"' 
+            });
+        }
+        
+        // Check if this session has already voted
+        if (votingData.sessionVotes.has(sessionId)) {
+            return res.json({ 
+                success: false, 
+                message: 'You have already voted in this session' 
+            });
+        }
+        
+        // Record the vote
+        if (choice === 'ny') {
+            votingData.nyVotes++;
+        } else if (choice === 'chicago') {
+            votingData.chicagoVotes++;
+        }
+        
+        votingData.totalVotes = votingData.nyVotes + votingData.chicagoVotes;
+        votingData.sessionVotes.add(sessionId);
+        
+        // Save data to file (only in non-Vercel environments)
+        saveVotingData();
+        
+        // Broadcast to WebSocket clients if available
+        if (io.engine.clientsCount > 0) {
+            io.emit('voting-update', votingData);
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'Vote recorded successfully!',
+            data: votingData
+        });
+        
+        console.log(`Vote received via API: ${choice}. NY: ${votingData.nyVotes}, Chicago: ${votingData.chicagoVotes}`);
+    } catch (error) {
+        console.error('Error processing vote:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error processing vote' 
+        });
+    }
+});
+
+// Get current voting data
+app.get('/api/voting-data', (req, res) => {
+    res.json({
+        success: true,
+        data: {
+            nyVotes: votingData.nyVotes,
+            chicagoVotes: votingData.chicagoVotes,
+            totalVotes: votingData.totalVotes
+        }
+    });
+});
+
 // WebSocket event handlers
 io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
@@ -257,7 +345,7 @@ io.on('connection', (socket) => {
         votingData.totalVotes = votingData.nyVotes + votingData.chicagoVotes;
         votingData.sessionVotes.add(sessionId);
         
-        // Save data to file
+        // Save data to file (only in non-Vercel environments)
         saveVotingData();
         
         // Broadcast updated voting data to all connected clients
@@ -277,6 +365,12 @@ io.on('connection', (socket) => {
         console.log('Client disconnected:', socket.id);
     });
 });
+
+// Add a note about Vercel limitations
+if (isVercel) {
+    console.log('⚠️  Running on Vercel - WebSocket connections may not persist between requests');
+    console.log('⚠️  Voting data will reset when serverless functions restart');
+}
 
 // Start server
 server.listen(PORT, () => {
