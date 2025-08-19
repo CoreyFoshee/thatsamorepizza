@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initMobileMenu();
     initSmoothScrolling();
     initPizzaPoll(); // Initialize the pizza style poll
+    initVideoBackground(); // Initialize video background
 });
 
 // Pizza Style Poll functionality with WebSocket real-time updates
@@ -585,5 +586,63 @@ keyboardStyle.textContent = `
     }
 `;
 document.head.appendChild(keyboardStyle);
+
+// Video Background Management
+function initVideoBackground() {
+    const heroVideo = document.querySelector('#home video');
+    
+    if (!heroVideo) return;
+    
+    // Ensure video is muted and autoplays
+    heroVideo.muted = true;
+    heroVideo.autoplay = true;
+    heroVideo.loop = true;
+    heroVideo.playsInline = true;
+    
+    // Handle video loading
+    heroVideo.addEventListener('loadeddata', function() {
+        console.log('Hero video loaded successfully');
+        heroVideo.style.opacity = '1';
+    });
+    
+    // Handle video errors and fallback to image
+    heroVideo.addEventListener('error', function() {
+        console.warn('Video failed to load, falling back to image');
+        const fallbackImg = heroVideo.querySelector('img');
+        if (fallbackImg) {
+            fallbackImg.style.display = 'block';
+            heroVideo.style.display = 'none';
+        }
+    });
+    
+    // Pause video on mobile to save bandwidth (optional)
+    if (window.innerWidth <= 768) {
+        heroVideo.pause();
+        heroVideo.style.display = 'none';
+        const fallbackImg = heroVideo.querySelector('img');
+        if (fallbackImg) {
+            fallbackImg.style.display = 'block';
+        }
+    }
+    
+    // Resume video on larger screens
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            heroVideo.style.display = 'block';
+            heroVideo.play().catch(e => console.log('Video autoplay prevented:', e));
+            const fallbackImg = heroVideo.querySelector('img');
+            if (fallbackImg) {
+                fallbackImg.style.display = 'none';
+            }
+        } else {
+            heroVideo.pause();
+            heroVideo.style.display = 'none';
+            const fallbackImg = heroVideo.querySelector('img');
+            if (fallbackImg) {
+                fallbackImg.style.display = 'block';
+            }
+        }
+    });
+}
 
 console.log('That\'s Amore Pizzeria website loaded successfully! 🍕 The great pizza debate is ready!');

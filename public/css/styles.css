@@ -74,6 +74,45 @@ body::before {
     animation: typewriter 3s steps(40) infinite, blink-caret 0.75s step-end infinite;
 }
 
+/* Video Background Styles */
+.hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+/* Ensure video covers the entire hero section */
+.hero-video-container {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Video fallback and loading states */
+.hero-video[poster] {
+    object-fit: cover;
+}
+
+/* Mobile video optimization */
+@media (max-width: 768px) {
+    .hero-video {
+        object-position: center;
+    }
+}
+
+/* Video loading animation */
+.hero-video:not([src]) {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.hero-video[src] {
+    opacity: 1;
+}
+
 /* Mobile-friendly typewriter */
 @media (max-width: 768px) {
     .typewriter-text {

@@ -1,8 +1,20 @@
 <!-- Hero Section -->
 <section id="home" class="min-h-screen relative overflow-hidden">
-    <!-- Hero Background Image -->
+    <!-- Hero Background Video -->
     <div class="absolute inset-0">
-        <img src="/images/hero-restaurant.jpg" alt="That's Amore Restaurant Interior" class="w-full h-full object-cover">
+        <video 
+            autoplay 
+            muted 
+            loop 
+            playsinline
+            class="w-full h-full object-cover"
+            poster="/images/hero-restaurant.jpg"
+        >
+            <source src="/videos/hero-background.mp4" type="video/mp4">
+            <source src="/videos/hero-background.webm" type="video/webm">
+            <!-- Fallback to image if video fails to load -->
+            <img src="/images/hero-restaurant.jpg" alt="That's Amore Restaurant Interior" class="w-full h-full object-cover">
+        </video>
         <div class="absolute inset-0 bg-gradient-to-br from-maroon/30 via-primary/20 to-accent/30"></div>
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(218,165,32,0.15),transparent_50%)]"></div>
     </div>
