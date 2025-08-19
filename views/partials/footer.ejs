@@ -91,42 +91,149 @@ document.addEventListener('DOMContentLoaded', function() {
     const fullHours = document.getElementById('full-hours');
     const hoursArrow = document.getElementById('hours-arrow');
     
-    // Business hours data
-    const businessHours = {
-        0: { day: 'Sunday', hours: '11:00 AM - 8:00 PM', open: true },
-        1: { day: 'Monday', hours: 'Closed', open: false },
-        2: { day: 'Tuesday', hours: '11:00 AM - 8:00 PM', open: true },
-        3: { day: 'Wednesday', hours: '11:00 AM - 8:00 PM', open: true },
-        4: { day: 'Thursday', hours: '11:00 AM - 8:00 PM', open: true },
-        5: { day: 'Friday', hours: '11:00 AM - 9:00 PM', open: true },
-        6: { day: 'Saturday', hours: '11:00 AM - 9:00 PM', open: true }
-    };
+    // Fetch hours from backend
+    fetch('/api/hours')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateFooterHours(data.data, todayHoursElement, fullHours);
+            } else {
+                console.error('Failed to fetch hours:', data.message);
+                // Fallback to default hours
+                updateFooterHoursWithDefaults(todayHoursElement, fullHours);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching hours:', error);
+            // Fallback to default hours
+            updateFooterHoursWithDefaults(todayHoursElement, fullHours);
+        });
+    
+    function updateFooterHours(hoursData, todayHoursElement, fullHours) {
+        const businessHours = hoursData.businessHours || {};
+        const holidayHours = hoursData.holidayHours || [];
+        
+        // Get current date and check for holidays
+        const today = new Date();
+        const todayDay = today.getDay();
+        const holidayInfo = getHolidayHours(today, holidayHours);
+        
+        let displayHours, isOpen, statusText;
+        
+        if (holidayInfo) {
+            // Holiday hours
+            displayHours = `${holidayInfo.holidayName}: ${holidayInfo.hours}`;
+            isOpen = holidayInfo.open;
+            statusText = holidayInfo.open ? 'We\'re open today!' : 'We\'re closed today';
+        } else {
+            // Regular business hours
+            const todayInfo = businessHours[todayDay] || { day: 'Unknown', hours: 'Closed', open: false };
+            displayHours = `${todayInfo.day}: ${todayInfo.hours}`;
+            isOpen = todayInfo.open;
+            statusText = todayInfo.open ? 'We\'re open today!' : 'We\'re closed today';
+        }
+        
+        // Display today's hours
+        if (isOpen) {
+            todayHoursElement.innerHTML = `
+                <div class="text-green-400">${displayHours}</div>
+                <div class="text-xs text-gray-300 mt-1">${statusText}</div>
+            `;
+        } else {
+            todayHoursElement.innerHTML = `
+                <div class="text-red-400">${displayHours}</div>
+                <div class="text-xs text-gray-300 mt-1">${statusText}</div>
+            `;
+        }
+        
+        // Update full week schedule
+        updateFullWeekSchedule(businessHours, fullHours);
+    }
+    
+    function updateFooterHoursWithDefaults(todayHoursElement, fullHours) {
+        // Fallback to default hours if backend is unavailable
+        const businessHours = {
+            0: { day: 'Sunday', hours: '11:00 AM - 8:00 PM', open: true },
+            1: { day: 'Monday', hours: 'Closed', open: false },
+            2: { day: 'Tuesday', hours: '11:00 AM - 8:00 PM', open: true },
+            3: { day: 'Wednesday', hours: '11:00 AM - 8:00 PM', open: true },
+            4: { day: 'Thursday', hours: '11:00 AM - 8:00 PM', open: true },
+            5: { day: 'Friday', hours: '11:00 AM - 9:00 PM', open: true },
+            6: { day: 'Saturday', hours: '11:00 AM - 9:00 PM', open: true }
+        };
+        
+        const today = new Date();
+        const todayDay = today.getDay();
+        const todayInfo = businessHours[todayDay];
+        
+        if (todayInfo.open) {
+            todayHoursElement.innerHTML = `
+                <div class="text-green-400">${todayInfo.day}: ${todayInfo.hours}</div>
+                <div class="text-xs text-gray-300 mt-1">We're open today!</div>
+            `;
+        } else {
+            todayHoursElement.innerHTML = `
+                <div class="text-red-400">${todayInfo.day}: ${todayInfo.hours}</div>
+                <div class="text-xs text-gray-300 mt-1">We're closed today</div>
+            `;
+        }
+        
+        updateFullWeekSchedule(businessHours, fullHours);
+    }
+    
+    function updateFullWeekSchedule(businessHours, fullHours) {
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        fullHours.innerHTML = '';
+        
+        days.forEach((day, index) => {
+            const dayIndex = (index + 1) % 7; // Convert to 0-6 index (Sunday = 0)
+            const dayData = businessHours[dayIndex] || { day, hours: 'Closed', open: false };
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'flex justify-between';
+            dayDiv.innerHTML = `
+                <span>${day}:</span>
+                <span class="${dayData.open ? 'text-white' : 'text-red-400'}">${dayData.hours}</span>
+            `;
+            fullHours.appendChild(dayDiv);
+        });
+    }
     
     // Holiday exceptions
-    function getHolidayHours(date) {
+    function getHolidayHours(date, holidayHours) {
         const month = date.getMonth() + 1; // getMonth() returns 0-11
         const day = date.getDate();
         
-        // Christmas Day (December 25)
-        if (month === 12 && day === 25) {
-            return { hours: 'Closed', open: false, isHoliday: true, holidayName: 'Christmas Day' };
+        // Check for configured holidays
+        for (const holiday of holidayHours) {
+            if (holiday.month === month && holiday.day === day) {
+                return { 
+                    hours: holiday.hours, 
+                    open: holiday.open, 
+                    isHoliday: true, 
+                    holidayName: holiday.name 
+                };
+            }
         }
         
-        // Christmas Eve (December 24) - Close at 3 PM
-        if (month === 12 && day === 24) {
-            return { hours: '11:00 AM - 3:00 PM', open: true, isHoliday: true, holidayName: 'Christmas Eve' };
-        }
-        
-        // Easter (calculate dynamically)
-        const easterDate = getEasterDate(date.getFullYear());
-        if (month === easterDate.getMonth() + 1 && day === easterDate.getDate()) {
-            return { hours: 'Closed', open: false, isHoliday: true, holidayName: 'Easter' };
-        }
-        
-        // Thanksgiving (4th Thursday in November)
-        const thanksgivingDate = getThanksgivingDate(date.getFullYear());
-        if (month === 11 && day === thanksgivingDate.getDate()) {
-            return { hours: 'Closed', open: false, isHoliday: true, holidayName: 'Thanksgiving' };
+        // Check for calculated holidays (Easter, Thanksgiving)
+        for (const holiday of holidayHours) {
+            if (holiday.isCalculated) {
+                let calculatedDate;
+                if (holiday.name === 'Easter') {
+                    calculatedDate = getEasterDate(date.getFullYear());
+                } else if (holiday.name === 'Thanksgiving') {
+                    calculatedDate = getThanksgivingDate(date.getFullYear());
+                }
+                
+                if (calculatedDate && month === calculatedDate.getMonth() + 1 && day === calculatedDate.getDate()) {
+                    return { 
+                        hours: holiday.hours, 
+                        open: holiday.open, 
+                        isHoliday: true, 
+                        holidayName: holiday.name 
+                    };
+                }
+            }
         }
         
         return null; // No holiday
@@ -158,39 +265,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const firstThursday = new Date(year, 10, 1 + ((4 - firstDay.getDay()) + 7) % 7);
         const thanksgiving = new Date(year, 10, firstThursday.getDate() + 21); // 3 weeks later
         return thanksgiving;
-    }
-    
-    // Get current date and check for holidays
-    const today = new Date();
-    const todayDay = today.getDay();
-    const holidayInfo = getHolidayHours(today);
-    
-    let displayHours, isOpen, statusText;
-    
-    if (holidayInfo) {
-        // Holiday hours
-        displayHours = `${holidayInfo.holidayName}: ${holidayInfo.hours}`;
-        isOpen = holidayInfo.open;
-        statusText = holidayInfo.open ? 'We\'re open today!' : 'We\'re closed today';
-    } else {
-        // Regular business hours
-        const todayInfo = businessHours[todayDay];
-        displayHours = `${todayInfo.day}: ${todayInfo.hours}`;
-        isOpen = todayInfo.open;
-        statusText = todayInfo.open ? 'We\'re open today!' : 'We\'re closed today';
-    }
-    
-    // Display today's hours
-    if (isOpen) {
-        todayHoursElement.innerHTML = `
-            <div class="text-green-400">${displayHours}</div>
-            <div class="text-xs text-gray-300 mt-1">${statusText}</div>
-        `;
-    } else {
-        todayHoursElement.innerHTML = `
-            <div class="text-red-400">${displayHours}</div>
-            <div class="text-xs text-gray-300 mt-1">${statusText}</div>
-        `;
     }
     
     // Toggle full hours dropdown

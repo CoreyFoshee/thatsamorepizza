@@ -42,6 +42,21 @@ let adminData = {
     hours: {
         header: "Mon-Fri: 11AM-10PM | Sat-Sun: 12PM-11PM",
         footer: "Open Daily | Mon-Fri: 11AM-10PM | Sat-Sun: 12PM-11PM",
+        businessHours: {
+            0: { day: 'Sunday', hours: '11:00 AM - 8:00 PM', open: true },
+            1: { day: 'Monday', hours: 'Closed', open: false },
+            2: { day: 'Tuesday', hours: '11:00 AM - 8:00 PM', open: true },
+            3: { day: 'Wednesday', hours: '11:00 AM - 8:00 PM', open: true },
+            4: { day: 'Thursday', hours: '11:00 AM - 8:00 PM', open: true },
+            5: { day: 'Friday', hours: '11:00 AM - 9:00 PM', open: true },
+            6: { day: 'Saturday', hours: '11:00 AM - 9:00 PM', open: true }
+        },
+        holidayHours: [
+            { name: 'Christmas Day', month: 12, day: 25, hours: 'Closed', open: false },
+            { name: 'Christmas Eve', month: 12, day: 24, hours: '11:00 AM - 3:00 PM', open: true },
+            { name: 'Easter', month: 0, day: 0, hours: 'Closed', open: false },
+            { name: 'Thanksgiving', month: 10, day: 0, hours: 'Closed', open: false, isCalculated: true }
+        ],
         lastUpdated: new Date().toISOString()
     },
     scheduledClosures: [],
@@ -361,17 +376,73 @@ app.post('/api/admin/restaurant-status', (req, res) => {
 
 app.post('/api/admin/hours', (req, res) => {
     try {
-        const { header, footer } = req.body;
+        const { header, footer, businessHours, holidayHours } = req.body;
         
-        if (typeof header !== 'string' || typeof footer !== 'string') {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid hours data. Header and footer must be strings.' 
-            });
+        if (header !== undefined) {
+            if (typeof header !== 'string') {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Invalid header hours. Must be a string.' 
+                });
+            }
+            adminData.hours.header = header;
         }
         
-        adminData.hours.header = header;
-        adminData.hours.footer = footer;
+        if (footer !== undefined) {
+            if (typeof footer !== 'string') {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Invalid footer hours. Must be a string.' 
+                });
+            }
+            adminData.hours.footer = footer;
+        }
+        
+        if (businessHours !== undefined) {
+            if (!Array.isArray(businessHours) || businessHours.length !== 7) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Invalid business hours. Must be an array of 7 days.' 
+                });
+            }
+            
+            // Validate each day's hours
+            for (let i = 0; i < 7; i++) {
+                const day = businessHours[i];
+                if (!day || typeof day.day !== 'string' || typeof day.hours !== 'string' || typeof day.open !== 'boolean') {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: `Invalid business hours for day ${i}. Each day must have day, hours, and open properties.` 
+                    });
+                }
+            }
+            
+            adminData.hours.businessHours = businessHours;
+        }
+        
+        if (holidayHours !== undefined) {
+            if (!Array.isArray(holidayHours)) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Invalid holiday hours. Must be an array.' 
+                });
+            }
+            
+            // Validate holiday hours structure
+            for (const holiday of holidayHours) {
+                if (!holiday.name || typeof holiday.name !== 'string' || 
+                    typeof holiday.month !== 'number' || typeof holiday.day !== 'number' ||
+                    typeof holiday.hours !== 'string' || typeof holiday.open !== 'boolean') {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: 'Invalid holiday hours structure. Each holiday must have name, month, day, hours, and open properties.' 
+                    });
+                }
+            }
+            
+            adminData.hours.holidayHours = holidayHours;
+        }
+        
         adminData.hours.lastUpdated = new Date().toISOString();
         adminData.lastUpdated = new Date().toISOString();
         
@@ -386,6 +457,18 @@ app.post('/api/admin/hours', (req, res) => {
     } catch (error) {
         console.error('Error updating hours:', error);
         res.status(500).json({ success: false, message: 'Error updating hours' });
+    }
+});
+
+app.get('/api/hours', (req, res) => {
+    try {
+        res.json({
+            success: true,
+            data: adminData.hours
+        });
+    } catch (error) {
+        console.error('Error fetching hours:', error);
+        res.status(500).json({ success: false, message: 'Error fetching hours' });
     }
 });
 

@@ -1,0 +1,126 @@
+{
+  "restaurantStatus": {
+    "manualClosed": false,
+    "lastUpdated": "2025-08-19T13:53:36.793Z"
+  },
+  "hours": {
+    "header": "Mon-Fri: 11AM-10PM | Sat-Sun: 12PM-11PM",
+    "footer": "Open Daily | Mon-Fri: 11AM-10PM | Sat-Sun: 12PM-11PM",
+    "lastUpdated": "2025-08-19T13:52:58.857Z"
+  },
+  "scheduledClosures": [],
+  "cateringMenu": [
+    {
+      "id": "1",
+      "name": "Homemade Lasagna",
+      "smallPrice": 70,
+      "largePrice": 105,
+      "singlePrice": null
+    },
+    {
+      "id": "2",
+      "name": "Chicken Alfredo Pasta",
+      "smallPrice": 60,
+      "largePrice": 85,
+      "singlePrice": null
+    },
+    {
+      "id": "3",
+      "name": "Shrimp Alfredo Pasta",
+      "smallPrice": 65,
+      "largePrice": 95,
+      "singlePrice": null
+    },
+    {
+      "id": "4",
+      "name": "Chicken Tenders",
+      "smallPrice": null,
+      "largePrice": null,
+      "singlePrice": 25
+    },
+    {
+      "id": "5",
+      "name": "Chicken Wings with Sauce",
+      "smallPrice": null,
+      "largePrice": null,
+      "singlePrice": 50
+    },
+    {
+      "id": "6",
+      "name": "Caesar Salad",
+      "smallPrice": 25,
+      "largePrice": 45,
+      "singlePrice": null
+    },
+    {
+      "id": "7",
+      "name": "Italian Salad",
+      "smallPrice": 35,
+      "largePrice": 55,
+      "singlePrice": null
+    },
+    {
+      "id": "8",
+      "name": "House Salad",
+      "smallPrice": 25,
+      "largePrice": 45,
+      "singlePrice": null
+    },
+    {
+      "id": "9",
+      "name": "Muffaletta",
+      "smallPrice": null,
+      "largePrice": null,
+      "singlePrice": 75
+    },
+    {
+      "id": "10",
+      "name": "Spaghetti & Meatballs",
+      "smallPrice": null,
+      "largePrice": null,
+      "singlePrice": 40
+    },
+    {
+      "id": "11",
+      "name": "Fried Ravioli with Marinara",
+      "smallPrice": null,
+      "largePrice": null,
+      "singlePrice": 40
+    },
+    {
+      "id": "12",
+      "name": "Catfish Strips",
+      "smallPrice": null,
+      "largePrice": null,
+      "singlePrice": 80
+    },
+    {
+      "id": "13",
+      "name": "Waffle Fries",
+      "smallPrice": null,
+      "largePrice": null,
+      "singlePrice": 15
+    },
+    {
+      "id": "14",
+      "name": "Pizza Beignets with Dipping Sauce",
+      "smallPrice": null,
+      "largePrice": null,
+      "singlePrice": 30
+    },
+    {
+      "id": "15",
+      "name": "Gallon Iced Tea",
+      "smallPrice": null,
+      "largePrice": null,
+      "singlePrice": 8
+    }
+  ],
+  "tvControls": {
+    "piesSold": 0,
+    "nyVotes": 0,
+    "chicagoVotes": 0,
+    "lastUpdated": "2025-08-19T13:52:58.857Z"
+  },
+  "lastUpdated": "2025-08-19T13:53:36.793Z"
+}

@@ -201,18 +201,38 @@
             <!-- Hours Management -->
             <div class="admin-card">
                 <h2 class="text-2xl font-bold text-blue-400 mb-6">🕒 Hours Management</h2>
-                <div class="grid md:grid-cols-2 gap-6">
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
                         <h3 class="text-lg font-semibold mb-4">Header Hours</h3>
-                        <textarea id="header-hours" class="form-input" rows="4" placeholder="Enter hours for header display..."></textarea>
+                        <textarea id="header-hours" class="form-input" rows="3" placeholder="Enter hours for header display..."></textarea>
                     </div>
                     <div>
                         <h3 class="text-lg font-semibold mb-4">Footer Hours</h3>
-                        <textarea id="footer-hours" class="form-input" rows="4" placeholder="Enter hours for footer display..."></textarea>
+                        <textarea id="footer-hours" class="form-input" rows="3" placeholder="Enter hours for footer display..."></textarea>
                     </div>
                 </div>
+                
+                <!-- Daily Business Hours -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Daily Business Hours</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div id="daily-hours-container">
+                            <!-- Daily hours will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Holiday Hours -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Holiday Hours</h3>
+                    <div id="holiday-hours-container">
+                        <!-- Holiday hours will be populated here -->
+                    </div>
+                    <button id="add-holiday" class="btn-primary mt-3">➕ Add Holiday</button>
+                </div>
+                
                 <div class="mt-4">
-                    <button id="save-hours" class="btn-success">💾 Save Hours</button>
+                    <button id="save-hours" class="btn-success">💾 Save All Hours</button>
                 </div>
             </div>
             
@@ -415,6 +435,71 @@
         function updateHoursDisplay(hours) {
             headerHours.value = hours.header || '';
             footerHours.value = hours.footer || '';
+            updateDailyHoursDisplay(hours.businessHours || []);
+            updateHolidayHoursDisplay(hours.holidayHours || []);
+        }
+        
+        // Update daily hours display
+        function updateDailyHoursDisplay(businessHours) {
+            const container = document.getElementById('daily-hours-container');
+            container.innerHTML = '';
+            
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            
+            days.forEach((day, index) => {
+                const dayData = businessHours[index] || { day, hours: 'Closed', open: false };
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'p-4 bg-gray-800 rounded-lg';
+                dayDiv.innerHTML = `
+                    <h4 class="font-semibold text-accent mb-2">${day}</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="open-${index}" ${dayData.open ? 'checked' : ''} class="w-4 h-4">
+                            <label for="open-${index}" class="text-sm">Open</label>
+                        </div>
+                        <input type="text" id="hours-${index}" value="${dayData.hours}" 
+                               class="form-input text-sm" placeholder="e.g., 11:00 AM - 8:00 PM">
+                    </div>
+                `;
+                container.appendChild(dayDiv);
+            });
+        }
+        
+        // Update holiday hours display
+        function updateHolidayHoursDisplay(holidayHours) {
+            const container = document.getElementById('holiday-hours-container');
+            container.innerHTML = '';
+            
+            holidayHours.forEach((holiday, index) => {
+                const holidayDiv = document.createElement('div');
+                holidayDiv.className = 'p-4 bg-gray-800 rounded-lg mb-3';
+                holidayDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <input type="text" value="${holiday.name}" placeholder="Holiday Name" 
+                               class="form-input text-sm" data-field="name" data-index="${index}">
+                        <input type="number" value="${holiday.month}" placeholder="Month (1-12)" min="1" max="12"
+                               class="form-input text-sm" data-field="month" data-index="${index}">
+                        <input type="number" value="${holiday.day}" placeholder="Day (1-31)" min="1" max="31"
+                               class="form-input text-sm" data-field="day" data-index="${index}">
+                        <div class="flex items-center space-x-2">
+                            <input type="text" value="${holiday.hours}" placeholder="Hours" 
+                                   class="form-input text-sm" data-field="hours" data-index="${index}">
+                            <input type="checkbox" ${holiday.open ? 'checked' : ''} 
+                                   class="w-4 h-4" data-field="open" data-index="${index}">
+                            <label class="text-sm">Open</label>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-3">
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" ${holiday.isCalculated ? 'checked' : ''} 
+                                   class="w-4 h-4" data-field="isCalculated" data-index="${index}">
+                            <label class="text-sm">Calculated Date (Easter/Thanksgiving)</label>
+                        </div>
+                        <button class="btn-danger text-sm" onclick="deleteHoliday(${index})">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(holidayDiv);
+            });
         }
         
         // Update closures display
@@ -499,12 +584,45 @@
         
         saveHoursBtn.addEventListener('click', async () => {
             try {
+                // Collect daily business hours
+                const businessHours = [];
+                for (let i = 0; i < 7; i++) {
+                    const openCheckbox = document.getElementById(`open-${i}`);
+                    const hoursInput = document.getElementById(`hours-${i}`);
+                    businessHours.push({
+                        day: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][i],
+                        hours: hoursInput.value,
+                        open: openCheckbox.checked
+                    });
+                }
+                
+                // Collect holiday hours
+                const holidayHours = [];
+                const holidayContainers = document.querySelectorAll('#holiday-hours-container > div');
+                holidayContainers.forEach(container => {
+                    const inputs = container.querySelectorAll('input[data-field]');
+                    const holiday = {};
+                    inputs.forEach(input => {
+                        const field = input.dataset.field;
+                        if (input.type === 'checkbox') {
+                            holiday[field] = input.checked;
+                        } else {
+                            holiday[field] = field === 'month' || field === 'day' ? parseInt(input.value) : input.value;
+                        }
+                    });
+                    if (holiday.name && holiday.month && holiday.day && holiday.hours !== undefined) {
+                        holidayHours.push(holiday);
+                    }
+                });
+                
                 const response = await fetch('/api/admin/hours', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         header: headerHours.value,
-                        footer: footerHours.value
+                        footer: footerHours.value,
+                        businessHours,
+                        holidayHours
                     })
                 });
                 
@@ -734,6 +852,16 @@
                     }
                 } catch (error) {
                     console.error('Error deleting menu item:', error);
+                }
+            }
+        };
+        
+        window.deleteHoliday = function(index) {
+            if (confirm('Are you sure you want to delete this holiday?')) {
+                const container = document.getElementById('holiday-hours-container');
+                const holidayDiv = container.children[index];
+                if (holidayDiv) {
+                    holidayDiv.remove();
                 }
             }
         };
