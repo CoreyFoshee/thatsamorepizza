@@ -1,7 +1,7 @@
 {
   "restaurantStatus": {
     "manualClosed": false,
-    "lastUpdated": "2025-08-19T13:53:36.793Z"
+    "lastUpdated": "2025-08-19T13:58:20.111Z"
   },
   "hours": {
     "header": "Mon-Fri: 11AM-10PM | Sat-Sun: 12PM-11PM",
@@ -122,5 +122,5 @@
     "chicagoVotes": 0,
     "lastUpdated": "2025-08-19T13:52:58.857Z"
   },
-  "lastUpdated": "2025-08-19T13:53:36.793Z"
+  "lastUpdated": "2025-08-19T13:58:20.111Z"
 }

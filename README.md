@@ -1,156 +1,71 @@
-# That's Amore Pizzeria Website 🍕
+# That's Amore Pizzeria Website
 
-A modern, animated, mobile-responsive website for That's Amore Pizzeria featuring the Great Pizza Debate theme between Chicago Deep Dish and New York Thin Crust pizza.
-
-## ✨ Features
-
-- **Pizza Debate Theme**: Interactive poll system for Chicago vs New York style preferences
-- **Modern Animations**: Scroll-triggered animations, typewriter effects, and smooth transitions
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **Component-Based**: Reusable navbar and footer components using EJS templating
-- **Interactive Elements**: Poll voting, smooth scrolling, and hover effects
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 14.0.0 or higher
-- npm or yarn
-
-### Installation
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd thats-amore-website
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm start
-```
-
-The website will be available at `http://localhost:3000`
-
-### Development Mode
-```bash
-# Install nodemon for development (optional)
-npm install -g nodemon
-
-# Start with auto-reload
-npm run dev
-```
+The official website for That's Amore Pizzeria in Metairie, Louisiana, featuring the great pizza debate between Chicago Deep Dish and New York Thin Crust.
 
 ## 🏗️ Project Structure
 
 ```
 thats-amore-website/
-├── views/                    # EJS templates
-│   ├── partials/            # Reusable components
-│   │   ├── head.ejs         # Common head content
-│   │   ├── navbar.ejs       # Navigation component
-│   │   ├── footer.ejs       # Footer component
-│   │   └── scripts.ejs      # Common JavaScript
-│   ├── layout.ejs           # Main layout template
-│   ├── index.ejs            # Homepage
-│   ├── menu.ejs             # Menu page
-│   ├── catering.ejs         # Catering page
-│   ├── franchise.ejs        # Franchise page
-│   └── contact.ejs          # Contact page
-├── public/                   # Static assets
-│   ├── css/                 # Stylesheets
-│   ├── js/                  # JavaScript files
-│   └── Logo/                # Logo images
-├── server.js                 # Express server
-├── package.json              # Dependencies and scripts
-└── README.md                 # This file
+├── package.json                 # Main website dependencies
+├── server.js                    # Main website server
+├── README.md                    # This file
+├── views/                       # EJS templates for main site
+├── public/                      # Static assets
+├── catering-website/            # 🆕 Standalone catering website
+│   ├── package.json            # Catering site dependencies
+│   ├── catering-server.js      # Catering site server
+│   ├── views/                  # Catering site templates
+│   └── public/                 # Catering site assets
+└── data/                       # Data files
 ```
 
-## 🎨 Technology Stack
+## 🚀 Getting Started
 
-- **Backend**: Node.js with Express
-- **Templating**: EJS with express-ejs-layouts
-- **Styling**: Tailwind CSS
-- **Frontend**: Vanilla JavaScript (ES6+)
-- **Fonts**: Google Fonts (Playfair Display, Inter)
-- **Icons**: Emoji and custom CSS icons
+### Main Website
+1. Install dependencies: `npm install`
+2. Start server: `npm start`
+3. Visit: `http://localhost:3000`
 
-## 📱 Pages
+### Catering Website (Standalone)
+1. Navigate to catering directory: `cd catering-website`
+2. Install dependencies: `npm install`
+3. Start catering server: `npm start`
+4. Visit: `http://localhost:3001`
 
-1. **Homepage** (`/`) - Pizza debate theme with interactive poll
-2. **Menu** (`/menu`) - Popular menu items showcase
-3. **Catering** (`/catering`) - Corporate and event catering services
-4. **Franchise** (`/franchise`) - Franchise opportunities
-5. **Contact** (`/contact`) - Location, hours, and contact forms
+## 🌐 Available Sites
 
-## 🔧 Customization
+- **Main Website**: `http://localhost:3000` - Restaurant website with pizza debate
+- **Catering Website**: `http://localhost:3001` - Professional catering services
 
-### Adding New Pages
-1. Create a new `.ejs` file in the `views/` directory
-2. Add a route in `server.js`
-3. The navbar and footer will automatically be included
+## 📱 Features
 
-### Modifying Components
-- **Navbar**: Edit `views/partials/navbar.ejs`
-- **Footer**: Edit `views/partials/footer.ejs`
-- **Head**: Edit `views/partials/head.ejs`
+### Main Website
+- Pizza debate between Chicago vs New York styles
+- Restaurant menu and information
+- Voting system for pizza preferences
+- Admin panel for management
 
-### Styling
-- Main styles are in `public/css/styles.css`
-- Tailwind CSS classes are used throughout
-- Custom animations are defined in CSS
+### Catering Website
+- Professional catering services
+- Corporate and private event catering
+- Complete catering menu
+- Quote request system
 
-## 🚀 Deployment
+## 🔧 Development
 
-### Production Build
-```bash
-npm run production
-```
+Both websites can be developed independently:
+- Main site uses port 3000
+- Catering site uses port 3001
+- Separate package.json files for dependencies
+- Independent routing and templates
 
-### Build Script
-```bash
-npm run build
-```
+## 📞 Contact
 
-## 📊 Scripts
-
-- `npm start` - Start the production server
-- `npm run dev` - Start development server with auto-reload
-- `npm run build` - Build for production
-- `npm run production` - Create production build
-- `npm run status` - Check git status
-
-## 🎯 Key Features
-
-### Interactive Poll System
-- Real-time voting for pizza style preferences
-- Local storage persistence
-- Animated progress bars and vote counters
-
-### Animation System
-- Scroll-triggered animations using Intersection Observer
-- Staggered animation delays for smooth visual flow
-- CSS keyframe animations for special effects
-
-### Responsive Design
-- Mobile-first approach
-- Tailwind CSS utility classes
-- Flexible grid layouts
-
-## 🔍 Browser Support
-
-- Chrome 60+
-- Firefox 55+
-- Safari 12+
-- Edge 79+
-
-## 📄 License
-
-This project is proprietary to That's Amore Pizzeria.
-
-## 🤝 Contributing
-
-This is a private project for That's Amore Pizzeria. For questions or support, please contact the development team.
+- **Phone**: (504) 463-5384
+- **Address**: 4441 West Metairie Ave, Metairie, LA 70001
+- **Email**: info@thatsamorepizza.com
 
 ---
 
-**That's Amore Pizzeria** - Where the Great Pizza Debate Ends! 🍕🗽🏙️
+**Last Updated**: December 2024  
+**Version**: 2.0.0 (Added standalone catering website)

@@ -1,0 +1,380 @@
+<!-- Hero Section -->
+<section id="home" class="min-h-[100vh] md:min-h-[90vh] relative overflow-hidden">
+    <!-- Hero Background Video -->
+    <div class="absolute inset-0">
+        <video 
+            autoplay 
+            muted 
+            loop 
+            playsinline
+            class="w-full h-full object-cover"
+            poster="/images/catering-setup.jpg"
+        >
+            <source src="/videos/hero-background.mp4" type="video/mp4">
+            <source src="/videos/hero-background.webm" type="video/webm">
+            <!-- Fallback to image if video fails to load -->
+            <img src="/images/catering-setup.jpg" alt="That's Amore Catering Setup" class="w-full h-full object-cover">
+        </video>
+        <div class="absolute inset-0 bg-gradient-to-br from-maroon/30 via-primary/20 to-accent/30"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(218,165,32,0.15),transparent_50%)]"></div>
+        <!-- White overlay for better text readability -->
+        <div class="absolute inset-0 bg-white/60"></div>
+    </div>
+    
+    <!-- Classic Italian Pattern Overlay -->
+    <div class="absolute inset-0 opacity-5">
+        <div class="absolute inset-0" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(139, 0, 0, 0.1) 35px, rgba(139, 0, 0, 0.1) 70px);"></div>
+    </div>
+    
+    <!-- Hero Content -->
+    <div class="relative z-10 flex items-center justify-center min-h-[100vh] md:min-h-[90vh] px-4">
+        <div class="text-center max-w-6xl mx-auto">
+            <!-- Main Headline -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-heading font-bold text-dark mb-4 md:mb-6 leading-tight w-full md:w-auto mx-auto" data-aos="fade-up" data-aos-delay="100">
+                <span class="block">Professional</span>
+                <span class="block text-primary">Catering Services</span>
+            </h1>
+            
+            <!-- Catering Subtitle -->
+            <div class="text-base md:text-lg lg:text-xl xl:text-2xl font-body text-gray-700 mb-4 md:mb-8 px-2 md:px-4" data-aos="fade-up" data-aos-delay="300">
+                <span class="typewriter-text">Corporate Events • Private Parties • Special Occasions<br class="md:hidden">Authentic Italian Cuisine for Any Group Size</span>
+            </div>
+            
+            <!-- Catering Call to Action -->
+            <div class="text-base md:text-lg lg:text-xl text-gray-600 mb-4 md:mb-8 max-w-3xl mx-auto px-2" data-aos="fade-up" data-aos-delay="500">
+                <p class="mb-2 md:mb-4">From intimate gatherings to large corporate events</p>
+                <p class="font-semibold text-primary">Let us handle the food while you enjoy the celebration!</p>
+            </div>
+            
+            <!-- Catering CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center mb-4 md:mb-8" data-aos="fade-up" data-aos-delay="700">
+                <a href="/quote" class="bg-gradient-to-r from-primary to-maroon text-white px-6 md:px-10 py-3 md:py-4 rounded-full text-lg md:text-xl font-medium hover:from-maroon hover:to-primary transition-all duration-300 transform hover:scale-105 shadow-2xl border-2 border-accent/30 w-full sm:w-auto">
+                    Get Catering Quote
+                </a>
+                <a href="tel:504-463-5384" class="bg-gradient-to-r from-secondary to-cream text-primary border-2 border-primary px-6 md:px-10 py-3 md:py-4 rounded-full text-lg md:text-xl font-medium hover:from-primary hover:to-maroon hover:text-white transition-all duration-300 transform hover:scale-105 shadow-2xl w-full sm:w-auto">
+                    Call for Catering
+                </a>
+            </div>
+            
+            <!-- Scroll to see catering options -->
+            <div class="text-xs md:text-sm text-gray-500" data-aos="fade-up" data-aos-delay="900">
+                Scroll down to explore our catering services...
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div class="w-6 h-10 border-2 border-primary rounded-full flex justify-center">
+            <div class="w-1 h-3 bg-primary rounded-full mt-2 animate-pulse"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Our Catering Section -->
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div data-aos="fade-right">
+                <h2 class="text-4xl font-heading font-bold text-dark mb-6">
+                    Why Choose <span class="text-primary">Our Catering?</span>
+                </h2>
+                <p class="text-xl text-gray-600 mb-6">
+                    We're not just another caterer - we're culinary experts with decades of experience in creating memorable dining experiences.
+                </p>
+                <div class="space-y-4">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-primary rounded-full mt-2"></div>
+                        <span class="text-gray-700">Authentic Italian recipes passed down through generations</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-primary rounded-full mt-2"></div>
+                        <span class="text-gray-700">Fresh, locally-sourced ingredients</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-primary rounded-full mt-2"></div>
+                        <span class="text-gray-700">Professional setup and service</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-primary rounded-full mt-2"></div>
+                        <span class="text-gray-700">Flexible packages for any group size</span>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-2 h-2 bg-primary rounded-full mt-2"></div>
+                        <span class="text-gray-700">Reliable delivery and timing</span>
+                    </div>
+                </div>
+            </div>
+            <div data-aos="fade-left">
+                <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+                    <h3 class="text-2xl font-heading font-bold text-primary mb-4">Our Catering Story</h3>
+                    <p class="text-gray-600 mb-4">
+                        Founded in Metairie, Louisiana, That's Amore has been serving authentic Italian cuisine since 1995. 
+                        Our catering division was born from the overwhelming demand for our delicious food at private events.
+                    </p>
+                    <p class="text-gray-600 mb-4">
+                        We understand that every event is unique, which is why we offer customizable catering packages 
+                        that can be tailored to your specific needs and budget.
+                    </p>
+                    <p class="text-gray-600">
+                        From corporate lunches to wedding receptions, we've catered thousands of successful events 
+                        and look forward to making your next gathering unforgettable!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Catering Services Section -->
+<section id="catering-services" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-4xl font-heading font-bold text-dark mb-4">
+                Our <span class="text-primary">Catering Services</span>
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                From intimate gatherings to large corporate events, we provide comprehensive catering solutions 
+                that ensure your event is a culinary success.
+            </p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Corporate Catering -->
+            <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 border-2 border-blue-200">
+                    <div class="text-5xl mb-4">🏢</div>
+                    <h3 class="text-2xl font-heading font-bold text-blue-800 mb-4">Corporate Events</h3>
+                    <p class="text-gray-600 mb-6">Professional catering for offices and businesses</p>
+                    <ul class="text-left text-sm text-gray-700 space-y-2 mb-6">
+                        <li>• Lunch meetings and conferences</li>
+                        <li>• Team building events</li>
+                        <li>• Client appreciation</li>
+                        <li>• Holiday parties</li>
+                    </ul>
+                    <a href="/quote" class="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition-all duration-300">
+                        Get Corporate Quote
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Private Parties -->
+            <div class="text-center" data-aos="fade-up" data-aos-delay="400">
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8 border-2 border-green-200">
+                    <div class="text-5xl mb-4">🎉</div>
+                    <h3 class="text-2xl font-heading font-bold text-green-800 mb-4">Private Parties</h3>
+                    <p class="text-gray-600 mb-6">Celebrate special moments with family and friends</p>
+                    <ul class="text-left text-sm text-gray-700 space-y-2 mb-6">
+                        <li>• Birthday celebrations</li>
+                        <li>• Anniversary parties</li>
+                        <li>• Family reunions</li>
+                        <li>• Graduation parties</li>
+                    </ul>
+                    <a href="/quote" class="bg-green-600 text-white px-6 py-3 rounded-full font-medium hover:bg-green-700 transition-all duration-300">
+                        Get Private Quote
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Special Events -->
+            <div class="text-center" data-aos="fade-up" data-aos-delay="600">
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-8 border-2 border-purple-200">
+                    <div class="text-5xl mb-4">🌟</div>
+                    <h3 class="text-2xl font-heading font-bold text-purple-800 mb-4">Special Events</h3>
+                    <p class="text-gray-600 mb-6">Make your event unforgettable</p>
+                    <ul class="text-left text-sm text-gray-700 space-y-2 mb-6">
+                        <li>• Weddings and receptions</li>
+                        <li>• Fundraisers</li>
+                        <li>• Community events</li>
+                        <li>• Holiday celebrations</li>
+                    </ul>
+                    <a href="/quote" class="bg-purple-600 text-white px-6 py-3 rounded-full font-medium hover:bg-purple-700 transition-all duration-300">
+                        Get Special Quote
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Catering Menu Preview Section -->
+<section id="catering-menu" class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-4xl font-heading font-bold text-dark mb-4">
+                Our <span class="text-primary">Catering Menu</span>
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Authentic Italian dishes perfect for any event. From pizza to pasta, appetizers to salads - 
+                we have everything you need for a memorable celebration.
+            </p>
+        </div>
+        
+        <div class="grid lg:grid-cols-2 gap-12">
+            <!-- Pizza Catering -->
+            <div data-aos="fade-right">
+                <h3 class="text-3xl font-heading font-bold text-primary mb-8">Pizza Catering</h3>
+                <p class="text-lg text-gray-600 mb-6">Perfect for any group size - from small meetings to large events</p>
+                
+                <div class="space-y-4">
+                    <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
+                        <h4 class="text-xl font-heading font-bold text-dark mb-3">New York Style</h4>
+                        <p class="text-gray-600 mb-3">Traditional thin crust pizza - perfect for sharing</p>
+                        <div class="text-sm text-gray-700 space-y-1">
+                            <div>• 10" (One Topping) - $10</div>
+                            <div>• 16" (One Topping) - $18</div>
+                            <div>• 18" (One Topping) - $23</div>
+                            <div>• 20" (One Topping) - $27</div>
+                            <div>• 24" (One Topping) - $34</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
+                        <h4 class="text-xl font-heading font-bold text-dark mb-3">Chicago Deep Dish</h4>
+                        <p class="text-gray-600 mb-3">Hearty deep dish pizza - a meal in itself</p>
+                        <div class="text-sm text-gray-700 space-y-1">
+                            <div>• 7" (One Topping) - $20</div>
+                            <div>• 13x9" (One Topping) - $30</div>
+                            <div>• 14" (One Topping) - $33</div>
+                        </div>
+                        <p class="text-xs text-yellow-600 mt-2">*Deep dish takes 45+ minutes to cook</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Dishes & Appetizers -->
+            <div data-aos="fade-left">
+                <h3 class="text-3xl font-heading font-bold text-primary mb-8">Main Dishes & Appetizers</h3>
+                <p class="text-lg text-gray-600 mb-6">Complete meal solutions for your event</p>
+                
+                <div class="space-y-4">
+                    <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
+                        <h4 class="text-xl font-heading font-bold text-dark mb-3">Pasta Dishes</h4>
+                        <div class="text-sm text-gray-700 space-y-1">
+                            <div>• Homemade Lasagna - $70/$105</div>
+                            <div>• Chicken Alfredo - $60/$85</div>
+                            <div>• Shrimp Alfredo - $65/$95</div>
+                            <div>• Spaghetti & Meatballs - $50/$75</div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">*Small (8-10 people) / Large (15-20 people)</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
+                        <h4 class="text-xl font-heading font-bold text-dark mb-3">Appetizers & Sides</h4>
+                        <div class="text-sm text-gray-700 space-y-1">
+                            <div>• Fried Ravioli (40 pieces) - $40</div>
+                            <div>• Chicken Tenders (50 pieces) - $50</div>
+                            <div>• Chicken Wings (50 pieces) - $80</div>
+                            <div>• Waffle Fries (80 pieces) - $40</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-12" data-aos="fade-up" data-aos-delay="200">
+            <a href="/menu" class="bg-primary text-white px-8 py-4 rounded-full text-xl font-medium hover:bg-primary/90 transition-all duration-300 transform hover:scale-105">
+                View Full Catering Menu
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Catering Tips Section -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-4xl font-heading font-bold text-dark mb-4">
+                Catering <span class="text-primary">Tips & Guidelines</span>
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Make your catering experience smooth and successful with these helpful guidelines
+            </p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Planning -->
+            <div class="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-8 border-2 border-primary/20" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-4xl mb-4">📅</div>
+                <h3 class="text-2xl font-heading font-bold text-primary mb-4">Planning Ahead</h3>
+                <ul class="space-y-3 text-gray-700">
+                    <li class="flex items-start">
+                        <span class="text-primary mr-2">✓</span>
+                        <span>Book at least 48 hours in advance</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-primary mr-2">✓</span>
+                        <span>Deep dish requires 45+ minutes</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-primary mr-2">✓</span>
+                        <span>Large orders need more notice</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Portions -->
+            <div class="bg-gradient-to-br from-secondary/10 to-cream/10 rounded-2xl p-8 border-2 border-secondary/20" data-aos="fade-up" data-aos-delay="400">
+                <div class="text-4xl mb-4">🍽️</div>
+                <h3 class="text-2xl font-heading font-bold text-primary mb-4">Portion Guidelines</h3>
+                <ul class="space-y-3 text-gray-700">
+                    <li class="flex items-start">
+                        <span class="text-primary mr-2">✓</span>
+                        <span>Small groups (5-10): 2-3 large pizzas</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-primary mr-2">✓</span>
+                        <span>Medium groups (10-20): 4-6 large pizzas</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-primary mr-2">✓</span>
+                        <span>Large groups (20+): Mix of sizes</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Service -->
+            <div class="bg-gradient-to-br from-accent/10 to-primary/10 rounded-2xl p-8 border-2 border-accent/20" data-aos="fade-up" data-aos-delay="600">
+                <div class="text-4xl mb-4">🚚</div>
+                <h3 class="text-2xl font-heading font-bold text-primary mb-4">Delivery & Setup</h3>
+                <ul class="space-y-3 text-gray-700">
+                    <li class="flex items-start">
+                        <span class="text-primary mr-2">✓</span>
+                        <span>Professional delivery service</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-primary mr-2">✓</span>
+                        <span>Setup and presentation included</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-primary mr-2">✓</span>
+                        <span>Disposable serving items available</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-20 bg-primary text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl font-heading font-bold mb-6" data-aos="fade-up">Ready to Plan Your Event?</h2>
+        <p class="text-xl mb-8" data-aos="fade-up" data-aos-delay="200">Let us make your next gathering unforgettable with our delicious catering</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center" data-aos="fade-up" data-aos-delay="400">
+            <a href="/quote" class="bg-white text-primary px-8 py-4 rounded-full text-xl font-medium hover:bg-gray-100 transition-all duration-300 transform hover:scale-105">
+                Get Quote Now
+            </a>
+            <a href="tel:504-463-5384" class="bg-accent text-dark px-8 py-4 rounded-full text-xl font-medium hover:bg-accent/90 transition-all duration-300">
+                Call (504) 463-5384
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Floating Contact Button -->
+<div id="floating-contact" class="fixed bottom-8 right-8 z-[9999] opacity-100 pointer-events-auto transition-all duration-300 transform translate-y-0">
+    <a href="tel:504-463-5384" class="bg-primary text-white px-6 py-3 rounded-full shadow-2xl hover:bg-primary/90 transition-all duration-300 transform hover:scale-110 flex items-center justify-center">
+        <span class="text-sm font-medium">Call Now</span>
+    </a>
+</div>

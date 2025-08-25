@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : "That's Amore Catering | Professional Event Catering in Metairie" %></title>
+    <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'Professional catering services for corporate events, parties, and special occasions. Pizza trays, pasta, appetizers, and complete meal packages available.' %>">
+    <meta name="keywords" content="catering, corporate catering, event catering, pizza catering, Italian catering, Metairie, Louisiana">
+    <meta property="og:title" content="That's Amore Catering | Professional Event Catering">
+    <meta property="og:description" content="Professional catering services for corporate events, parties, and special occasions. Pizza trays, pasta, appetizers, and complete meal packages available.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://catering.thatsamorepizza.com">
+    <link rel="canonical" href="https://catering.thatsamorepizza.com">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/catering-styles.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/Logo/favicon.jpg">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8B0000',    // Maroon
+                        secondary: '#F5F5DC',  // Beige
+                        accent: '#DAA520',      // Goldenrod
+                        maroon: '#8B0000',
+                        cream: '#F5F5DC',
+                        dark: '#1F2937'
+                    },
+                    fontFamily: {
+                        heading: ['Playfair Display', 'serif'],
+                        body: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-body text-dark bg-white">
+    <%- include('partials/catering-navbar', { currentPage: currentPage || 'home' }) %>
+    
+    <%- body %>
+    
+    <%- include('partials/catering-footer') %>
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+    </script>
+    
+    <% if (typeof pageScripts !== 'undefined' && pageScripts.length > 0) { %>
+        <% pageScripts.forEach(function(script) { %>
+            <script src="<%= script %>"></script>
+        <% }); %>
+    <% } %>
+</body>
+</html>

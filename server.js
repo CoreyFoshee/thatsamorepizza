@@ -229,6 +229,8 @@ app.get('/catering', (req, res) => {
     });
 });
 
+
+
 app.get('/franchise', (req, res) => {
     res.render('franchise', { 
         title: "Franchise - That's Amore Pizzeria | Own a Slice of Something Great",
