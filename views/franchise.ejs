@@ -37,7 +37,7 @@
         <div class="grid md:grid-cols-3 gap-8">
             <div class="text-center" data-aos="fade-up" data-aos-delay="100">
                 <div class="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-8">
-                    <div class="text-5xl font-heading font-bold text-primary mb-2" data-count="12">0</div>
+                    <div class="text-5xl font-heading font-bold text-primary mb-2" id="years-in-business">0</div>
                     <div class="text-gray-700 text-lg font-medium">Years in Business</div>
                     <p class="text-gray-500 text-sm mt-2">Established in 2012</p>
                 </div>
@@ -440,11 +440,16 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Animate the years counter only
-    const yearsCounter = document.querySelector('[data-count="12"]');
+    // Calculate years in business dynamically (current year - 2012)
+    const currentYear = new Date().getFullYear();
+    const establishedYear = 2012;
+    const yearsInBusiness = currentYear - establishedYear;
+    
+    // Animate the years counter
+    const yearsCounter = document.getElementById('years-in-business');
     
     if (yearsCounter) {
-        const target = 12;
+        const target = yearsInBusiness;
         const increment = target / 100;
         let current = 0;
         

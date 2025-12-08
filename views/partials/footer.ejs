@@ -78,12 +78,20 @@
             </div>
         </div>
         <div class="border-t border-gray-700 mt-8 pt-8">
-            <p class="text-gray-400">© 2024 That's Amore Pizzeria. All rights reserved.</p>
+            <p class="text-gray-400">© <span id="copyright-year"></span> That's Amore Pizzeria. All rights reserved.</p>
         </div>
     </div>
 </footer>
 
 <script>
+// Set copyright year dynamically
+document.addEventListener('DOMContentLoaded', function() {
+    const copyrightYear = document.getElementById('copyright-year');
+    if (copyrightYear) {
+        copyrightYear.textContent = new Date().getFullYear();
+    }
+});
+
 // Business Hours Logic
 document.addEventListener('DOMContentLoaded', function() {
     const todayHoursElement = document.getElementById('today-hours');
