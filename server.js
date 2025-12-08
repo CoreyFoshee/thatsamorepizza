@@ -119,7 +119,18 @@ function loadAdminData() {
     try {
         if (fs.existsSync(ADMIN_DATA_FILE)) {
             const data = JSON.parse(fs.readFileSync(ADMIN_DATA_FILE, 'utf8'));
+            // Merge the data, but preserve nested objects like hours
             adminData = { ...adminData, ...data };
+            // If hours object exists in loaded data, merge it properly to preserve businessHours and holidayHours
+            if (data.hours) {
+                adminData.hours = {
+                    ...adminData.hours,
+                    ...data.hours,
+                    // Preserve businessHours and holidayHours from defaults if not in loaded data
+                    businessHours: data.hours.businessHours || adminData.hours.businessHours,
+                    holidayHours: data.hours.holidayHours || adminData.hours.holidayHours
+                };
+            }
             console.log('Admin data loaded from file');
         }
     } catch (error) {
@@ -243,7 +254,7 @@ app.get('/franchise', (req, res) => {
 app.get('/contact', (req, res) => {
     res.render('contact', { 
         title: "Contact - That's Amore Pizzeria | Visit Us in Metairie, Louisiana",
-        description: "Contact That's Amore Pizzeria in Metairie, Louisiana. Visit us at 4441 West Metairie Ave or call (504) 463-5384 for orders and reservations.",
+        description: "Contact That's Amore Pizzeria in Metairie, Louisiana. Visit us at 4441 West Metairie Ave or call (504) 454-5885 for orders and reservations.",
         currentPage: 'contact',
         pageScripts: []
     });
@@ -419,7 +430,12 @@ app.post('/api/admin/hours', (req, res) => {
                 }
             }
             
-            adminData.hours.businessHours = businessHours;
+            // Convert array to object with numeric keys (0-6) for frontend compatibility
+            const businessHoursObj = {};
+            businessHours.forEach((day, index) => {
+                businessHoursObj[index] = day;
+            });
+            adminData.hours.businessHours = businessHoursObj;
         }
         
         if (holidayHours !== undefined) {

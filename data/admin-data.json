@@ -6,6 +6,21 @@
   "hours": {
     "header": "Mon-Fri: 11AM-10PM | Sat-Sun: 12PM-11PM",
     "footer": "Open Daily | Mon-Fri: 11AM-10PM | Sat-Sun: 12PM-11PM",
+    "businessHours": {
+      "0": { "day": "Sunday", "hours": "11:00 AM - 8:00 PM", "open": true },
+      "1": { "day": "Monday", "hours": "Closed", "open": false },
+      "2": { "day": "Tuesday", "hours": "11:00 AM - 8:00 PM", "open": true },
+      "3": { "day": "Wednesday", "hours": "11:00 AM - 8:00 PM", "open": true },
+      "4": { "day": "Thursday", "hours": "11:00 AM - 8:00 PM", "open": true },
+      "5": { "day": "Friday", "hours": "11:00 AM - 9:00 PM", "open": true },
+      "6": { "day": "Saturday", "hours": "11:00 AM - 9:00 PM", "open": true }
+    },
+    "holidayHours": [
+      { "name": "Christmas Day", "month": 12, "day": 25, "hours": "Closed", "open": false },
+      { "name": "Christmas Eve", "month": 12, "day": 24, "hours": "11:00 AM - 3:00 PM", "open": true },
+      { "name": "Easter", "month": 0, "day": 0, "hours": "Closed", "open": false, "isCalculated": true },
+      { "name": "Thanksgiving", "month": 10, "day": 0, "hours": "Closed", "open": false, "isCalculated": true }
+    ],
     "lastUpdated": "2025-08-19T13:52:58.857Z"
   },
   "scheduledClosures": [],

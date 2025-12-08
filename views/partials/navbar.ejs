@@ -1,10 +1,65 @@
+<!-- Top Contact Bar -->
+<div class="bg-primary text-white py-2 px-4 text-sm">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center space-y-1 md:space-y-0">
+        <a href="tel:504-454-5885" class="flex items-center space-x-2 hover:text-accent transition-colors">
+            <span>📞</span>
+            <span>(504) 454-5885</span>
+        </a>
+        <span class="hidden md:inline text-gray-300 mx-4">•</span>
+        <a href="https://maps.google.com/?q=4441+West+Metairie+Ave+Metairie+LA+70001" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-2 hover:text-accent transition-colors">
+            <span>📍</span>
+            <span>4441 West Metairie Ave, Metairie, LA 70001</span>
+        </a>
+    </div>
+</div>
+
 <!-- Today's Hours Infobar -->
-<div id="hours-infobar" class="bg-dark text-white py-2 px-4 text-center text-sm">
+<div id="hours-infobar" class="bg-dark text-white py-2 px-4 text-center text-sm relative">
     <div class="max-w-7xl mx-auto flex items-center justify-center space-x-2">
         <span class="text-accent">🕒</span>
         <span id="infobar-hours">Loading hours...</span>
         <span class="text-accent">•</span>
         <span id="infobar-status">Loading...</span>
+        <span class="text-accent mx-2">•</span>
+        <button id="view-schedule-btn" class="text-accent hover:text-accent/80 underline transition-colors cursor-pointer">
+            View Full Schedule
+        </button>
+    </div>
+    
+    <!-- Full Week Schedule Dropdown -->
+    <div id="full-schedule-dropdown" class="hidden absolute top-full left-0 right-0 bg-dark border-t border-gray-700 shadow-lg z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="grid grid-cols-1 md:grid-cols-7 gap-3 text-center">
+                <div id="schedule-day-0" class="p-2">
+                    <div class="font-semibold text-accent mb-1">Sunday</div>
+                    <div class="text-sm">Loading...</div>
+                </div>
+                <div id="schedule-day-1" class="p-2">
+                    <div class="font-semibold text-accent mb-1">Monday</div>
+                    <div class="text-sm">Loading...</div>
+                </div>
+                <div id="schedule-day-2" class="p-2">
+                    <div class="font-semibold text-accent mb-1">Tuesday</div>
+                    <div class="text-sm">Loading...</div>
+                </div>
+                <div id="schedule-day-3" class="p-2">
+                    <div class="font-semibold text-accent mb-1">Wednesday</div>
+                    <div class="text-sm">Loading...</div>
+                </div>
+                <div id="schedule-day-4" class="p-2">
+                    <div class="font-semibold text-accent mb-1">Thursday</div>
+                    <div class="text-sm">Loading...</div>
+                </div>
+                <div id="schedule-day-5" class="p-2">
+                    <div class="font-semibold text-accent mb-1">Friday</div>
+                    <div class="text-sm">Loading...</div>
+                </div>
+                <div id="schedule-day-6" class="p-2">
+                    <div class="font-semibold text-accent mb-1">Saturday</div>
+                    <div class="text-sm">Loading...</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -21,7 +76,7 @@
                 <div class="ml-10 flex items-baseline space-x-8">
                     <a href="/" class="nav-link <%= currentPage === 'home' ? 'text-accent' : 'text-white' %>">Home</a>
                     <a href="/menu" class="nav-link <%= currentPage === 'menu' ? 'text-accent' : 'text-white' %>">Menu</a>
-                    <a href="/catering" class="nav-link <%= currentPage === 'catering' ? 'text-accent' : 'text-white' %>">Catering</a>
+                    <a href="https://amorecatering.net" class="nav-link <%= currentPage === 'catering' ? 'text-accent' : 'text-white' %>" target="_blank" rel="noopener noreferrer">Catering</a>
                     <a href="/franchise" class="nav-link <%= currentPage === 'franchise' ? 'text-accent' : 'text-white' %>">Franchise</a>
                     <a href="/contact" class="nav-link <%= currentPage === 'contact' ? 'text-accent' : 'text-white' %>">Contact</a>
                     <a href="https://www.thatsamorepizzametairie.com/#/" class="bg-accent text-dark px-6 py-2 rounded-full font-medium hover:bg-accent/90 transition-all duration-300 transform hover:scale-105">
@@ -68,7 +123,7 @@
                 <a href="/menu" class="mobile-nav-link <%= currentPage === 'menu' ? 'text-accent' : 'text-white' %>" data-page="menu">
                     <span class="text-3xl font-heading font-bold">Menu</span>
                 </a>
-                <a href="/catering" class="mobile-nav-link <%= currentPage === 'catering' ? 'text-accent' : 'text-white' %>" data-page="catering">
+                <a href="https://amorecatering.net" class="mobile-nav-link <%= currentPage === 'catering' ? 'text-accent' : 'text-white' %>" data-page="catering" target="_blank" rel="noopener noreferrer">
                     <span class="text-3xl font-heading font-bold">Catering</span>
                 </a>
                 <a href="/franchise" class="mobile-nav-link <%= currentPage === 'franchise' ? 'text-accent' : 'text-white' %>" data-page="franchise">
@@ -110,17 +165,68 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     updateHoursInfobar(data.data, infobarHours, infobarStatus);
+                    updateFullWeekSchedule(data.data);
                 } else {
                     console.error('Failed to fetch hours:', data.message);
                     // Fallback to default hours
                     updateHoursInfobarWithDefaults(infobarHours, infobarStatus);
+                    updateFullWeekScheduleWithDefaults();
                 }
             })
             .catch(error => {
                 console.error('Error fetching hours:', error);
                 // Fallback to default hours
                 updateHoursInfobarWithDefaults(infobarHours, infobarStatus);
+                updateFullWeekScheduleWithDefaults();
             });
+        
+        // Toggle schedule dropdown
+        const viewScheduleBtn = document.getElementById('view-schedule-btn');
+        const scheduleDropdown = document.getElementById('full-schedule-dropdown');
+        
+        if (viewScheduleBtn && scheduleDropdown) {
+            viewScheduleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                scheduleDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!scheduleDropdown.contains(e.target) && !viewScheduleBtn.contains(e.target)) {
+                    scheduleDropdown.classList.add('hidden');
+                }
+            });
+        }
+    }
+    
+    function updateFullWeekSchedule(hoursData) {
+        const businessHours = hoursData.businessHours || {};
+        
+        for (let i = 0; i < 7; i++) {
+            const dayElement = document.getElementById(`schedule-day-${i}`);
+            if (dayElement) {
+                const dayInfo = businessHours[i] || { day: 'Unknown', hours: 'Closed', open: false };
+                const hoursElement = dayElement.querySelector('.text-sm');
+                if (hoursElement) {
+                    hoursElement.textContent = dayInfo.hours;
+                    hoursElement.className = dayInfo.open ? 'text-sm text-green-400' : 'text-sm text-red-400';
+                }
+            }
+        }
+    }
+    
+    function updateFullWeekScheduleWithDefaults() {
+        const businessHours = {
+            0: { day: 'Sunday', hours: '11:00 AM - 8:00 PM', open: true },
+            1: { day: 'Monday', hours: 'Closed', open: false },
+            2: { day: 'Tuesday', hours: '11:00 AM - 8:00 PM', open: true },
+            3: { day: 'Wednesday', hours: '11:00 AM - 8:00 PM', open: true },
+            4: { day: 'Thursday', hours: '11:00 AM - 8:00 PM', open: true },
+            5: { day: 'Friday', hours: '11:00 AM - 9:00 PM', open: true },
+            6: { day: 'Saturday', hours: '11:00 AM - 9:00 PM', open: true }
+        };
+        
+        updateFullWeekSchedule({ businessHours });
     }
     
     function updateHoursInfobar(hoursData, infobarHours, infobarStatus) {
