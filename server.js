@@ -1,16 +1,29 @@
 const express = require('express');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
-const http = require('http');
-const socketIo = require('socket.io');
 const fs = require('fs');
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
-const PORT = process.env.PORT || 3000;
 
 // Check if we're running on Vercel (serverless environment)
 const isVercel = process.env.VERCEL === '1';
+
+// Socket.IO and HTTP server only for non-Vercel environments
+let server, io;
+if (!isVercel) {
+    const http = require('http');
+    const socketIo = require('socket.io');
+    server = http.createServer(app);
+    io = socketIo(server);
+} else {
+    // Create a dummy io object for Vercel to prevent errors
+    io = {
+        emit: () => {}, // No-op function
+        on: () => {}, // No-op function
+        engine: { clientsCount: 0 }
+    };
+}
+
+const PORT = process.env.PORT || 3000;
 
 // Data file paths (only used in non-Vercel environments)
 const DATA_FILE = path.join(__dirname, 'data', 'voting-data.json');
@@ -778,8 +791,9 @@ app.get('/api/voting-data', (req, res) => {
     });
 });
 
-// WebSocket event handlers
-io.on('connection', (socket) => {
+// WebSocket event handlers (only active in non-Vercel environments)
+if (!isVercel) {
+    io.on('connection', (socket) => {
     console.log('New client connected:', socket.id);
     
     // Send current voting data to new clients
@@ -824,19 +838,23 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
     });
-});
+    });
+}
 
 // Add a note about Vercel limitations
 if (isVercel) {
     console.log('⚠️  Running on Vercel - WebSocket connections may not persist between requests');
     console.log('⚠️  Voting data will reset when serverless functions restart');
+    // Don't initialize Socket.IO on Vercel as it doesn't work in serverless
+    // The io object will be undefined, which is handled in the code
+} else {
+    // Start server only in non-Vercel environments
+    server.listen(PORT, () => {
+        console.log(`🚀 That's Amore Pizzeria website running on http://localhost:${PORT}`);
+        console.log(`🍕 The great pizza debate is ready!`);
+        console.log(`📡 WebSocket server active for real-time voting!`);
+    });
 }
 
-// Start server
-server.listen(PORT, () => {
-    console.log(`🚀 That's Amore Pizzeria website running on http://localhost:3000`);
-    console.log(`🍕 The great pizza debate is ready!`);
-    console.log(`📡 WebSocket server active for real-time voting!`);
-});
-
+// Export app for Vercel serverless functions
 module.exports = app;
