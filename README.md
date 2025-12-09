@@ -63,7 +63,7 @@ Both websites can be developed independently:
 
 - **Phone**: (504) 454-5885
 - **Address**: 4441 West Metairie Ave, Metairie, LA 70001
-- **Email**: info@thatsamorepizza.com
+- **Email**: Darren.thatsamore@gmail.com
 
 ---
 
