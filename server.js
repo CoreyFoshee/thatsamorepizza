@@ -1,3 +1,6 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
@@ -281,11 +284,17 @@ async function recordVote(choice, sessionId) {
         }
         
         // Insert vote record
-        const { error: insertError } = await supabase
+        const { data: insertedVote, error: insertError } = await supabase
             .from('vote_records')
-            .insert({ choice, session_id: sessionId });
+            .insert({ choice, session_id: sessionId })
+            .select();
         
-        if (insertError) throw insertError;
+        if (insertError) {
+            console.error('Error inserting vote record:', insertError);
+            throw insertError;
+        }
+        
+        console.log('Vote record inserted successfully:', insertedVote);
         
         // Update metrics
         const { data: metrics } = await supabase
@@ -321,7 +330,8 @@ async function recordVote(choice, sessionId) {
         };
     } catch (error) {
         console.error('Error recording vote:', error);
-        return { success: false, message: 'Error recording vote' };
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        return { success: false, message: 'Error recording vote: ' + (error.message || error.toString()) };
     }
 }
 
@@ -1317,6 +1327,35 @@ app.get('/api/voting-data', async (req, res) => {
     } catch (error) {
         console.error('Error fetching voting data:', error);
         res.status(500).json({ success: false, message: 'Error fetching voting data' });
+    }
+});
+
+// Debug endpoint to check vote records
+app.get('/api/debug/vote-records', async (req, res) => {
+    if (!supabase) {
+        return res.json({ success: false, message: 'Supabase not configured' });
+    }
+    
+    try {
+        const { data, error } = await supabase
+            .from('vote_records')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(10);
+        
+        if (error) {
+            console.error('Error fetching vote records:', error);
+            return res.status(500).json({ success: false, error: error.message });
+        }
+        
+        res.json({
+            success: true,
+            count: data ? data.length : 0,
+            records: data
+        });
+    } catch (error) {
+        console.error('Error in vote records debug:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 
