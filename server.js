@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
+const session = require('express-session');
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 const app = express();
@@ -821,6 +822,18 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Session configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'thats-amore-secret-key-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
 // Add error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err.stack);
@@ -904,8 +917,8 @@ app.get('/admin', (req, res) => {
     }));
 });
 
-// Admin API endpoints
-app.post('/api/admin/reset-votes', async (req, res) => {
+// Admin API endpoints (all protected)
+app.post('/api/admin/reset-votes', requireAuth, async (req, res) => {
     try {
         const result = await resetVotes();
         
@@ -933,7 +946,7 @@ app.post('/api/admin/reset-votes', async (req, res) => {
     }
 });
 
-app.post('/api/admin/set-votes', async (req, res) => {
+app.post('/api/admin/set-votes', requireAuth, async (req, res) => {
     try {
         const { nyVotes, chicagoVotes } = req.body;
         
@@ -1140,7 +1153,7 @@ function calculateCurrentStatus(status, hours, closures) {
     };
 }
 
-app.get('/api/admin/data', async (req, res) => {
+app.get('/api/admin/data', requireAuth, async (req, res) => {
     try {
         const [metrics, hours, status, closures] = await Promise.all([
             getRestaurantMetrics(),
@@ -1182,7 +1195,7 @@ app.get('/api/admin/data', async (req, res) => {
     }
 });
 
-app.post('/api/admin/restaurant-status', async (req, res) => {
+app.post('/api/admin/restaurant-status', requireAuth, async (req, res) => {
     try {
         const { manualClosed } = req.body;
         
@@ -1223,7 +1236,7 @@ app.post('/api/admin/restaurant-status', async (req, res) => {
     }
 });
 
-app.post('/api/admin/hours', async (req, res) => {
+app.post('/api/admin/hours', requireAuth, async (req, res) => {
     try {
         const { businessHours, holidayHours } = req.body;
         
@@ -1308,7 +1321,7 @@ app.get('/api/hours', async (req, res) => {
     }
 });
 
-app.post('/api/admin/closures', async (req, res) => {
+app.post('/api/admin/closures', requireAuth, async (req, res) => {
     try {
         const { date, reason } = req.body;
         
@@ -1339,7 +1352,7 @@ app.post('/api/admin/closures', async (req, res) => {
     }
 });
 
-app.delete('/api/admin/closures/:date', async (req, res) => {
+app.delete('/api/admin/closures/:date', requireAuth, async (req, res) => {
     try {
         const { date } = req.params;
         
@@ -1368,7 +1381,7 @@ app.delete('/api/admin/closures/:date', async (req, res) => {
 
 // Catering menu endpoints removed - no longer needed
 
-app.post('/api/admin/tv-controls', async (req, res) => {
+app.post('/api/admin/tv-controls', requireAuth, async (req, res) => {
     try {
         const { piesSold, nyVotes, chicagoVotes, nyLifetimeSales, chicagoLifetimeSales } = req.body;
         
@@ -1475,7 +1488,7 @@ app.post('/api/admin/tv-controls', async (req, res) => {
     }
 });
 
-app.get('/api/admin/voting-data', async (req, res) => {
+app.get('/api/admin/voting-data', requireAuth, async (req, res) => {
     try {
         const metrics = await getRestaurantMetrics();
         res.json({
