@@ -99,6 +99,56 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .popup-content {
+            background: #1a1a1a;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: white;
+        }
+        
+        .popup-content h3 {
+            margin-bottom: 1rem;
+            color: #fbbf24;
+        }
+        
+        .popup-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .popup-content li {
+            padding: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .popup-close {
+            float: right;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
         .btn-primary {
             background: #3b82f6;
             color: white;
@@ -230,34 +280,29 @@
             <!-- Holiday/Closures -->
             <div class="admin-card">
                 <h2 class="text-2xl font-bold text-yellow-400 mb-6">📅 Holiday/Closures</h2>
-                <div class="grid md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <h3 class="text-lg font-semibold mb-4">Add New Holiday</h3>
-                        <div class="space-y-3">
-                            <input type="text" id="holiday-name" class="form-input" placeholder="Holiday Name">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="number" id="holiday-month" class="form-input" placeholder="Month (1-12)" min="1" max="12">
-                                <input type="number" id="holiday-day" class="form-input" placeholder="Day (1-31)" min="1" max="31">
-                            </div>
-                            <input type="text" id="holiday-hours" class="form-input" placeholder="Hours (e.g., 11:00 AM - 3:00 PM)">
-                            <div class="flex items-center space-x-2">
-                                <input type="checkbox" id="holiday-open" class="w-4 h-4">
-                                <label for="holiday-open" class="text-sm">Open on this holiday</label>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <input type="checkbox" id="holiday-calculated" class="w-4 h-4">
-                                <label for="holiday-calculated" class="text-sm">Calculated Date (Easter/Thanksgiving)</label>
-                            </div>
-                            <button id="add-holiday" class="btn-primary">➕ Add Holiday</button>
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Add Holiday Hours / Closed Date</h3>
+                    <div class="grid md:grid-cols-2 gap-4 max-w-2xl">
+                        <input type="text" id="holiday-name" class="form-input" placeholder="Holiday Name">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="holiday-month" class="form-input" placeholder="Month (1-12)" min="1" max="12">
+                            <input type="number" id="holiday-day" class="form-input" placeholder="Day (1-31)" min="1" max="31">
                         </div>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold mb-4">Add New Closure</h3>
-                        <div class="space-y-3">
-                            <input type="date" id="closure-date" class="form-input">
-                            <input type="text" id="closure-reason" class="form-input" placeholder="Reason for closure (optional)">
-                            <button id="add-closure" class="btn-warning">➕ Add Closure</button>
+                        <input type="text" id="holiday-hours" class="form-input" placeholder="Hours (e.g., 11:00 AM - 3:00 PM or Closed)">
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="holiday-open" class="w-4 h-4">
+                            <label for="holiday-open" class="text-sm">Open on this holiday</label>
                         </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="holiday-repeats-yearly" class="w-4 h-4">
+                            <label for="holiday-repeats-yearly" class="text-sm">Repeats yearly</label>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="holiday-calculated" class="w-4 h-4">
+                            <label for="holiday-calculated" class="text-sm">Calculated Date</label>
+                            <a href="#" id="calculated-dates-link" class="text-blue-400 text-sm underline ml-2" onclick="showCalculatedDatesPopup(event); return false;">(view calculated dates)</a>
+                        </div>
+                        <button id="add-holiday" class="btn-primary">➕ Add Holiday</button>
                     </div>
                 </div>
                 <div class="mb-6">
@@ -351,11 +396,9 @@
         const holidayDay = document.getElementById('holiday-day');
         const holidayHours = document.getElementById('holiday-hours');
         const holidayOpen = document.getElementById('holiday-open');
+        const holidayRepeatsYearly = document.getElementById('holiday-repeats-yearly');
         const holidayCalculated = document.getElementById('holiday-calculated');
         const addHolidayBtn = document.getElementById('add-holiday');
-        const closureDate = document.getElementById('closure-date');
-        const closureReason = document.getElementById('closure-reason');
-        const addClosureBtn = document.getElementById('add-closure');
         const closuresList = document.getElementById('closures-list');
         const piesSold = document.getElementById('pies-sold');
         const updatePiesSoldBtn = document.getElementById('update-pies-sold');
@@ -567,6 +610,8 @@
                             holiday[field] = field === 'month' || field === 'day' ? parseInt(input.value) : input.value;
                         }
                     });
+                    // Set defaults for optional fields
+                    if (!holiday.hasOwnProperty('repeatsYearly')) holiday.repeatsYearly = true; // Default to true
                     if (holiday.name && holiday.month && holiday.day && holiday.hours !== undefined) {
                         holidayHours.push(holiday);
                     }
@@ -619,7 +664,8 @@
                 day: parseInt(holidayDay.value),
                 hours: holidayHours.value,
                 open: holidayOpen.checked,
-                isCalculated: holidayCalculated.checked
+                isCalculated: holidayCalculated.checked,
+                repeatsYearly: holidayRepeatsYearly.checked
             };
             
             currentHolidays.push(newHoliday);
@@ -632,34 +678,7 @@
             holidayHours.value = '';
             holidayOpen.checked = false;
             holidayCalculated.checked = false;
-        });
-        
-        addClosureBtn.addEventListener('click', async () => {
-            if (!closureDate.value) {
-                alert('Please select a date');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/admin/closures', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        date: closureDate.value,
-                        reason: closureReason.value
-                    })
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    updateClosuresDisplay(result.data);
-                    closureDate.value = '';
-                    closureReason.value = '';
-                    alert('Closure added successfully!');
-                }
-            } catch (error) {
-                console.error('Error adding closure:', error);
-            }
+            holidayRepeatsYearly.checked = false;
         });
         
         updatePiesSoldBtn.addEventListener('click', async () => {
@@ -800,6 +819,50 @@
                     holidayDiv.remove();
                 }
             }
+        };
+        
+        // Show calculated dates popup
+        window.showCalculatedDatesPopup = function(event) {
+            event.preventDefault();
+            
+            const calculatedDates = [
+                { name: 'Easter', description: 'First Sunday after the first full moon following the March equinox' },
+                { name: 'Thanksgiving', description: 'Fourth Thursday of November' },
+                { name: 'Good Friday', description: 'Friday before Easter Sunday' },
+                { name: 'Easter Monday', description: 'Monday after Easter Sunday' },
+                { name: 'Memorial Day', description: 'Last Monday of May' },
+                { name: 'Labor Day', description: 'First Monday of September' },
+                { name: 'Columbus Day', description: 'Second Monday of October' },
+                { name: 'Presidents Day', description: 'Third Monday of February' },
+                { name: 'Martin Luther King Jr. Day', description: 'Third Monday of January' }
+            ];
+            
+            const popup = document.createElement('div');
+            popup.className = 'popup-overlay';
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <h3>Calculated Dates Reference</h3>
+                    <p class="text-gray-400 mb-4">These dates are calculated automatically each year:</p>
+                    <ul>
+                        ${calculatedDates.map(date => `
+                            <li>
+                                <strong class="text-yellow-400">${date.name}:</strong>
+                                <span class="text-gray-300">${date.description}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                    <button class="popup-close" onclick="this.closest('.popup-overlay').remove()">Close</button>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            // Close on overlay click
+            popup.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.remove();
+                }
+            });
         };
     </script>
 </body>
