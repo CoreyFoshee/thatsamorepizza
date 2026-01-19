@@ -231,6 +231,9 @@
                     <div class="progress-bar">
                         <div class="progress-fill chicago-progress" id="chicago-progress" style="width: 0%"></div>
                     </div>
+                    <div class="text-sm text-gray-600 mt-2 text-center">
+                        Lifetime Sales: <span id="lifetime-sales-chicago">0</span>
+                    </div>
                 </div>
             </div>
             
@@ -272,6 +275,7 @@
         const totalVotesEl = document.getElementById('total-votes');
         const lastVoteEl = document.getElementById('last-vote');
         const lifetimeSalesEl = document.getElementById('lifetime-sales');
+        const lifetimeSalesChicagoEl = document.getElementById('lifetime-sales-chicago');
         
         // Load initial data from Supabase
         loadInitialData();
@@ -303,8 +307,12 @@
             nyVotesEl.textContent = data.nyVotes || 0;
             chicagoVotesEl.textContent = data.chicagoVotes || 0;
             totalVotesEl.textContent = data.totalVotes || 0;
+            const lifetimeSalesValue = data.piesSold || data.pizzasSold || 0;
             if (lifetimeSalesEl) {
-                lifetimeSalesEl.textContent = data.piesSold || data.pizzasSold || 0;
+                lifetimeSalesEl.textContent = lifetimeSalesValue;
+            }
+            if (lifetimeSalesChicagoEl) {
+                lifetimeSalesChicagoEl.textContent = lifetimeSalesValue;
             }
             
             // Calculate percentages
