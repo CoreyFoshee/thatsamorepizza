@@ -930,6 +930,98 @@ app.post('/api/admin/set-votes', async (req, res) => {
 });
 
 // New Admin API endpoints
+// Calculate current restaurant status based on hours, closures, and manual override
+function calculateCurrentStatus(status, hours, closures) {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayDay = today.getDay(); // 0 = Sunday, 6 = Saturday
+    const currentTime = now.getHours() * 60 + now.getMinutes(); // Minutes since midnight
+    
+    // 1. Check manual override first
+    if (status.manualClosed) {
+        return {
+            isOpen: false,
+            reason: 'Manual Override',
+            message: 'CLOSED (Manual Override)'
+        };
+    }
+    
+    // 2. Check scheduled closures
+    const todayStr = today.toISOString().split('T')[0];
+    const scheduledClosure = closures.find(c => c.date === todayStr);
+    if (scheduledClosure) {
+        return {
+            isOpen: false,
+            reason: scheduledClosure.reason || 'Scheduled Closure',
+            message: `CLOSED (${scheduledClosure.reason || 'Scheduled Closure'})`
+        };
+    }
+    
+    // 3. Check holiday hours
+    const holidayHours = hours.holidayHours || [];
+    const todayHoliday = holidayHours.find(h => {
+        if (h.isCalculated) {
+            // For calculated holidays like Easter/Thanksgiving, we'd need to calculate the date
+            // For now, skip these or implement date calculation
+            return false;
+        }
+        return h.month === now.getMonth() && h.day === now.getDate();
+    });
+    
+    if (todayHoliday) {
+        return {
+            isOpen: todayHoliday.open,
+            reason: todayHoliday.name,
+            message: todayHoliday.open ? `OPEN (${todayHoliday.name}: ${todayHoliday.hours})` : `CLOSED (${todayHoliday.name})`
+        };
+    }
+    
+    // 4. Check regular business hours
+    const businessHours = hours.businessHours || [];
+    const todayHours = businessHours.find(h => {
+        // Convert day name to day index
+        const dayMap = { 'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6 };
+        return dayMap[h.day] === todayDay;
+    });
+    
+    if (!todayHours || !todayHours.open) {
+        return {
+            isOpen: false,
+            reason: 'Closed Today',
+            message: `CLOSED (${todayHours?.day || 'Not Open Today'})`
+        };
+    }
+    
+    // Parse hours string (e.g., "11:00 AM - 8:00 PM")
+    const hoursMatch = todayHours.hours.match(/(\d{1,2}):(\d{2})\s*(AM|PM)\s*-\s*(\d{1,2}):(\d{2})\s*(AM|PM)/);
+    if (hoursMatch) {
+        const [, openHour, openMin, openPeriod, closeHour, closeMin, closePeriod] = hoursMatch;
+        
+        let openTime = parseInt(openHour) * 60 + parseInt(openMin);
+        if (openPeriod === 'PM' && openHour !== '12') openTime += 12 * 60;
+        if (openPeriod === 'AM' && openHour === '12') openTime -= 12 * 60;
+        
+        let closeTime = parseInt(closeHour) * 60 + parseInt(closeMin);
+        if (closePeriod === 'PM' && closeHour !== '12') closeTime += 12 * 60;
+        if (closePeriod === 'AM' && closeHour === '12') closeTime -= 12 * 60;
+        
+        const isOpen = currentTime >= openTime && currentTime <= closeTime;
+        
+        return {
+            isOpen: isOpen,
+            reason: todayHours.day,
+            message: isOpen ? `OPEN (${todayHours.hours})` : `CLOSED (${todayHours.hours})`
+        };
+    }
+    
+    // Fallback if hours can't be parsed
+    return {
+        isOpen: todayHours.open,
+        reason: todayHours.day,
+        message: todayHours.open ? `OPEN (${todayHours.hours})` : `CLOSED (${todayHours.hours})`
+    };
+}
+
 app.get('/api/admin/data', async (req, res) => {
     try {
         const [metrics, hours, status, closures] = await Promise.all([
@@ -939,10 +1031,16 @@ app.get('/api/admin/data', async (req, res) => {
             getScheduledClosures()
         ]);
         
+        // Calculate actual current status
+        const currentStatus = calculateCurrentStatus(status, hours, closures);
+        
         res.json({
             success: true,
             data: {
-                restaurantStatus: status,
+                restaurantStatus: {
+                    ...status,
+                    currentStatus: currentStatus
+                },
                 hours: hours,
                 scheduledClosures: closures,
                 tvControls: {
@@ -981,12 +1079,22 @@ app.post('/api/admin/restaurant-status', async (req, res) => {
             return res.status(500).json({ success: false, message: result.message || 'Error updating restaurant status' });
         }
         
-        const status = await getRestaurantStatus();
+        // Get updated status and calculate current status
+        const [status, hours, closures] = await Promise.all([
+            getRestaurantStatus(),
+            getRestaurantHours(),
+            getScheduledClosures()
+        ]);
+        
+        const currentStatus = calculateCurrentStatus(status, hours, closures);
         
         res.json({ 
             success: true, 
             message: 'Restaurant status updated successfully', 
-            data: status 
+            data: {
+                ...status,
+                currentStatus: currentStatus
+            }
         });
         console.log(`Restaurant status updated: manualClosed=${manualClosed}`);
     } catch (error) {
@@ -997,25 +1105,7 @@ app.post('/api/admin/restaurant-status', async (req, res) => {
 
 app.post('/api/admin/hours', async (req, res) => {
     try {
-        const { header, footer, businessHours, holidayHours } = req.body;
-        
-        if (header !== undefined) {
-            if (typeof header !== 'string') {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: 'Invalid header hours. Must be a string.' 
-                });
-            }
-        }
-        
-        if (footer !== undefined) {
-            if (typeof footer !== 'string') {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: 'Invalid footer hours. Must be a string.' 
-                });
-            }
-        }
+        const { businessHours, holidayHours } = req.body;
         
         let businessHoursObj = undefined;
         if (businessHours !== undefined) {
@@ -1065,7 +1155,7 @@ app.post('/api/admin/hours', async (req, res) => {
             }
         }
         
-        const result = await updateRestaurantHours(header, footer, businessHoursObj, holidayHours);
+        const result = await updateRestaurantHours(undefined, undefined, businessHoursObj, holidayHours);
         
         if (!result.success) {
             return res.status(500).json({ success: false, message: result.message || 'Error updating hours' });

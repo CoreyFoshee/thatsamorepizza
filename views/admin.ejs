@@ -211,16 +211,6 @@
             <!-- Hours Management -->
             <div class="admin-card">
                 <h2 class="text-2xl font-bold text-blue-400 mb-6">🕒 Hours Management</h2>
-                <div class="grid md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <h3 class="text-lg font-semibold mb-4">Header Hours</h3>
-                        <textarea id="header-hours" class="form-input" rows="3" placeholder="Enter hours for header display..."></textarea>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold mb-4">Footer Hours</h3>
-                        <textarea id="footer-hours" class="form-input" rows="3" placeholder="Enter hours for footer display..."></textarea>
-                    </div>
-                </div>
                 
                 <!-- Daily Business Hours -->
                 <div class="mb-6">
@@ -352,8 +342,6 @@
         // DOM elements
         const manualClosedToggle = document.getElementById('manual-closed-toggle');
         const currentStatus = document.getElementById('current-status');
-        const headerHours = document.getElementById('header-hours');
-        const footerHours = document.getElementById('footer-hours');
         const saveHoursBtn = document.getElementById('save-hours');
         const closureDate = document.getElementById('closure-date');
         const closureReason = document.getElementById('closure-reason');
@@ -410,21 +398,31 @@
         
         // Update restaurant status display
         function updateRestaurantStatus(status) {
-            if (status.manualClosed) {
-                currentStatus.textContent = 'CLOSED (Manual Override)';
-                currentStatus.className = 'text-2xl status-closed';
-                manualClosedToggle.checked = true;
+            manualClosedToggle.checked = status.manualClosed || false;
+            
+            // Display actual current status
+            if (status.currentStatus) {
+                const statusInfo = status.currentStatus;
+                currentStatus.textContent = statusInfo.message || 'Loading...';
+                if (statusInfo.isOpen) {
+                    currentStatus.className = 'text-2xl status-open';
+                } else {
+                    currentStatus.className = 'text-2xl status-closed';
+                }
             } else {
-                currentStatus.textContent = 'OPEN (Based on Hours)';
-                currentStatus.className = 'text-2xl status-open';
-                manualClosedToggle.checked = false;
+                // Fallback if currentStatus not available
+                if (status.manualClosed) {
+                    currentStatus.textContent = 'CLOSED (Manual Override)';
+                    currentStatus.className = 'text-2xl status-closed';
+                } else {
+                    currentStatus.textContent = 'OPEN (Based on Hours)';
+                    currentStatus.className = 'text-2xl status-open';
+                }
             }
         }
         
         // Update hours display
         function updateHoursDisplay(hours) {
-            headerHours.value = hours.header || '';
-            footerHours.value = hours.footer || '';
             updateDailyHoursDisplay(hours.businessHours || []);
             updateHolidayHoursDisplay(hours.holidayHours || []);
         }
@@ -582,8 +580,6 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        header: headerHours.value,
-                        footer: footerHours.value,
                         businessHours,
                         holidayHours
                     })
