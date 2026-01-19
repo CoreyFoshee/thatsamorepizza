@@ -324,10 +324,17 @@
                 <h2 class="text-2xl font-bold text-red-400 mb-6">📺 TV Page Controls</h2>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
-                        <h3 class="text-lg font-semibold mb-4">Lifetime Sales</h3>
+                        <h3 class="text-lg font-semibold mb-4">NY Style Lifetime Sales</h3>
                         <div class="flex items-center space-x-4">
-                            <input type="number" id="lifetime-sales" class="form-input price-input" min="0" placeholder="0">
-                            <button id="update-lifetime-sales" class="btn-primary">Update</button>
+                            <input type="number" id="ny-lifetime-sales" class="form-input price-input" min="0" placeholder="0">
+                            <button id="update-ny-lifetime-sales" class="btn-primary">Update</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Chicago Style Lifetime Sales</h3>
+                        <div class="flex items-center space-x-4">
+                            <input type="number" id="chicago-lifetime-sales" class="form-input price-input" min="0" placeholder="0">
+                            <button id="update-chicago-lifetime-sales" class="btn-primary">Update</button>
                         </div>
                     </div>
                     <div>
@@ -400,8 +407,10 @@
         const holidayCalculated = document.getElementById('holiday-calculated');
         const addHolidayBtn = document.getElementById('add-holiday');
         const closuresList = document.getElementById('closures-list');
-        const lifetimeSales = document.getElementById('lifetime-sales');
-        const updateLifetimeSalesBtn = document.getElementById('update-lifetime-sales');
+        const nyLifetimeSales = document.getElementById('ny-lifetime-sales');
+        const updateNyLifetimeSalesBtn = document.getElementById('update-ny-lifetime-sales');
+        const chicagoLifetimeSales = document.getElementById('chicago-lifetime-sales');
+        const updateChicagoLifetimeSalesBtn = document.getElementById('update-chicago-lifetime-sales');
         const nyVotesOverride = document.getElementById('ny-votes-override');
         const chicagoVotesOverride = document.getElementById('chicago-votes-override');
         const updateVotesBtn = document.getElementById('update-votes');
@@ -559,7 +568,8 @@
         
         // Update TV controls display
         function updateTVControls(controls) {
-            lifetimeSales.value = controls.piesSold || 0;
+            if (nyLifetimeSales) nyLifetimeSales.value = controls.nyLifetimeSales || 0;
+            if (chicagoLifetimeSales) chicagoLifetimeSales.value = controls.chicagoLifetimeSales || 0;
             nyVotesOverride.value = controls.nyVotes || 0;
             chicagoVotesOverride.value = controls.chicagoVotes || 0;
         }
@@ -681,20 +691,37 @@
             holidayRepeatsYearly.checked = false;
         });
         
-        updateLifetimeSalesBtn.addEventListener('click', async () => {
+        updateNyLifetimeSalesBtn.addEventListener('click', async () => {
             try {
                 const response = await fetch('/api/admin/tv-controls', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ piesSold: parseInt(lifetimeSales.value) || 0 })
+                    body: JSON.stringify({ nyLifetimeSales: parseInt(nyLifetimeSales.value) || 0 })
                 });
                 
                 const result = await response.json();
                 if (result.success) {
-                    alert('Lifetime sales updated successfully!');
+                    alert('NY Style lifetime sales updated successfully!');
                 }
             } catch (error) {
-                console.error('Error updating lifetime sales:', error);
+                console.error('Error updating NY lifetime sales:', error);
+            }
+        });
+        
+        updateChicagoLifetimeSalesBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/admin/tv-controls', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chicagoLifetimeSales: parseInt(chicagoLifetimeSales.value) || 0 })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert('Chicago Style lifetime sales updated successfully!');
+                }
+            } catch (error) {
+                console.error('Error updating Chicago lifetime sales:', error);
             }
         });
         

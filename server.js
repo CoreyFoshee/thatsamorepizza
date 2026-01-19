@@ -239,7 +239,9 @@ async function getRestaurantMetrics() {
             nyVotes: data.ny_votes || 0,
             chicagoVotes: data.chicago_votes || 0,
             totalVotes: data.total_votes || 0,
-            pizzasSold: data.pizzas_sold || 0
+            pizzasSold: data.pizzas_sold || 0,
+            nyLifetimeSales: data.ny_lifetime_sales || 0,
+            chicagoLifetimeSales: data.chicago_lifetime_sales || 0
         };
     } catch (error) {
         console.error('Error fetching restaurant metrics:', error);
@@ -361,6 +363,46 @@ async function updatePizzasSold(count) {
     } catch (error) {
         console.error('Error updating pizzas sold:', error);
         return { success: false, message: 'Error updating pizzas sold' };
+    }
+}
+
+async function updateLifetimeSales(nySales, chicagoSales) {
+    if (!supabase) {
+        // Fallback to file-based storage if needed
+        return { success: false, message: 'Supabase required for lifetime sales' };
+    }
+    
+    try {
+        const { data: metrics } = await supabase
+            .from('restaurant_metrics')
+            .select('*')
+            .limit(1)
+            .single();
+        
+        if (!metrics) throw new Error('Restaurant metrics not found');
+        
+        const updateData = {};
+        if (nySales !== undefined) {
+            updateData.ny_lifetime_sales = nySales;
+        }
+        if (chicagoSales !== undefined) {
+            updateData.chicago_lifetime_sales = chicagoSales;
+        }
+        
+        if (Object.keys(updateData).length === 0) {
+            return { success: true };
+        }
+        
+        const { error } = await supabase
+            .from('restaurant_metrics')
+            .update(updateData)
+            .eq('id', metrics.id);
+        
+        if (error) throw error;
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating lifetime sales:', error);
+        return { success: false, message: 'Error updating lifetime sales' };
     }
 }
 
@@ -1121,6 +1163,8 @@ app.get('/api/admin/data', async (req, res) => {
                 scheduledClosures: closures,
                 tvControls: {
                     piesSold: metrics.pizzasSold,
+                    nyLifetimeSales: metrics.nyLifetimeSales,
+                    chicagoLifetimeSales: metrics.chicagoLifetimeSales,
                     nyVotes: metrics.nyVotes,
                     chicagoVotes: metrics.chicagoVotes,
                     lastUpdated: new Date().toISOString()
@@ -1326,7 +1370,7 @@ app.delete('/api/admin/closures/:date', async (req, res) => {
 
 app.post('/api/admin/tv-controls', async (req, res) => {
     try {
-        const { piesSold, nyVotes, chicagoVotes } = req.body;
+        const { piesSold, nyVotes, chicagoVotes, nyLifetimeSales, chicagoLifetimeSales } = req.body;
         
         if (piesSold !== undefined) {
             if (typeof piesSold !== 'number' || piesSold < 0) {
@@ -1338,6 +1382,25 @@ app.post('/api/admin/tv-controls', async (req, res) => {
             const result = await updatePizzasSold(piesSold);
             if (!result.success) {
                 return res.status(500).json({ success: false, message: result.message || 'Error updating pizzas sold' });
+            }
+        }
+        
+        if (nyLifetimeSales !== undefined || chicagoLifetimeSales !== undefined) {
+            if (nyLifetimeSales !== undefined && (typeof nyLifetimeSales !== 'number' || nyLifetimeSales < 0)) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Invalid NY lifetime sales value. Must be non-negative number.' 
+                });
+            }
+            if (chicagoLifetimeSales !== undefined && (typeof chicagoLifetimeSales !== 'number' || chicagoLifetimeSales < 0)) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Invalid Chicago lifetime sales value. Must be non-negative number.' 
+                });
+            }
+            const result = await updateLifetimeSales(nyLifetimeSales, chicagoLifetimeSales);
+            if (!result.success) {
+                return res.status(500).json({ success: false, message: result.message || 'Error updating lifetime sales' });
             }
         }
         
@@ -1487,7 +1550,9 @@ app.get('/api/voting-data', async (req, res) => {
                 nyVotes: metrics.nyVotes,
                 chicagoVotes: metrics.chicagoVotes,
                 totalVotes: metrics.totalVotes,
-                pizzasSold: metrics.pizzasSold
+                pizzasSold: metrics.pizzasSold,
+                nyLifetimeSales: metrics.nyLifetimeSales,
+                chicagoLifetimeSales: metrics.chicagoLifetimeSales
             }
         });
     } catch (error) {

@@ -292,7 +292,9 @@
                         nyVotes: data.data.nyVotes || 0,
                         chicagoVotes: data.data.chicagoVotes || 0,
                         totalVotes: data.data.totalVotes || 0,
-                        piesSold: data.data.pizzasSold || 0
+                        piesSold: data.data.pizzasSold || 0,
+                        nyLifetimeSales: data.data.nyLifetimeSales || 0,
+                        chicagoLifetimeSales: data.data.chicagoLifetimeSales || 0
                     });
                 } else {
                     console.error('Failed to load data:', data);
@@ -307,12 +309,11 @@
             nyVotesEl.textContent = data.nyVotes || 0;
             chicagoVotesEl.textContent = data.chicagoVotes || 0;
             totalVotesEl.textContent = data.totalVotes || 0;
-            const lifetimeSalesValue = data.piesSold || data.pizzasSold || 0;
             if (lifetimeSalesEl) {
-                lifetimeSalesEl.textContent = lifetimeSalesValue;
+                lifetimeSalesEl.textContent = data.nyLifetimeSales || 0;
             }
             if (lifetimeSalesChicagoEl) {
-                lifetimeSalesChicagoEl.textContent = lifetimeSalesValue;
+                lifetimeSalesChicagoEl.textContent = data.chicagoLifetimeSales || 0;
             }
             
             // Calculate percentages
@@ -362,7 +363,9 @@
                                 nyVotes: payload.new.ny_votes || 0,
                                 chicagoVotes: payload.new.chicago_votes || 0,
                                 totalVotes: payload.new.total_votes || 0,
-                                piesSold: payload.new.pizzas_sold || 0
+                                piesSold: payload.new.pizzas_sold || 0,
+                                nyLifetimeSales: payload.new.ny_lifetime_sales || 0,
+                                chicagoLifetimeSales: payload.new.chicago_lifetime_sales || 0
                             });
                             
                             // Show notification for new vote
@@ -410,7 +413,9 @@
                                 nyVotes: data.data.nyVotes || 0,
                                 chicagoVotes: data.data.chicagoVotes || 0,
                                 totalVotes: data.data.totalVotes || 0,
-                                piesSold: data.data.pizzasSold || 0
+                                piesSold: data.data.pizzasSold || 0,
+                                nyLifetimeSales: data.data.nyLifetimeSales || 0,
+                                chicagoLifetimeSales: data.data.chicagoLifetimeSales || 0
                             });
                             
                             // Show notification for new vote
