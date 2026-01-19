@@ -4,7 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
-const session = require('express-session');
+const cookieSession = require('cookie-session');
 const fs = require('fs');
 const { createClient } = require('@supabase/supabase-js');
 const app = express();
@@ -822,16 +822,13 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session configuration
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'thats-amore-secret-key-change-in-production',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
+// Session configuration (using cookie-session for serverless compatibility)
+app.use(cookieSession({
+    name: 'session',
+    keys: [process.env.SESSION_SECRET || 'thats-amore-secret-key-change-in-production'],
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production' // Use secure cookies in production (HTTPS)
 }));
 
 // Add error handling middleware
