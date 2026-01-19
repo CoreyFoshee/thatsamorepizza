@@ -828,7 +828,8 @@ app.use(cookieSession({
     keys: [process.env.SESSION_SECRET || 'thats-amore-secret-key-change-in-production'],
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production' // Use secure cookies in production (HTTPS)
+    secure: false, // Set to false for now - Vercel handles HTTPS but cookies work better with secure: false initially
+    sameSite: 'lax'
 }));
 
 // Add error handling middleware
@@ -909,6 +910,9 @@ const ADMIN_PASSWORD = 'thatsamore';
 
 // Authentication middleware
 function requireAuth(req, res, next) {
+    console.log('requireAuth check - session:', req.session ? 'exists' : 'missing');
+    console.log('requireAuth check - authenticated:', req.session?.authenticated);
+    
     if (req.session && req.session.authenticated === true) {
         return next();
     } else {
@@ -937,10 +941,16 @@ app.get('/admin/login', (req, res) => {
 app.post('/admin/login', (req, res) => {
     const { password } = req.body;
     
+    console.log('Login attempt - password received:', password ? 'yes' : 'no');
+    console.log('Expected password:', ADMIN_PASSWORD);
+    
     if (password === ADMIN_PASSWORD) {
         req.session.authenticated = true;
+        console.log('Authentication successful, session set:', req.session);
+        // Ensure session is saved before redirect
         res.redirect('/admin');
     } else {
+        console.log('Authentication failed - incorrect password');
         res.render('admin-login', {
             title: "Admin Login - That's Amore Pizzeria",
             description: "Admin login",
