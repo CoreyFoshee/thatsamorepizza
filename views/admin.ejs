@@ -497,17 +497,6 @@
             chicagoVotesOverride.value = controls.chicagoVotes || 0;
         }
         
-        // Update connection status
-        function updateConnectionStatus(connected) {
-            if (connected) {
-                connectionStatusEl.className = 'w-3 h-3 rounded-full bg-green-500';
-                statusTextEl.textContent = 'Connected';
-            } else {
-                connectionStatusEl.className = 'w-3 h-3 rounded-full bg-red-500';
-                statusTextEl.textContent = 'Disconnected';
-            }
-        }
-        
         // Event Listeners
         manualClosedToggle.addEventListener('change', async () => {
             try {
@@ -647,29 +636,24 @@
         if (socket) {
             socket.on('connect', () => {
                 console.log('Connected to server');
-                updateConnectionStatus(true);
             });
             
             socket.on('disconnect', () => {
                 console.log('Disconnected from server');
-                updateConnectionStatus(false);
             });
             
             socket.on('voting-update', (data) => {
                 updateDisplay({ votingData: data });
-                if (lastUpdateEl) lastUpdateEl.textContent = new Date().toLocaleTimeString();
             });
         } else {
             // Polling fallback when Socket.io not available
             console.log('Using polling for updates (Socket.io not available)');
-            if (updateConnectionStatus) updateConnectionStatus(false);
             setInterval(async () => {
                 try {
                     const response = await fetch('/api/admin/data');
                     const result = await response.json();
                     if (result.success) {
                         updateDisplay(result.data);
-                        if (lastUpdateEl) lastUpdateEl.textContent = new Date().toLocaleTimeString();
                     }
                 } catch (error) {
                     console.error('Error polling admin data:', error);
