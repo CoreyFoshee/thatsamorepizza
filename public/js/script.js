@@ -35,8 +35,17 @@ function initPizzaPoll() {
     const chicagoPercentage = document.getElementById('chicago-percentage');
     const totalVotes = document.getElementById('total-votes');
     
-    // Initialize Socket.io connection (fallback)
-    const socket = io();
+    // Initialize Socket.io connection (fallback) - only if available
+    let socket = null;
+    if (typeof io !== 'undefined') {
+        try {
+            socket = io();
+        } catch (error) {
+            console.warn('⚠️  Socket.io not available (serverless environment):', error);
+        }
+    } else {
+        console.log('ℹ️  Socket.io not available - using Supabase Realtime and API fallback');
+    }
     
     // Initialize Supabase client if available
     let supabase = null;
@@ -132,12 +141,29 @@ function initPizzaPoll() {
                         });
                     }
                 })
-                .subscribe();
-            
-            console.log('✅ Supabase Realtime subscription active');
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log('✅ Supabase Realtime subscription active');
+                    } else if (status === 'CHANNEL_ERROR') {
+                        console.warn('⚠️  Supabase Realtime subscription error - using polling fallback');
+                        startPolling();
+                    }
+                });
         } catch (error) {
             console.warn('⚠️  Failed to set up Supabase Realtime subscription:', error);
+            startPolling();
         }
+    } else {
+        // If Supabase not available, use polling
+        startPolling();
+    }
+    
+    // Polling fallback function
+    function startPolling() {
+        console.log('🔄 Starting polling for vote updates');
+        setInterval(() => {
+            loadInitialVotes();
+        }, 5000); // Poll every 5 seconds
     }
     
     // Load initial data
@@ -224,27 +250,22 @@ function initPizzaPoll() {
             }
             
             try {
-                if (useWebSocket && socket && socket.connected) {
-                    // Send vote to server via WebSocket with session ID
-                    socket.emit('vote', { choice: 'ny', sessionId: sessionId });
+                // Always use API endpoint (Socket.io not reliable on serverless)
+                const response = await fetch('/api/vote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ choice: 'ny', sessionId: sessionId })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    updatePollDisplay(result.data);
+                    showVoteConfirmation('NY Style', '🗽');
                 } else {
-                    // Fallback to API endpoint
-                    const response = await fetch('/api/vote', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ choice: 'ny', sessionId: sessionId })
-                    });
-                    
-                    const result = await response.json();
-                    if (result.success) {
-                        updatePollDisplay(result.data);
-                        showVoteConfirmation('NY Style', '🗽');
-                    } else {
-                        showVoteError(result.message);
-                        return;
-                    }
+                    showVoteError(result.message);
+                    return;
                 }
                 
                 hasVoted = true;
@@ -270,27 +291,22 @@ function initPizzaPoll() {
             }
             
             try {
-                if (useWebSocket && socket && socket.connected) {
-                    // Send vote to server via WebSocket with session ID
-                    socket.emit('vote', { choice: 'chicago', sessionId: sessionId });
+                // Always use API endpoint (Socket.io not reliable on serverless)
+                const response = await fetch('/api/vote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ choice: 'chicago', sessionId: sessionId })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    updatePollDisplay(result.data);
+                    showVoteConfirmation('Chicago Style', '🏙️');
                 } else {
-                    // Fallback to API endpoint
-                    const response = await fetch('/api/vote', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ choice: 'chicago', sessionId: sessionId })
-                    });
-                    
-                    const result = await response.json();
-                    if (result.success) {
-                        updatePollDisplay(result.data);
-                        showVoteConfirmation('Chicago Style', '🏙️');
-                    } else {
-                        showVoteError(result.message);
-                        return;
-                    }
+                    showVoteError(result.message);
+                    return;
                 }
                 
                 hasVoted = true;
@@ -307,59 +323,58 @@ function initPizzaPoll() {
         });
     }
     
-    // WebSocket event handlers
-    socket.on('voting-data', (data) => {
-        console.log('Received initial voting data:', data);
-        updatePollDisplay(data);
-    });
-    
-    socket.on('voting-update', (data) => {
-        console.log('Received voting update:', data);
-        updatePollDisplay(data);
-    });
-    
-    // Handle vote success
-    socket.on('vote-success', (data) => {
-        console.log('Vote recorded successfully:', data);
-        if (data.choice === 'ny') {
-            showVoteConfirmation('NY Style', '🗽');
-        } else if (data.choice === 'chicago') {
-            showVoteConfirmation('Chicago Style', '🏙️');
-        }
-    });
-    
-    // Handle vote errors
-    socket.on('vote-error', (data) => {
-        console.log('Vote error:', data);
-        showVoteError(data.message);
-        // Re-enable voting if there was an error
-        hasVoted = false;
-        if (nyVoteBtn) {
-            nyVoteBtn.disabled = false;
-            nyVoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        }
-        if (chicagoVoteBtn) {
-            chicagoVoteBtn.disabled = false;
-            chicagoVoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-        }
-    });
-    
-    // Handle connection errors
-    socket.on('connect_error', (error) => {
-        console.error('WebSocket connection error:', error);
-        // Fallback to local storage if WebSocket fails
-        const localVotes = JSON.parse(localStorage.getItem('pizzaPollVotes')) || { ny: 0, chicago: 0 };
-        updatePollDisplay({
-            nyVotes: localVotes.ny,
-            chicagoVotes: localVotes.chicago,
-            totalVotes: localVotes.ny + localVotes.chicago
+    // WebSocket event handlers (only if socket is available)
+    if (socket) {
+        socket.on('voting-data', (data) => {
+            console.log('Received initial voting data:', data);
+            updatePollDisplay(data);
         });
-    });
+        
+        socket.on('voting-update', (data) => {
+            console.log('Received voting update:', data);
+            updatePollDisplay(data);
+        });
+        
+        // Handle vote success
+        socket.on('vote-success', (data) => {
+            console.log('Vote recorded successfully:', data);
+            if (data.choice === 'ny') {
+                showVoteConfirmation('NY Style', '🗽');
+            } else if (data.choice === 'chicago') {
+                showVoteConfirmation('Chicago Style', '🏙️');
+            }
+        });
+        
+        // Handle vote errors
+        socket.on('vote-error', (data) => {
+            console.log('Vote error:', data);
+            showVoteError(data.message);
+            // Re-enable voting if there was an error
+            hasVoted = false;
+            if (nyVoteBtn) {
+                nyVoteBtn.disabled = false;
+                nyVoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            if (chicagoVoteBtn) {
+                chicagoVoteBtn.disabled = false;
+                chicagoVoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        });
+        
+        // Handle connection errors
+        socket.on('connect_error', (error) => {
+            console.error('WebSocket connection error:', error);
+            // Fallback to API polling if WebSocket fails
+            loadInitialVotes();
+        });
+    }
 }
 
 // Navigation functionality
 function initNavigation() {
     const navbar = document.getElementById('navbar');
+    if (!navbar) return; // Exit if navbar doesn't exist
+    
     let lastScrollTop = 0;
     
     window.addEventListener('scroll', function() {

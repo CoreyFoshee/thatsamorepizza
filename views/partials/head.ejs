@@ -103,8 +103,18 @@
 <!-- Custom CSS -->
 <link rel="stylesheet" href="/css/styles.css">
 
-<!-- Socket.io Client for Real-time Voting -->
-<script src="/socket.io/socket.io.js"></script>
+<!-- Socket.io Client for Real-time Voting (optional - only works on non-serverless environments) -->
+<script>
+    // Only load Socket.io if we're not on Vercel/serverless
+    if (typeof window !== 'undefined' && !window.location.hostname.includes('vercel.app')) {
+        const script = document.createElement('script');
+        script.src = '/socket.io/socket.io.js';
+        script.onerror = function() {
+            console.log('Socket.io not available - using Supabase Realtime instead');
+        };
+        document.head.appendChild(script);
+    }
+</script>
 
 <!-- Supabase Client for Real-time Updates -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
