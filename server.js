@@ -240,8 +240,8 @@ async function getRestaurantMetrics() {
             chicagoVotes: data.chicago_votes || 0,
             totalVotes: data.total_votes || 0,
             pizzasSold: data.pizzas_sold || 0,
-            nyLifetimeSales: data.ny_lifetime_sales || 0,
-            chicagoLifetimeSales: data.chicago_lifetime_sales || 0
+            nyLifetimeSales: data.ny_lifetime_sales || '',
+            chicagoLifetimeSales: data.chicago_lifetime_sales || ''
         };
     } catch (error) {
         console.error('Error fetching restaurant metrics:', error);
@@ -1386,16 +1386,17 @@ app.post('/api/admin/tv-controls', async (req, res) => {
         }
         
         if (nyLifetimeSales !== undefined || chicagoLifetimeSales !== undefined) {
-            if (nyLifetimeSales !== undefined && (typeof nyLifetimeSales !== 'number' || nyLifetimeSales < 0)) {
+            // Accept text values for lifetime sales (can be formatted like "$1,234" or "1,234 pizzas")
+            if (nyLifetimeSales !== undefined && typeof nyLifetimeSales !== 'string') {
                 return res.status(400).json({ 
                     success: false, 
-                    message: 'Invalid NY lifetime sales value. Must be non-negative number.' 
+                    message: 'Invalid NY lifetime sales value. Must be text.' 
                 });
             }
-            if (chicagoLifetimeSales !== undefined && (typeof chicagoLifetimeSales !== 'number' || chicagoLifetimeSales < 0)) {
+            if (chicagoLifetimeSales !== undefined && typeof chicagoLifetimeSales !== 'string') {
                 return res.status(400).json({ 
                     success: false, 
-                    message: 'Invalid Chicago lifetime sales value. Must be non-negative number.' 
+                    message: 'Invalid Chicago lifetime sales value. Must be text.' 
                 });
             }
             const result = await updateLifetimeSales(nyLifetimeSales, chicagoLifetimeSales);

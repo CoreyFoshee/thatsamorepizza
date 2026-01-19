@@ -326,14 +326,14 @@
                     <div>
                         <h3 class="text-lg font-semibold mb-4">NY Style Lifetime Sales</h3>
                         <div class="flex items-center space-x-4">
-                            <input type="number" id="ny-lifetime-sales" class="form-input price-input" min="0" placeholder="0">
+                            <input type="text" id="ny-lifetime-sales" class="form-input price-input" placeholder="e.g., $1,234 or 1,234 pizzas">
                             <button id="update-ny-lifetime-sales" class="btn-primary">Update</button>
                         </div>
                     </div>
                     <div>
                         <h3 class="text-lg font-semibold mb-4">Chicago Style Lifetime Sales</h3>
                         <div class="flex items-center space-x-4">
-                            <input type="number" id="chicago-lifetime-sales" class="form-input price-input" min="0" placeholder="0">
+                            <input type="text" id="chicago-lifetime-sales" class="form-input price-input" placeholder="e.g., $1,234 or 1,234 pizzas">
                             <button id="update-chicago-lifetime-sales" class="btn-primary">Update</button>
                         </div>
                     </div>
@@ -568,8 +568,8 @@
         
         // Update TV controls display
         function updateTVControls(controls) {
-            if (nyLifetimeSales) nyLifetimeSales.value = controls.nyLifetimeSales || 0;
-            if (chicagoLifetimeSales) chicagoLifetimeSales.value = controls.chicagoLifetimeSales || 0;
+            if (nyLifetimeSales) nyLifetimeSales.value = controls.nyLifetimeSales || '';
+            if (chicagoLifetimeSales) chicagoLifetimeSales.value = controls.chicagoLifetimeSales || '';
             nyVotesOverride.value = controls.nyVotes || 0;
             chicagoVotesOverride.value = controls.chicagoVotes || 0;
         }
@@ -696,7 +696,7 @@
                 const response = await fetch('/api/admin/tv-controls', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nyLifetimeSales: parseInt(nyLifetimeSales.value) || 0 })
+                    body: JSON.stringify({ nyLifetimeSales: nyLifetimeSales.value || '' })
                 });
                 
                 const result = await response.json();
@@ -713,7 +713,7 @@
                 const response = await fetch('/api/admin/tv-controls', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chicagoLifetimeSales: parseInt(chicagoLifetimeSales.value) || 0 })
+                    body: JSON.stringify({ chicagoLifetimeSales: chicagoLifetimeSales.value || '' })
                 });
                 
                 const result = await response.json();

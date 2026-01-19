@@ -209,7 +209,7 @@
                         <div class="progress-fill ny-progress" id="ny-progress" style="width: 0%"></div>
                     </div>
                     <div class="text-sm text-gray-600 mt-2 text-center">
-                        Lifetime Sales: <span id="lifetime-sales">0</span>
+                        Lifetime Sales: <span id="lifetime-sales"></span>
                     </div>
                 </div>
                 
@@ -235,7 +235,7 @@
                         <div class="progress-fill chicago-progress" id="chicago-progress" style="width: 0%"></div>
                     </div>
                     <div class="text-sm text-gray-600 mt-2 text-center">
-                        Lifetime Sales: <span id="lifetime-sales-chicago">0</span>
+                        Lifetime Sales: <span id="lifetime-sales-chicago"></span>
                     </div>
                 </div>
             </div>
@@ -313,10 +313,10 @@
             chicagoVotesEl.textContent = data.chicagoVotes || 0;
             totalVotesEl.textContent = data.totalVotes || 0;
             if (lifetimeSalesEl) {
-                lifetimeSalesEl.textContent = data.nyLifetimeSales || 0;
+                lifetimeSalesEl.textContent = data.nyLifetimeSales || '';
             }
             if (lifetimeSalesChicagoEl) {
-                lifetimeSalesChicagoEl.textContent = data.chicagoLifetimeSales || 0;
+                lifetimeSalesChicagoEl.textContent = data.chicagoLifetimeSales || '';
             }
             
             // Calculate percentages
