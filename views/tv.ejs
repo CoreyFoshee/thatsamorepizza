@@ -66,9 +66,21 @@
             margin: 1rem 0;
             padding: 2rem;
             border-radius: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: white;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            color: black;
+        }
+        
+        .pizza-style h2 {
+            color: black;
+        }
+        
+        .pizza-style .vote-count {
+            color: black;
+        }
+        
+        .pizza-style .percentage {
+            color: black;
         }
         
         .qr-section {
@@ -114,6 +126,7 @@
             font-size: 1.5rem;
             margin: 2rem 0;
             color: #fbbf24;
+            text-align: center;
         }
         
         .title {
@@ -121,12 +134,14 @@
             font-weight: bold;
             margin-bottom: 2rem;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            text-align: center;
         }
         
         .subtitle {
             font-size: 1.5rem;
             margin-bottom: 3rem;
             color: #fbbf24;
+            text-align: center;
         }
         
         .live-indicator {
@@ -184,7 +199,7 @@
             <div class="flex flex-col lg:flex-row gap-8 items-center justify-center">
                 <!-- NY Style - Left Side -->
                 <div class="pizza-style flex-1 max-w-md">
-                    <h2 class="text-3xl font-bold text-blue-400 mb-4">New York Style</h2>
+                    <h2 class="text-3xl font-bold mb-4" style="color: #3b82f6;">New York Style</h2>
                     <div class="vote-count" id="ny-votes">0</div>
                     <div class="percentage" id="ny-percentage">0%</div>
                     <div class="progress-bar">
@@ -214,7 +229,7 @@
                 
                 <!-- Chicago Style - Right Side -->
                 <div class="pizza-style flex-1 max-w-md">
-                    <h2 class="text-3xl font-bold text-red-400 mb-4">Chicago Style</h2>
+                    <h2 class="text-3xl font-bold mb-4" style="color: #dc2626;">Chicago Style</h2>
                     <div class="vote-count" id="chicago-votes">0</div>
                     <div class="percentage" id="chicago-percentage">0%</div>
                     <div class="progress-bar">
