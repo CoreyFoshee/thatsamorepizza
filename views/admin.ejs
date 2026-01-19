@@ -324,10 +324,10 @@
                 <h2 class="text-2xl font-bold text-red-400 mb-6">📺 TV Page Controls</h2>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
-                        <h3 class="text-lg font-semibold mb-4">Pies Sold Counter</h3>
+                        <h3 class="text-lg font-semibold mb-4">Lifetime Sales</h3>
                         <div class="flex items-center space-x-4">
-                            <input type="number" id="pies-sold" class="form-input price-input" min="0" placeholder="0">
-                            <button id="update-pies-sold" class="btn-primary">Update</button>
+                            <input type="number" id="lifetime-sales" class="form-input price-input" min="0" placeholder="0">
+                            <button id="update-lifetime-sales" class="btn-primary">Update</button>
                         </div>
                     </div>
                     <div>
@@ -400,8 +400,8 @@
         const holidayCalculated = document.getElementById('holiday-calculated');
         const addHolidayBtn = document.getElementById('add-holiday');
         const closuresList = document.getElementById('closures-list');
-        const piesSold = document.getElementById('pies-sold');
-        const updatePiesSoldBtn = document.getElementById('update-pies-sold');
+        const lifetimeSales = document.getElementById('lifetime-sales');
+        const updateLifetimeSalesBtn = document.getElementById('update-lifetime-sales');
         const nyVotesOverride = document.getElementById('ny-votes-override');
         const chicagoVotesOverride = document.getElementById('chicago-votes-override');
         const updateVotesBtn = document.getElementById('update-votes');
@@ -559,7 +559,7 @@
         
         // Update TV controls display
         function updateTVControls(controls) {
-            piesSold.value = controls.piesSold || 0;
+            lifetimeSales.value = controls.piesSold || 0;
             nyVotesOverride.value = controls.nyVotes || 0;
             chicagoVotesOverride.value = controls.chicagoVotes || 0;
         }
@@ -681,20 +681,20 @@
             holidayRepeatsYearly.checked = false;
         });
         
-        updatePiesSoldBtn.addEventListener('click', async () => {
+        updateLifetimeSalesBtn.addEventListener('click', async () => {
             try {
                 const response = await fetch('/api/admin/tv-controls', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ piesSold: parseInt(piesSold.value) || 0 })
+                    body: JSON.stringify({ piesSold: parseInt(lifetimeSales.value) || 0 })
                 });
                 
                 const result = await response.json();
                 if (result.success) {
-                    alert('Pies sold updated successfully!');
+                    alert('Lifetime sales updated successfully!');
                 }
             } catch (error) {
-                console.error('Error updating pies sold:', error);
+                console.error('Error updating lifetime sales:', error);
             }
         });
         

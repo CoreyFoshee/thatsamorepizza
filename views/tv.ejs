@@ -205,11 +205,14 @@
                     <div class="progress-bar">
                         <div class="progress-fill ny-progress" id="ny-progress" style="width: 0%"></div>
                     </div>
+                    <div class="text-sm text-gray-600 mt-2 text-center">
+                        Lifetime Sales: <span id="lifetime-sales">0</span>
+                    </div>
                 </div>
                 
-                <!-- Center Section with QR Code and Pies Sold -->
+                <!-- Center Section with QR Code -->
                 <div class="qr-section text-center">
-                    <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
                         <div class="text-6xl mb-4">📱</div>
                         <h3 class="text-xl font-bold text-gray-800 mb-2">Scan QR Code To Vote!</h3>
                         <p class="text-sm text-gray-600 mb-4">Help us settle the great pizza debate.</p>
@@ -217,13 +220,6 @@
                             <img src="/images/qr-code.svg" alt="QR Code to vote" class="w-full h-full object-contain" />
                         </div>
                         <p class="text-xs text-gray-500 mt-2">thatsamorepizzaonline.com</p>
-                    </div>
-                    
-                    <!-- Pies Sold Counter -->
-                    <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 shadow-lg">
-                        <div class="text-4xl mb-2">🍕</div>
-                        <h3 class="text-xl font-bold text-white mb-2">Pies Sold Today</h3>
-                        <div class="text-3xl font-bold text-white" id="pies-sold">0</div>
                     </div>
                 </div>
                 
@@ -275,7 +271,7 @@
         const chicagoProgressEl = document.getElementById('chicago-progress');
         const totalVotesEl = document.getElementById('total-votes');
         const lastVoteEl = document.getElementById('last-vote');
-        const piesSoldEl = document.getElementById('pies-sold');
+        const lifetimeSalesEl = document.getElementById('lifetime-sales');
         
         // Load initial data from Supabase
         loadInitialData();
@@ -307,7 +303,9 @@
             nyVotesEl.textContent = data.nyVotes || 0;
             chicagoVotesEl.textContent = data.chicagoVotes || 0;
             totalVotesEl.textContent = data.totalVotes || 0;
-            piesSoldEl.textContent = data.piesSold || data.pizzasSold || 0;
+            if (lifetimeSalesEl) {
+                lifetimeSalesEl.textContent = data.piesSold || data.pizzasSold || 0;
+            }
             
             // Calculate percentages
             const nyPercentage = data.totalVotes > 0 ? Math.round((data.nyVotes / data.totalVotes) * 100) : 0;
