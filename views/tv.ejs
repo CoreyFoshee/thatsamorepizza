@@ -10,19 +10,6 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Socket.io Client (optional - only works on non-serverless environments) -->
-    <script>
-        // Only load Socket.io if we're not on Vercel/serverless
-        if (typeof window !== 'undefined' && !window.location.hostname.includes('vercel.app')) {
-            const script = document.createElement('script');
-            script.src = '/socket.io/socket.io.js';
-            script.onerror = function() {
-                console.log('Socket.io not available - using Supabase Realtime instead');
-            };
-            document.head.appendChild(script);
-        }
-    </script>
-    
     <!-- Supabase Client for Real-time Updates -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -229,27 +216,17 @@
     </div>
     
     <script>
-        // Connect to WebSocket server (optional - only if available)
-        let socket = null;
-        if (typeof io !== 'undefined') {
-            try {
-                socket = io();
-            } catch (error) {
-                console.warn('Socket.io not available:', error);
-            }
-        } else {
-            console.log('Socket.io not available - using Supabase Realtime and polling');
-        }
-        
-        // Initialize Supabase client if available
+        // Initialize Supabase client
         let supabase = null;
         if (window.supabase && window.supabaseUrl && window.supabaseAnonKey) {
             try {
                 supabase = window.supabase.createClient(window.supabaseUrl, window.supabaseAnonKey);
                 console.log('✅ Supabase client initialized for TV display');
             } catch (error) {
-                console.warn('⚠️  Failed to initialize Supabase client:', error);
+                console.error('❌ Failed to initialize Supabase client:', error);
             }
+        } else {
+            console.error('❌ Supabase credentials not available');
         }
         
         // DOM elements
@@ -263,42 +240,28 @@
         const lastVoteEl = document.getElementById('last-vote');
         const piesSoldEl = document.getElementById('pies-sold');
         
-        // Load initial admin data
-        loadAdminData();
+        // Load initial data from Supabase
+        loadInitialData();
         
-        // Load admin data including pies sold and vote counts
-        async function loadAdminData() {
+        // Load data from Supabase via API
+        async function loadInitialData() {
             try {
-                const response = await fetch('/api/admin/data');
-                const data = await response.json();
-                if (data.success) {
-                    updateDisplay({
-                        nyVotes: data.data.tvControls.nyVotes || 0,
-                        chicagoVotes: data.data.tvControls.chicagoVotes || 0,
-                        totalVotes: (data.data.tvControls.nyVotes || 0) + (data.data.tvControls.chicagoVotes || 0),
-                        piesSold: data.data.tvControls.piesSold || 0
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading admin data:', error);
-                // Fallback to regular voting data
-                loadVotingData();
-            }
-        }
-        
-        // Load regular voting data as fallback
-        async function loadVotingData() {
-            try {
+                // Try to load from restaurant_metrics table via API
                 const response = await fetch('/api/voting-data');
                 const data = await response.json();
                 if (data.success) {
+                    console.log('Loaded initial data from Supabase:', data.data);
                     updateDisplay({
-                        ...data.data,
-                        piesSold: 0
+                        nyVotes: data.data.nyVotes || 0,
+                        chicagoVotes: data.data.chicagoVotes || 0,
+                        totalVotes: data.data.totalVotes || 0,
+                        piesSold: data.data.pizzasSold || 0
                     });
+                } else {
+                    console.error('Failed to load data:', data);
                 }
             } catch (error) {
-                console.error('Error loading voting data:', error);
+                console.error('Error loading data from Supabase:', error);
             }
         }
         
@@ -335,23 +298,28 @@
         // Initialize Supabase Realtime subscription for TV display
         if (supabase) {
             try {
+                console.log('🔌 Setting up Supabase Realtime subscription...');
                 const channel = supabase
-                    .channel('tv-display-updates')
+                    .channel('tv-display-updates', {
+                        config: {
+                            broadcast: { self: true }
+                        }
+                    })
                     .on('postgres_changes', {
                         event: '*',
                         schema: 'public',
                         table: 'restaurant_metrics'
                     }, (payload) => {
-                        console.log('Received Supabase Realtime update:', payload);
+                        console.log('📊 Received Supabase Realtime update:', payload);
                         if (payload.new) {
                             const oldNyVotes = parseInt(nyVotesEl.textContent) || 0;
                             const oldChicagoVotes = parseInt(chicagoVotesEl.textContent) || 0;
                             
                             updateDisplay({
-                                nyVotes: payload.new.ny_votes,
-                                chicagoVotes: payload.new.chicago_votes,
-                                totalVotes: payload.new.total_votes,
-                                piesSold: payload.new.pizzas_sold
+                                nyVotes: payload.new.ny_votes || 0,
+                                chicagoVotes: payload.new.chicago_votes || 0,
+                                totalVotes: payload.new.total_votes || 0,
+                                piesSold: payload.new.pizzas_sold || 0
                             });
                             
                             // Show notification for new vote
@@ -362,36 +330,53 @@
                             }
                         }
                     })
-                    .subscribe((status) => {
+                    .subscribe((status, err) => {
+                        if (err) {
+                            console.error('❌ Supabase Realtime subscription error:', err);
+                            return;
+                        }
                         if (status === 'SUBSCRIBED') {
                             console.log('✅ Supabase Realtime subscription active for TV display');
+                        } else if (status === 'CHANNEL_ERROR') {
+                            console.error('❌ Supabase Realtime channel error');
                         } else {
-                            console.warn('⚠️  Supabase Realtime subscription issue - using polling');
-                            startPolling();
+                            console.log('🔄 Supabase Realtime status:', status);
                         }
                     });
             } catch (error) {
-                console.warn('⚠️  Failed to set up Supabase Realtime:', error);
-                startPolling();
+                console.error('❌ Failed to set up Supabase Realtime:', error);
             }
         } else {
-            startPolling();
+            console.warn('⚠️  Supabase client not available - using polling only');
         }
         
-        // Polling fallback function
+        // Polling fallback function (always active as backup)
         function startPolling() {
-            console.log('🔄 Starting polling for TV display updates');
+            console.log('🔄 Starting polling for TV display updates (backup)');
             setInterval(async () => {
                 try {
-                    const response = await fetch('/api/admin/data');
+                    const response = await fetch('/api/voting-data');
                     const data = await response.json();
                     if (data.success) {
-                        updateDisplay({
-                            nyVotes: data.data.tvControls.nyVotes || 0,
-                            chicagoVotes: data.data.tvControls.chicagoVotes || 0,
-                            totalVotes: (data.data.tvControls.nyVotes || 0) + (data.data.tvControls.chicagoVotes || 0),
-                            piesSold: data.data.tvControls.piesSold || 0
-                        });
+                        const currentNyVotes = parseInt(nyVotesEl.textContent) || 0;
+                        const currentChicagoVotes = parseInt(chicagoVotesEl.textContent) || 0;
+                        
+                        // Only update if values changed
+                        if (data.data.nyVotes !== currentNyVotes || data.data.chicagoVotes !== currentChicagoVotes) {
+                            updateDisplay({
+                                nyVotes: data.data.nyVotes || 0,
+                                chicagoVotes: data.data.chicagoVotes || 0,
+                                totalVotes: data.data.totalVotes || 0,
+                                piesSold: data.data.pizzasSold || 0
+                            });
+                            
+                            // Show notification for new vote
+                            if (data.data.nyVotes > currentNyVotes) {
+                                showLastVote('ny');
+                            } else if (data.data.chicagoVotes > currentChicagoVotes) {
+                                showLastVote('chicago');
+                            }
+                        }
                     }
                 } catch (error) {
                     console.error('Error polling TV data:', error);
@@ -399,57 +384,8 @@
             }, 5000); // Poll every 5 seconds
         }
         
-        // Socket event handlers (only if socket is available)
-        if (socket) {
-            socket.on('voting-data', (data) => {
-                console.log('Received initial voting data:', data);
-                // Only update if we don't have admin data
-                if (parseInt(nyVotesEl.textContent) === 0 && parseInt(chicagoVotesEl.textContent) === 0) {
-                    updateDisplay({
-                        ...data,
-                        piesSold: 0
-                    });
-                }
-            });
-            
-            socket.on('voting-update', (data) => {
-                console.log('Received voting update:', data);
-                // Check if this is an admin update or regular voting
-                if (data.nyVotes !== parseInt(nyVotesEl.textContent) || data.chicagoVotes !== parseInt(chicagoVotesEl.textContent)) {
-                    updateDisplay({
-                        ...data,
-                        piesSold: parseInt(piesSoldEl.textContent) || 0
-                    });
-                    
-                    // Show notification for new vote
-                    if (data.nyVotes > parseInt(nyVotesEl.textContent)) {
-                        showLastVote('ny');
-                    } else if (data.chicagoVotes > parseInt(chicagoVotesEl.textContent)) {
-                        showLastVote('chicago');
-                    }
-                }
-            });
-            
-            // Listen for admin data updates
-            socket.on('admin-update', (data) => {
-                console.log('Received admin update:', data);
-                if (data.type === 'tv-controls') {
-                    updateDisplay({
-                        nyVotes: data.data.nyVotes || 0,
-                        chicagoVotes: data.data.chicagoVotes || 0,
-                        totalVotes: (data.data.nyVotes || 0) + (data.data.chicagoVotes || 0),
-                        piesSold: data.data.piesSold || 0
-                    });
-                }
-            });
-            
-            // Auto-refresh every 30 seconds to ensure sync
-            setInterval(() => {
-                if (socket && socket.connected) {
-                    socket.emit('request-update');
-                }
-            }, 30000);
-        }
+        // Always start polling as backup (Supabase Realtime is primary)
+        startPolling();
         
         // Fullscreen toggle on click
         document.addEventListener('click', () => {
