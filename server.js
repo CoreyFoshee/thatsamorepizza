@@ -904,7 +904,60 @@ app.get('/tv', (req, res) => {
     }));
 });
 
-app.get('/admin', (req, res) => {
+// Admin password
+const ADMIN_PASSWORD = 'thatsamore';
+
+// Authentication middleware
+function requireAuth(req, res, next) {
+    if (req.session && req.session.authenticated === true) {
+        return next();
+    } else {
+        // For API routes, return JSON error; for page routes, redirect to login
+        if (req.path.startsWith('/api/')) {
+            return res.status(401).json({ success: false, message: 'Authentication required' });
+        }
+        return res.redirect('/admin/login');
+    }
+}
+
+// Login page
+app.get('/admin/login', (req, res) => {
+    // If already authenticated, redirect to admin
+    if (req.session && req.session.authenticated === true) {
+        return res.redirect('/admin');
+    }
+    res.render('admin-login', {
+        title: "Admin Login - That's Amore Pizzeria",
+        description: "Admin login",
+        layout: false
+    });
+});
+
+// Login handler
+app.post('/admin/login', (req, res) => {
+    const { password } = req.body;
+    
+    if (password === ADMIN_PASSWORD) {
+        req.session.authenticated = true;
+        res.redirect('/admin');
+    } else {
+        res.render('admin-login', {
+            title: "Admin Login - That's Amore Pizzeria",
+            description: "Admin login",
+            error: 'Incorrect password. Please try again.',
+            layout: false
+        });
+    }
+});
+
+// Logout handler
+app.post('/admin/logout', (req, res) => {
+    req.session = null; // Clear session with cookie-session
+    res.redirect('/admin/login');
+});
+
+// Protected admin page
+app.get('/admin', requireAuth, (req, res) => {
     res.render('admin', addSupabaseToRender({ 
         title: "Admin Panel - That's Amore Pizzeria",
         description: "Admin panel for managing voting results",
