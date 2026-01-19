@@ -222,24 +222,35 @@
                     </div>
                 </div>
                 
-                <!-- Holiday Hours -->
-                <div class="mb-6">
-                    <h3 class="text-lg font-semibold mb-4">Holiday Hours</h3>
-                    <div id="holiday-hours-container">
-                        <!-- Holiday hours will be populated here -->
-                    </div>
-                    <button id="add-holiday" class="btn-primary mt-3">➕ Add Holiday</button>
-                </div>
-                
                 <div class="mt-4">
                     <button id="save-hours" class="btn-success">💾 Save All Hours</button>
                 </div>
             </div>
             
-            <!-- Scheduled Closures -->
+            <!-- Holiday/Closures -->
             <div class="admin-card">
-                <h2 class="text-2xl font-bold text-yellow-400 mb-6">📅 Scheduled Closures</h2>
-                <div class="grid md:grid-cols-2 gap-6">
+                <h2 class="text-2xl font-bold text-yellow-400 mb-6">📅 Holiday/Closures</h2>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Add New Holiday</h3>
+                        <div class="space-y-3">
+                            <input type="text" id="holiday-name" class="form-input" placeholder="Holiday Name">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" id="holiday-month" class="form-input" placeholder="Month (1-12)" min="1" max="12">
+                                <input type="number" id="holiday-day" class="form-input" placeholder="Day (1-31)" min="1" max="31">
+                            </div>
+                            <input type="text" id="holiday-hours" class="form-input" placeholder="Hours (e.g., 11:00 AM - 3:00 PM)">
+                            <div class="flex items-center space-x-2">
+                                <input type="checkbox" id="holiday-open" class="w-4 h-4">
+                                <label for="holiday-open" class="text-sm">Open on this holiday</label>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="checkbox" id="holiday-calculated" class="w-4 h-4">
+                                <label for="holiday-calculated" class="text-sm">Calculated Date (Easter/Thanksgiving)</label>
+                            </div>
+                            <button id="add-holiday" class="btn-primary">➕ Add Holiday</button>
+                        </div>
+                    </div>
                     <div>
                         <h3 class="text-lg font-semibold mb-4">Add New Closure</h3>
                         <div class="space-y-3">
@@ -248,11 +259,17 @@
                             <button id="add-closure" class="btn-warning">➕ Add Closure</button>
                         </div>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-semibold mb-4">Upcoming Closures</h3>
-                        <div id="closures-list" class="space-y-2">
-                            <!-- Closures will be populated here -->
-                        </div>
+                </div>
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Holidays</h3>
+                    <div id="holiday-hours-container" class="space-y-2">
+                        <!-- Holiday hours will be populated here -->
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Upcoming Closures</h3>
+                    <div id="closures-list" class="space-y-2">
+                        <!-- Closures will be populated here -->
                     </div>
                 </div>
             </div>
@@ -329,6 +346,13 @@
         const manualClosedToggle = document.getElementById('manual-closed-toggle');
         const currentStatus = document.getElementById('current-status');
         const saveHoursBtn = document.getElementById('save-hours');
+        const holidayName = document.getElementById('holiday-name');
+        const holidayMonth = document.getElementById('holiday-month');
+        const holidayDay = document.getElementById('holiday-day');
+        const holidayHours = document.getElementById('holiday-hours');
+        const holidayOpen = document.getElementById('holiday-open');
+        const holidayCalculated = document.getElementById('holiday-calculated');
+        const addHolidayBtn = document.getElementById('add-holiday');
         const closureDate = document.getElementById('closure-date');
         const closureReason = document.getElementById('closure-reason');
         const addClosureBtn = document.getElementById('add-closure');
@@ -564,6 +588,50 @@
             } catch (error) {
                 console.error('Error saving hours:', error);
             }
+        });
+        
+        addHolidayBtn.addEventListener('click', () => {
+            if (!holidayName.value || !holidayMonth.value || !holidayDay.value || !holidayHours.value) {
+                alert('Please fill in all holiday fields');
+                return;
+            }
+            
+            // Get current holidays
+            const container = document.getElementById('holiday-hours-container');
+            const currentHolidays = Array.from(container.children).map((div, index) => {
+                const inputs = div.querySelectorAll('input[data-field]');
+                const holiday = {};
+                inputs.forEach(input => {
+                    const field = input.dataset.field;
+                    if (input.type === 'checkbox') {
+                        holiday[field] = input.checked;
+                    } else {
+                        holiday[field] = field === 'month' || field === 'day' ? parseInt(input.value) : input.value;
+                    }
+                });
+                return holiday;
+            });
+            
+            // Add new holiday
+            const newHoliday = {
+                name: holidayName.value,
+                month: parseInt(holidayMonth.value),
+                day: parseInt(holidayDay.value),
+                hours: holidayHours.value,
+                open: holidayOpen.checked,
+                isCalculated: holidayCalculated.checked
+            };
+            
+            currentHolidays.push(newHoliday);
+            updateHolidayHoursDisplay(currentHolidays);
+            
+            // Clear form
+            holidayName.value = '';
+            holidayMonth.value = '';
+            holidayDay.value = '';
+            holidayHours.value = '';
+            holidayOpen.checked = false;
+            holidayCalculated.checked = false;
         });
         
         addClosureBtn.addEventListener('click', async () => {
