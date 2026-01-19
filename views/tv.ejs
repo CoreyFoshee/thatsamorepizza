@@ -16,7 +16,8 @@
         // Expose Supabase credentials to frontend (anon key is safe for public use)
         window.supabaseUrl = '<%= typeof supabaseUrl !== "undefined" ? supabaseUrl : "" %>';
         window.supabaseAnonKey = '<%= typeof supabaseAnonKey !== "undefined" ? supabaseAnonKey : "" %>';
-        window.supabase = supabase;
+        // Store reference to the global supabase object
+        window.supabaseLib = supabase;
     </script>
     
     <!-- Custom Styles -->
@@ -217,16 +218,20 @@
     
     <script>
         // Initialize Supabase client
-        let supabase = null;
-        if (window.supabase && window.supabaseUrl && window.supabaseAnonKey) {
+        let supabaseClient = null;
+        if (window.supabaseLib && window.supabaseUrl && window.supabaseAnonKey) {
             try {
-                supabase = window.supabase.createClient(window.supabaseUrl, window.supabaseAnonKey);
+                supabaseClient = window.supabaseLib.createClient(window.supabaseUrl, window.supabaseAnonKey);
                 console.log('✅ Supabase client initialized for TV display');
             } catch (error) {
                 console.error('❌ Failed to initialize Supabase client:', error);
             }
         } else {
-            console.error('❌ Supabase credentials not available');
+            console.error('❌ Supabase credentials not available', {
+                hasLib: !!window.supabaseLib,
+                hasUrl: !!window.supabaseUrl,
+                hasKey: !!window.supabaseAnonKey
+            });
         }
         
         // DOM elements
@@ -296,10 +301,10 @@
         }
         
         // Initialize Supabase Realtime subscription for TV display
-        if (supabase) {
+        if (supabaseClient) {
             try {
                 console.log('🔌 Setting up Supabase Realtime subscription...');
-                const channel = supabase
+                const channel = supabaseClient
                     .channel('tv-display-updates', {
                         config: {
                             broadcast: { self: true }
