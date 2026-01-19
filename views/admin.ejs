@@ -785,27 +785,6 @@
         }
         
         // Admin actions
-        document.getElementById('reset-votes').addEventListener('click', async () => {
-            if (confirm('Are you sure you want to reset all votes? This action cannot be undone.')) {
-                try {
-                    const response = await fetch('/api/admin/reset-votes', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-                    
-                    const result = await response.json();
-                    if (result.success) {
-                        alert('Votes reset successfully!');
-                        updateDisplay({ votingData: result.data });
-                    } else {
-                        alert('Error resetting votes: ' + result.message);
-                    }
-                } catch (error) {
-                    console.error('Error resetting votes:', error);
-                    alert('Error resetting votes. Please try again.');
-                }
-            }
-        });
         
         document.getElementById('export-data').addEventListener('click', () => {
             const data = {
