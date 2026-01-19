@@ -957,15 +957,89 @@ function calculateCurrentStatus(status, hours, closures) {
         };
     }
     
+    // Helper function to calculate holiday dates
+    function calculateHolidayDate(holidayName, year) {
+        switch(holidayName) {
+            case 'Easter':
+                return getEasterDate(year);
+            case 'Thanksgiving':
+                return getThanksgivingDate(year);
+            case 'Good Friday':
+                const easter = getEasterDate(year);
+                return new Date(easter.getTime() - 2 * 24 * 60 * 60 * 1000); // 2 days before Easter
+            case 'Easter Monday':
+                const easterMon = getEasterDate(year);
+                return new Date(easterMon.getTime() + 1 * 24 * 60 * 60 * 1000); // 1 day after Easter
+            case 'Memorial Day':
+                return getLastMondayOfMonth(year, 4); // May (month 4)
+            case 'Labor Day':
+                return getFirstMondayOfMonth(year, 8); // September (month 8)
+            case 'Columbus Day':
+                return getNthMondayOfMonth(year, 9, 2); // October (month 9), 2nd Monday
+            case 'Presidents Day':
+                return getNthMondayOfMonth(year, 1, 3); // February (month 1), 3rd Monday
+            case 'Martin Luther King Jr. Day':
+                return getNthMondayOfMonth(year, 0, 3); // January (month 0), 3rd Monday
+            default:
+                return null;
+        }
+    }
+    
+    function getEasterDate(year) {
+        const a = year % 19;
+        const b = Math.floor(year / 100);
+        const c = year % 100;
+        const d = Math.floor(b / 4);
+        const e = b % 4;
+        const f = Math.floor((b + 8) / 25);
+        const g = Math.floor((b - f + 1) / 3);
+        const h = (19 * a + b - d - g + 15) % 30;
+        const i = Math.floor(c / 4);
+        const k = c % 4;
+        const l = (32 + 2 * e + 2 * i - h - k) % 7;
+        const m = Math.floor((a + 11 * h + 22 * l) / 451);
+        const month = Math.floor((h + l - 7 * m + 114) / 31);
+        const day = ((h + l - 7 * m + 114) % 31) + 1;
+        return new Date(year, month - 1, day);
+    }
+    
+    function getThanksgivingDate(year) {
+        const firstDay = new Date(year, 10, 1); // November 1st
+        const firstThursday = new Date(year, 10, 1 + ((4 - firstDay.getDay() + 7) % 7));
+        return new Date(year, 10, firstThursday.getDate() + 21); // 3 weeks later
+    }
+    
+    function getFirstMondayOfMonth(year, month) {
+        const firstDay = new Date(year, month, 1);
+        const dayOfWeek = firstDay.getDay();
+        const daysToAdd = (1 - dayOfWeek + 7) % 7; // Days to add to get to Monday
+        return new Date(year, month, 1 + daysToAdd);
+    }
+    
+    function getLastMondayOfMonth(year, month) {
+        const lastDay = new Date(year, month + 1, 0); // Last day of month
+        const dayOfWeek = lastDay.getDay();
+        const daysToSubtract = (dayOfWeek - 1 + 7) % 7; // Days to subtract to get to Monday
+        return new Date(year, month, lastDay.getDate() - daysToSubtract);
+    }
+    
+    function getNthMondayOfMonth(year, month, n) {
+        const firstMonday = getFirstMondayOfMonth(year, month);
+        return new Date(year, month, firstMonday.getDate() + (n - 1) * 7);
+    }
+    
     // 3. Check holiday hours
     const holidayHours = hours.holidayHours || [];
     const todayHoliday = holidayHours.find(h => {
         if (h.isCalculated) {
-            // For calculated holidays like Easter/Thanksgiving, we'd need to calculate the date
-            // For now, skip these or implement date calculation
+            const calculatedDate = calculateHolidayDate(h.name, now.getFullYear());
+            if (calculatedDate) {
+                return calculatedDate.getMonth() === now.getMonth() && 
+                       calculatedDate.getDate() === now.getDate();
+            }
             return false;
         }
-        return h.month === now.getMonth() && h.day === now.getDate();
+        return h.month === now.getMonth() + 1 && h.day === now.getDate();
     });
     
     if (todayHoliday) {

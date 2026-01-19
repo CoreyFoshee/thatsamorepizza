@@ -223,16 +223,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Check for calculated holidays (Easter, Thanksgiving)
+        // Check for calculated holidays
         for (const holiday of holidayHours) {
             if (holiday.isCalculated) {
-                let calculatedDate;
-                if (holiday.name === 'Easter') {
-                    calculatedDate = getEasterDate(date.getFullYear());
-                } else if (holiday.name === 'Thanksgiving') {
-                    calculatedDate = getThanksgivingDate(date.getFullYear());
-                }
-                
+                const calculatedDate = calculateHolidayDate(holiday.name, date.getFullYear());
                 if (calculatedDate && month === calculatedDate.getMonth() + 1 && day === calculatedDate.getDate()) {
                     return { 
                         hours: holiday.hours, 
@@ -245,6 +239,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         return null; // No holiday
+    }
+    
+    // Calculate holiday dates based on name
+    function calculateHolidayDate(holidayName, year) {
+        switch(holidayName) {
+            case 'Easter':
+                return getEasterDate(year);
+            case 'Thanksgiving':
+                return getThanksgivingDate(year);
+            case 'Good Friday':
+                const easter = getEasterDate(year);
+                return new Date(easter.getTime() - 2 * 24 * 60 * 60 * 1000); // 2 days before Easter
+            case 'Easter Monday':
+                const easterMon = getEasterDate(year);
+                return new Date(easterMon.getTime() + 1 * 24 * 60 * 60 * 1000); // 1 day after Easter
+            case 'Memorial Day':
+                return getLastMondayOfMonth(year, 4); // May (month 4)
+            case 'Labor Day':
+                return getFirstMondayOfMonth(year, 8); // September (month 8)
+            case 'Columbus Day':
+                return getNthMondayOfMonth(year, 9, 2); // October (month 9), 2nd Monday
+            case 'Presidents Day':
+                return getNthMondayOfMonth(year, 1, 3); // February (month 1), 3rd Monday
+            case 'Martin Luther King Jr. Day':
+                return getNthMondayOfMonth(year, 0, 3); // January (month 0), 3rd Monday
+            default:
+                return null;
+        }
     }
     
     // Calculate Easter date (Meeus/Jones/Butcher algorithm)
@@ -270,9 +292,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Calculate Thanksgiving date (4th Thursday in November)
     function getThanksgivingDate(year) {
         const firstDay = new Date(year, 10, 1); // November 1st
-        const firstThursday = new Date(year, 10, 1 + ((4 - firstDay.getDay()) + 7) % 7);
-        const thanksgiving = new Date(year, 10, firstThursday.getDate() + 21); // 3 weeks later
-        return thanksgiving;
+        const firstThursday = new Date(year, 10, 1 + ((4 - firstDay.getDay() + 7) % 7));
+        return new Date(year, 10, firstThursday.getDate() + 21); // 3 weeks later
+    }
+    
+    // Get first Monday of a month
+    function getFirstMondayOfMonth(year, month) {
+        const firstDay = new Date(year, month, 1);
+        const dayOfWeek = firstDay.getDay();
+        const daysToAdd = (1 - dayOfWeek + 7) % 7; // Days to add to get to Monday
+        return new Date(year, month, 1 + daysToAdd);
+    }
+    
+    // Get last Monday of a month
+    function getLastMondayOfMonth(year, month) {
+        const lastDay = new Date(year, month + 1, 0); // Last day of month
+        const dayOfWeek = lastDay.getDay();
+        const daysToSubtract = (dayOfWeek - 1 + 7) % 7; // Days to subtract to get to Monday
+        return new Date(year, month, lastDay.getDate() - daysToSubtract);
+    }
+    
+    // Get nth Monday of a month
+    function getNthMondayOfMonth(year, month, n) {
+        const firstMonday = getFirstMondayOfMonth(year, month);
+        return new Date(year, month, firstMonday.getDate() + (n - 1) * 7);
     }
     
     // Toggle full hours dropdown
