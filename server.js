@@ -977,12 +977,14 @@ function calculateCurrentStatus(status, hours, closures) {
     }
     
     // 4. Check regular business hours
-    const businessHours = hours.businessHours || [];
-    const todayHours = businessHours.find(h => {
+    const businessHours = hours.businessHours || {};
+    // Convert object format (with numeric keys) to array if needed
+    let businessHoursArray = Array.isArray(businessHours) ? businessHours : Object.values(businessHours);
+    const todayHours = businessHoursArray.find(h => {
         // Convert day name to day index
         const dayMap = { 'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6 };
         return dayMap[h.day] === todayDay;
-    });
+    }) || businessHours[todayDay]; // Fallback to direct key access
     
     if (!todayHours || !todayHours.open) {
         return {
