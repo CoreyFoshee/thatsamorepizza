@@ -1,5 +1,12 @@
 // That's Amore Pizzeria - Interactive JavaScript
 
+// Initialize Supabase client for frontend (read-only)
+let supabaseClient = null;
+if (typeof supabaseUrl !== 'undefined' && typeof supabaseAnonKey !== 'undefined') {
+    // Supabase will be loaded from CDN or configured via window object
+    // We'll check for it in initPizzaPoll
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize all functionality
     initNavigation();
@@ -15,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initVideoBackground(); // Initialize video background
 });
 
-// Pizza Style Poll functionality with WebSocket real-time updates
+// Pizza Style Poll functionality with Supabase Realtime and WebSocket fallback
 function initPizzaPoll() {
     // Get poll elements
     const nyVoteBtn = document.querySelector('.vote-btn-ny');
@@ -28,24 +35,55 @@ function initPizzaPoll() {
     const chicagoPercentage = document.getElementById('chicago-percentage');
     const totalVotes = document.getElementById('total-votes');
     
-    // Initialize Socket.io connection
+    // Initialize Socket.io connection (fallback)
     const socket = io();
     
+    // Initialize Supabase client if available
+    let supabase = null;
+    if (window.supabase && window.supabaseUrl && window.supabaseAnonKey) {
+        try {
+            supabase = window.supabase.createClient(window.supabaseUrl, window.supabaseAnonKey);
+            console.log('✅ Supabase client initialized for realtime updates');
+        } catch (error) {
+            console.warn('⚠️  Failed to initialize Supabase client:', error);
+        }
+    }
+    
+    // Session management
+    let sessionId = localStorage.getItem('pizzaPollSessionId');
+    if (!sessionId) {
+        sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('pizzaPollSessionId', sessionId);
+    }
+    
+    let hasVoted = false;
+    let useWebSocket = true; // Default to WebSocket, fallback to API
+    
     // Current voting data
-    let currentVotes = { ny: 0, chicago: 0, total: 0 };
+    let currentVotes = { nyVotes: 0, chicagoVotes: 0, totalVotes: 0 };
     
     // Update display with voting data
     function updatePollDisplay(data) {
         if (!data) return;
         
-        currentVotes = data;
-        const nyPercent = data.total > 0 ? Math.round((data.nyVotes / data.totalVotes) * 100) : 0;
-        const chicagoPercent = data.total > 0 ? Math.round((data.chicagoVotes / data.totalVotes) * 100) : 0;
+        // Handle both old format (nyVotes, chicagoVotes, totalVotes) and new format
+        const nyVotesCount = data.nyVotes || data.ny || 0;
+        const chicagoVotesCount = data.chicagoVotes || data.chicago || 0;
+        const totalVotesCount = data.totalVotes || data.total || (nyVotesCount + chicagoVotesCount);
+        
+        currentVotes = {
+            nyVotes: nyVotesCount,
+            chicagoVotes: chicagoVotesCount,
+            totalVotes: totalVotesCount
+        };
+        
+        const nyPercent = totalVotesCount > 0 ? Math.round((nyVotesCount / totalVotesCount) * 100) : 0;
+        const chicagoPercent = totalVotesCount > 0 ? Math.round((chicagoVotesCount / totalVotesCount) * 100) : 0;
         
         // Update vote counts
-        if (nyVotes) nyVotes.textContent = data.nyVotes;
-        if (chicagoVotes) chicagoVotes.textContent = data.chicagoVotes;
-        if (totalVotes) totalVotes.textContent = data.totalVotes;
+        if (nyVotes) nyVotes.textContent = nyVotesCount;
+        if (chicagoVotes) chicagoVotes.textContent = chicagoVotesCount;
+        if (totalVotes) totalVotes.textContent = totalVotesCount;
         
         // Update percentages
         if (nyPercentage) nyPercentage.textContent = nyPercent + '%';
@@ -61,6 +99,49 @@ function initPizzaPoll() {
             chicagoProgress.style.width = chicagoPercent + '%';
         }
     }
+    
+    // Load initial voting data
+    async function loadInitialVotes() {
+        try {
+            const response = await fetch('/api/voting-data');
+            const result = await response.json();
+            if (result.success && result.data) {
+                updatePollDisplay(result.data);
+            }
+        } catch (error) {
+            console.error('Error loading initial votes:', error);
+        }
+    }
+    
+    // Initialize Supabase Realtime subscription
+    if (supabase) {
+        try {
+            const channel = supabase
+                .channel('restaurant-metrics-changes')
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'restaurant_metrics'
+                }, (payload) => {
+                    console.log('Received Supabase Realtime update:', payload);
+                    if (payload.new) {
+                        updatePollDisplay({
+                            nyVotes: payload.new.ny_votes,
+                            chicagoVotes: payload.new.chicago_votes,
+                            totalVotes: payload.new.total_votes
+                        });
+                    }
+                })
+                .subscribe();
+            
+            console.log('✅ Supabase Realtime subscription active');
+        } catch (error) {
+            console.warn('⚠️  Failed to set up Supabase Realtime subscription:', error);
+        }
+    }
+    
+    // Load initial data
+    loadInitialVotes();
     
     // Show vote confirmation
     function showVoteConfirmation(style, emoji) {

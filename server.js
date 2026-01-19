@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const fs = require('fs');
+const { createClient } = require('@supabase/supabase-js');
 const app = express();
 
 // Check if we're running on Vercel (serverless environment)
@@ -25,7 +26,28 @@ if (!isVercel) {
 
 const PORT = process.env.PORT || 3000;
 
-// Data file paths (only used in non-Vercel environments)
+// Supabase client initialization
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+let supabase = null;
+let supabaseClient = null; // For frontend (read-only)
+
+if (supabaseUrl && supabaseServiceKey) {
+    // Server-side client with service role key (full access)
+    supabase = createClient(supabaseUrl, supabaseServiceKey);
+    console.log('✅ Supabase client initialized (server-side)');
+} else {
+    console.warn('⚠️  Supabase credentials not found. Using file-based storage as fallback.');
+}
+
+if (supabaseUrl && supabaseAnonKey) {
+    // Client for frontend (read-only)
+    supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+}
+
+// Data file paths (only used in non-Vercel environments and as fallback)
 const DATA_FILE = path.join(__dirname, 'data', 'voting-data.json');
 const ADMIN_DATA_FILE = path.join(__dirname, 'data', 'admin-data.json');
 
@@ -185,9 +207,546 @@ function saveAdminData() {
     }
 }
 
+// ============================================
+// Supabase Helper Functions
+// ============================================
+
+// Restaurant Metrics Functions
+async function getRestaurantMetrics() {
+    if (!supabase) {
+        // Fallback to in-memory data
+        return {
+            nyVotes: votingData.nyVotes,
+            chicagoVotes: votingData.chicagoVotes,
+            totalVotes: votingData.totalVotes,
+            pizzasSold: adminData.tvControls.piesSold || 0
+        };
+    }
+    
+    try {
+        const { data, error } = await supabase
+            .from('restaurant_metrics')
+            .select('*')
+            .limit(1)
+            .single();
+        
+        if (error) throw error;
+        
+        return {
+            nyVotes: data.ny_votes || 0,
+            chicagoVotes: data.chicago_votes || 0,
+            totalVotes: data.total_votes || 0,
+            pizzasSold: data.pizzas_sold || 0
+        };
+    } catch (error) {
+        console.error('Error fetching restaurant metrics:', error);
+        return {
+            nyVotes: 0,
+            chicagoVotes: 0,
+            totalVotes: 0,
+            pizzasSold: 0
+        };
+    }
+}
+
+async function recordVote(choice, sessionId) {
+    if (!supabase) {
+        // Fallback to in-memory
+        if (votingData.sessionVotes.has(sessionId)) {
+            return { success: false, message: 'Already voted' };
+        }
+        
+        if (choice === 'ny') {
+            votingData.nyVotes++;
+        } else if (choice === 'chicago') {
+            votingData.chicagoVotes++;
+        }
+        votingData.totalVotes = votingData.nyVotes + votingData.chicagoVotes;
+        votingData.sessionVotes.add(sessionId);
+        saveVotingData();
+        return { success: true, data: votingData };
+    }
+    
+    try {
+        // Check if session already voted
+        const { data: existingVote } = await supabase
+            .from('vote_records')
+            .select('id')
+            .eq('session_id', sessionId)
+            .limit(1)
+            .single();
+        
+        if (existingVote) {
+            return { success: false, message: 'You have already voted in this session' };
+        }
+        
+        // Insert vote record
+        const { error: insertError } = await supabase
+            .from('vote_records')
+            .insert({ choice, session_id: sessionId });
+        
+        if (insertError) throw insertError;
+        
+        // Update metrics
+        const { data: metrics } = await supabase
+            .from('restaurant_metrics')
+            .select('*')
+            .limit(1)
+            .single();
+        
+        if (!metrics) throw new Error('Restaurant metrics not found');
+        
+        const updateData = {
+            ny_votes: choice === 'ny' ? metrics.ny_votes + 1 : metrics.ny_votes,
+            chicago_votes: choice === 'chicago' ? metrics.chicago_votes + 1 : metrics.chicago_votes
+        };
+        updateData.total_votes = updateData.ny_votes + updateData.chicago_votes;
+        
+        const { data: updated, error: updateError } = await supabase
+            .from('restaurant_metrics')
+            .update(updateData)
+            .eq('id', metrics.id)
+            .select()
+            .single();
+        
+        if (updateError) throw updateError;
+        
+        return {
+            success: true,
+            data: {
+                nyVotes: updated.ny_votes,
+                chicagoVotes: updated.chicago_votes,
+                totalVotes: updated.total_votes
+            }
+        };
+    } catch (error) {
+        console.error('Error recording vote:', error);
+        return { success: false, message: 'Error recording vote' };
+    }
+}
+
+async function updatePizzasSold(count) {
+    if (!supabase) {
+        adminData.tvControls.piesSold = count;
+        saveAdminData();
+        return { success: true };
+    }
+    
+    try {
+        const { data: metrics } = await supabase
+            .from('restaurant_metrics')
+            .select('*')
+            .limit(1)
+            .single();
+        
+        if (!metrics) throw new Error('Restaurant metrics not found');
+        
+        const { error } = await supabase
+            .from('restaurant_metrics')
+            .update({ pizzas_sold: count })
+            .eq('id', metrics.id);
+        
+        if (error) throw error;
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating pizzas sold:', error);
+        return { success: false, message: 'Error updating pizzas sold' };
+    }
+}
+
+async function resetVotes() {
+    if (!supabase) {
+        votingData.nyVotes = 0;
+        votingData.chicagoVotes = 0;
+        votingData.totalVotes = 0;
+        votingData.sessionVotes.clear();
+        saveVotingData();
+        return { success: true };
+    }
+    
+    try {
+        const { data: metrics } = await supabase
+            .from('restaurant_metrics')
+            .select('*')
+            .limit(1)
+            .single();
+        
+        if (!metrics) throw new Error('Restaurant metrics not found');
+        
+        const { error } = await supabase
+            .from('restaurant_metrics')
+            .update({
+                ny_votes: 0,
+                chicago_votes: 0,
+                total_votes: 0,
+                last_reset: new Date().toISOString()
+            })
+            .eq('id', metrics.id);
+        
+        if (error) throw error;
+        
+        // Clear vote records (optional - you might want to keep them for analytics)
+        // await supabase.from('vote_records').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        
+        return { success: true };
+    } catch (error) {
+        console.error('Error resetting votes:', error);
+        return { success: false, message: 'Error resetting votes' };
+    }
+}
+
+async function setVotes(nyVotes, chicagoVotes) {
+    if (!supabase) {
+        votingData.nyVotes = nyVotes;
+        votingData.chicagoVotes = chicagoVotes;
+        votingData.totalVotes = nyVotes + chicagoVotes;
+        saveVotingData();
+        return { success: true };
+    }
+    
+    try {
+        const { data: metrics } = await supabase
+            .from('restaurant_metrics')
+            .select('*')
+            .limit(1)
+            .single();
+        
+        if (!metrics) throw new Error('Restaurant metrics not found');
+        
+        const { error } = await supabase
+            .from('restaurant_metrics')
+            .update({
+                ny_votes: nyVotes,
+                chicago_votes: chicagoVotes,
+                total_votes: nyVotes + chicagoVotes,
+                last_reset: new Date().toISOString()
+            })
+            .eq('id', metrics.id);
+        
+        if (error) throw error;
+        return { success: true };
+    } catch (error) {
+        console.error('Error setting votes:', error);
+        return { success: false, message: 'Error setting votes' };
+    }
+}
+
+async function setPizzasSold(count) {
+    return await updatePizzasSold(count);
+}
+
+// Restaurant Hours Functions
+async function getRestaurantHours() {
+    if (!supabase) {
+        return adminData.hours;
+    }
+    
+    try {
+        const { data, error } = await supabase
+            .from('restaurant_hours')
+            .select('*')
+            .limit(1)
+            .single();
+        
+        if (error) throw error;
+        
+        // Convert database format to expected format
+        return {
+            header: data.header_text,
+            footer: data.footer_text,
+            businessHours: data.business_hours,
+            holidayHours: data.holiday_hours,
+            lastUpdated: data.updated_at
+        };
+    } catch (error) {
+        console.error('Error fetching restaurant hours:', error);
+        return adminData.hours; // Fallback
+    }
+}
+
+async function updateRestaurantHours(header, footer, businessHours, holidayHours) {
+    if (!supabase) {
+        if (header !== undefined) adminData.hours.header = header;
+        if (footer !== undefined) adminData.hours.footer = footer;
+        if (businessHours !== undefined) adminData.hours.businessHours = businessHours;
+        if (holidayHours !== undefined) adminData.hours.holidayHours = holidayHours;
+        saveAdminData();
+        return { success: true };
+    }
+    
+    try {
+        const { data: hours } = await supabase
+            .from('restaurant_hours')
+            .select('*')
+            .limit(1)
+            .single();
+        
+        if (!hours) throw new Error('Restaurant hours not found');
+        
+        const updateData = {};
+        if (header !== undefined) updateData.header_text = header;
+        if (footer !== undefined) updateData.footer_text = footer;
+        if (businessHours !== undefined) updateData.business_hours = businessHours;
+        if (holidayHours !== undefined) updateData.holiday_hours = holidayHours;
+        
+        const { error } = await supabase
+            .from('restaurant_hours')
+            .update(updateData)
+            .eq('id', hours.id);
+        
+        if (error) throw error;
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating restaurant hours:', error);
+        return { success: false, message: 'Error updating restaurant hours' };
+    }
+}
+
+// Restaurant Status Functions
+async function getRestaurantStatus() {
+    if (!supabase) {
+        return adminData.restaurantStatus;
+    }
+    
+    try {
+        const { data, error } = await supabase
+            .from('restaurant_status')
+            .select('*')
+            .limit(1)
+            .single();
+        
+        if (error) throw error;
+        
+        return {
+            manualClosed: data.manual_closed,
+            lastUpdated: data.last_updated
+        };
+    } catch (error) {
+        console.error('Error fetching restaurant status:', error);
+        return adminData.restaurantStatus; // Fallback
+    }
+}
+
+async function updateRestaurantStatus(manualClosed) {
+    if (!supabase) {
+        adminData.restaurantStatus.manualClosed = manualClosed;
+        adminData.restaurantStatus.lastUpdated = new Date().toISOString();
+        saveAdminData();
+        return { success: true };
+    }
+    
+    try {
+        const { data: status } = await supabase
+            .from('restaurant_status')
+            .select('*')
+            .limit(1)
+            .single();
+        
+        if (!status) throw new Error('Restaurant status not found');
+        
+        const { error } = await supabase
+            .from('restaurant_status')
+            .update({
+                manual_closed: manualClosed,
+                last_updated: new Date().toISOString()
+            })
+            .eq('id', status.id);
+        
+        if (error) throw error;
+        return { success: true };
+    } catch (error) {
+        console.error('Error updating restaurant status:', error);
+        return { success: false, message: 'Error updating restaurant status' };
+    }
+}
+
+// Scheduled Closures Functions
+async function getScheduledClosures() {
+    if (!supabase) {
+        return adminData.scheduledClosures;
+    }
+    
+    try {
+        const { data, error } = await supabase
+            .from('scheduled_closures')
+            .select('*')
+            .order('closure_date', { ascending: true });
+        
+        if (error) throw error;
+        
+        return data.map(closure => ({
+            date: closure.closure_date,
+            reason: closure.reason
+        }));
+    } catch (error) {
+        console.error('Error fetching scheduled closures:', error);
+        return adminData.scheduledClosures; // Fallback
+    }
+}
+
+async function addScheduledClosure(date, reason) {
+    if (!supabase) {
+        const existingIndex = adminData.scheduledClosures.findIndex(c => c.date === date);
+        if (existingIndex !== -1) {
+            adminData.scheduledClosures[existingIndex] = { date, reason: reason || '' };
+        } else {
+            adminData.scheduledClosures.push({ date, reason: reason || '' });
+        }
+        adminData.scheduledClosures.sort((a, b) => new Date(a.date) - new Date(b.date));
+        saveAdminData();
+        return { success: true };
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('scheduled_closures')
+            .upsert({
+                closure_date: date,
+                reason: reason || null
+            }, {
+                onConflict: 'closure_date'
+            });
+        
+        if (error) throw error;
+        return { success: true };
+    } catch (error) {
+        console.error('Error adding scheduled closure:', error);
+        return { success: false, message: 'Error adding scheduled closure' };
+    }
+}
+
+async function deleteScheduledClosure(date) {
+    if (!supabase) {
+        adminData.scheduledClosures = adminData.scheduledClosures.filter(c => c.date !== date);
+        saveAdminData();
+        return { success: true };
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('scheduled_closures')
+            .delete()
+            .eq('closure_date', date);
+        
+        if (error) throw error;
+        return { success: true };
+    } catch (error) {
+        console.error('Error deleting scheduled closure:', error);
+        return { success: false, message: 'Error deleting scheduled closure' };
+    }
+}
+
+// Helper function to add Supabase credentials to render data
+function addSupabaseToRender(data) {
+    return {
+        ...data,
+        supabaseUrl: supabaseUrl || '',
+        supabaseAnonKey: supabaseAnonKey || ''
+    };
+}
+
 // Load data on startup
 loadVotingData();
 loadAdminData();
+
+// Migration function to migrate file-based data to Supabase
+async function migrateToSupabase() {
+    if (!supabase) {
+        console.log('⚠️  Supabase not configured, skipping migration');
+        return;
+    }
+    
+    try {
+        // Check if Supabase already has data
+        const { data: existingMetrics } = await supabase
+            .from('restaurant_metrics')
+            .select('*')
+            .limit(1)
+            .single();
+        
+        // Only migrate if Supabase is empty and we have file data
+        if (existingMetrics && (existingMetrics.ny_votes > 0 || existingMetrics.chicago_votes > 0 || existingMetrics.pizzas_sold > 0)) {
+            console.log('✅ Supabase already has data, skipping migration');
+            return;
+        }
+        
+        console.log('🔄 Starting migration from file-based storage to Supabase...');
+        
+        // Migrate voting data
+        if (votingData.nyVotes > 0 || votingData.chicagoVotes > 0) {
+            const { error } = await supabase
+                .from('restaurant_metrics')
+                .update({
+                    ny_votes: votingData.nyVotes,
+                    chicago_votes: votingData.chicagoVotes,
+                    total_votes: votingData.totalVotes,
+                    pizzas_sold: adminData.tvControls.piesSold || 0
+                })
+                .neq('id', '00000000-0000-0000-0000-000000000000'); // Update existing row
+            
+            if (error) throw error;
+            console.log(`✅ Migrated votes: NY=${votingData.nyVotes}, Chicago=${votingData.chicagoVotes}, Pizzas Sold=${adminData.tvControls.piesSold || 0}`);
+        }
+        
+        // Migrate restaurant hours
+        if (adminData.hours) {
+            const { error } = await supabase
+                .from('restaurant_hours')
+                .update({
+                    header_text: adminData.hours.header || '',
+                    footer_text: adminData.hours.footer || '',
+                    business_hours: adminData.hours.businessHours || {},
+                    holiday_hours: adminData.hours.holidayHours || []
+                })
+                .neq('id', '00000000-0000-0000-0000-000000000000');
+            
+            if (error) throw error;
+            console.log('✅ Migrated restaurant hours');
+        }
+        
+        // Migrate restaurant status
+        if (adminData.restaurantStatus) {
+            const { error } = await supabase
+                .from('restaurant_status')
+                .update({
+                    manual_closed: adminData.restaurantStatus.manualClosed || false
+                })
+                .neq('id', '00000000-0000-0000-0000-000000000000');
+            
+            if (error) throw error;
+            console.log(`✅ Migrated restaurant status: manualClosed=${adminData.restaurantStatus.manualClosed}`);
+        }
+        
+        // Migrate scheduled closures
+        if (adminData.scheduledClosures && adminData.scheduledClosures.length > 0) {
+            for (const closure of adminData.scheduledClosures) {
+                const { error } = await supabase
+                    .from('scheduled_closures')
+                    .upsert({
+                        closure_date: closure.date,
+                        reason: closure.reason || null
+                    }, {
+                        onConflict: 'closure_date'
+                    });
+                
+                if (error) {
+                    console.warn(`⚠️  Error migrating closure ${closure.date}:`, error);
+                }
+            }
+            console.log(`✅ Migrated ${adminData.scheduledClosures.length} scheduled closures`);
+        }
+        
+        console.log('✅ Migration completed successfully!');
+    } catch (error) {
+        console.error('❌ Error during migration:', error);
+        console.log('⚠️  Continuing with file-based storage as fallback');
+    }
+}
+
+// Run migration on startup (after a short delay to ensure Supabase is ready)
+setTimeout(() => {
+    migrateToSupabase();
+}, 2000);
 
 // Set EJS as templating engine
 app.set('view engine', 'ejs');
@@ -227,88 +786,94 @@ app.get('/test', (req, res) => {
 
 // Routes
 app.get('/', (req, res) => {
-    res.render('index', { 
+    res.render('index', addSupabaseToRender({ 
         title: "That's Amore Pizzeria | Chicago vs New York Pizza in Metairie",
         description: "Settle the great debate between Chicago Deep Dish and New York Thin Crust pizza. Authentic Italian pizza in Metairie, Louisiana.",
         currentPage: 'home',
         pageScripts: []
-    });
+    }));
 });
 
 app.get('/menu', (req, res) => {
-    res.render('menu', { 
+    res.render('menu', addSupabaseToRender({ 
         title: "Menu - That's Amore Pizzeria | Chicago vs New York Pizza in Metairie",
         description: "Explore our complete menu featuring both Chicago Deep Dish and New York Thin Crust pizza. From authentic Italian pasta to wings, sandwiches, and desserts.",
         currentPage: 'menu',
         pageScripts: []
-    });
+    }));
 });
 
 app.get('/catering', (req, res) => {
-    res.render('catering', { 
+    res.render('catering', addSupabaseToRender({ 
         title: "Catering - That's Amore Pizzeria | Corporate & Event Catering in Metairie",
         description: "Professional catering services for corporate events, parties, and special occasions. Pizza trays, pasta, appetizers, and complete meal packages available.",
         currentPage: 'catering',
         pageScripts: []
-    });
+    }));
 });
 
 
 
 app.get('/franchise', (req, res) => {
-    res.render('franchise', { 
+    res.render('franchise', addSupabaseToRender({ 
         title: "Franchise - That's Amore Pizzeria | Own a Slice of Something Great",
         description: "Join the That's Amore family! Franchise opportunities available with comprehensive training, marketing support, and proven business model.",
         currentPage: 'franchise',
         pageScripts: []
-    });
+    }));
 });
 
 app.get('/contact', (req, res) => {
-    res.render('contact', { 
+    res.render('contact', addSupabaseToRender({ 
         title: "Contact - That's Amore Pizzeria | Visit Us in Metairie, Louisiana",
         description: "Contact That's Amore Pizzeria in Metairie, Louisiana. Visit us at 4441 West Metairie Ave or call (504) 454-5885 for orders and reservations.",
         currentPage: 'contact',
         pageScripts: []
-    });
+    }));
 });
 
 app.get('/tv', (req, res) => {
-    res.render('tv', { 
+    res.render('tv', addSupabaseToRender({ 
         title: "Live Voting Results - That's Amore Pizzeria",
         description: "Live real-time voting results for the great pizza debate",
         currentPage: 'tv',
         pageScripts: ['/js/tv-display.js'],
         layout: false
-    });
+    }));
 });
 
 app.get('/admin', (req, res) => {
-    res.render('admin', { 
+    res.render('admin', addSupabaseToRender({ 
         title: "Admin Panel - That's Amore Pizzeria",
         description: "Admin panel for managing voting results",
         currentPage: 'admin',
         pageScripts: ['/js/admin.js'],
         layout: false
-    });
+    }));
 });
 
 // Admin API endpoints
-app.post('/api/admin/reset-votes', (req, res) => {
+app.post('/api/admin/reset-votes', async (req, res) => {
     try {
-        votingData.nyVotes = 0;
-        votingData.chicagoVotes = 0;
-        votingData.totalVotes = 0;
-        votingData.lastReset = new Date().toISOString();
-        votingData.sessionVotes.clear();
+        const result = await resetVotes();
         
-        saveVotingData();
+        if (!result.success) {
+            return res.status(500).json({ success: false, message: result.message || 'Error resetting votes' });
+        }
+        
+        // Get updated data for broadcast
+        const metrics = await getRestaurantMetrics();
+        const updateData = {
+            nyVotes: metrics.nyVotes,
+            chicagoVotes: metrics.chicagoVotes,
+            totalVotes: metrics.totalVotes
+        };
         
         // Broadcast reset to all connected clients
-        io.emit('voting-update', votingData);
+        io.emit('voting-update', updateData);
         io.emit('votes-reset', { message: 'Votes have been reset by admin' });
         
-        res.json({ success: true, message: 'Votes reset successfully', data: votingData });
+        res.json({ success: true, message: 'Votes reset successfully', data: updateData });
         console.log('Votes reset by admin');
     } catch (error) {
         console.error('Error resetting votes:', error);
@@ -316,7 +881,7 @@ app.post('/api/admin/reset-votes', (req, res) => {
     }
 });
 
-app.post('/api/admin/set-votes', (req, res) => {
+app.post('/api/admin/set-votes', async (req, res) => {
     try {
         const { nyVotes, chicagoVotes } = req.body;
         
@@ -328,18 +893,25 @@ app.post('/api/admin/set-votes', (req, res) => {
             });
         }
         
-        votingData.nyVotes = nyVotes;
-        votingData.chicagoVotes = chicagoVotes;
-        votingData.totalVotes = nyVotes + chicagoVotes;
-        votingData.lastReset = new Date().toISOString();
+        const result = await setVotes(nyVotes, chicagoVotes);
         
-        saveVotingData();
+        if (!result.success) {
+            return res.status(500).json({ success: false, message: result.message || 'Error setting votes' });
+        }
+        
+        // Get updated data for broadcast
+        const metrics = await getRestaurantMetrics();
+        const updateData = {
+            nyVotes: metrics.nyVotes,
+            chicagoVotes: metrics.chicagoVotes,
+            totalVotes: metrics.totalVotes
+        };
         
         // Broadcast update to all connected clients
-        io.emit('voting-update', votingData);
+        io.emit('voting-update', updateData);
         io.emit('votes-manually-set', { message: 'Votes have been manually set by admin' });
         
-        res.json({ success: true, message: 'Votes set successfully', data: votingData });
+        res.json({ success: true, message: 'Votes set successfully', data: updateData });
         console.log(`Votes manually set by admin: NY=${nyVotes}, Chicago=${chicagoVotes}`);
     } catch (error) {
         console.error('Error setting votes:', error);
@@ -348,20 +920,31 @@ app.post('/api/admin/set-votes', (req, res) => {
 });
 
 // New Admin API endpoints
-app.get('/api/admin/data', (req, res) => {
+app.get('/api/admin/data', async (req, res) => {
     try {
+        const [metrics, hours, status, closures] = await Promise.all([
+            getRestaurantMetrics(),
+            getRestaurantHours(),
+            getRestaurantStatus(),
+            getScheduledClosures()
+        ]);
+        
         res.json({
             success: true,
             data: {
-                restaurantStatus: adminData.restaurantStatus,
-                hours: adminData.hours,
-                scheduledClosures: adminData.scheduledClosures,
-                cateringMenu: adminData.cateringMenu,
-                tvControls: adminData.tvControls,
+                restaurantStatus: status,
+                hours: hours,
+                scheduledClosures: closures,
+                tvControls: {
+                    piesSold: metrics.pizzasSold,
+                    nyVotes: metrics.nyVotes,
+                    chicagoVotes: metrics.chicagoVotes,
+                    lastUpdated: new Date().toISOString()
+                },
                 votingData: {
-                    nyVotes: votingData.nyVotes,
-                    chicagoVotes: votingData.chicagoVotes,
-                    totalVotes: votingData.totalVotes
+                    nyVotes: metrics.nyVotes,
+                    chicagoVotes: metrics.chicagoVotes,
+                    totalVotes: metrics.totalVotes
                 }
             }
         });
@@ -371,7 +954,7 @@ app.get('/api/admin/data', (req, res) => {
     }
 });
 
-app.post('/api/admin/restaurant-status', (req, res) => {
+app.post('/api/admin/restaurant-status', async (req, res) => {
     try {
         const { manualClosed } = req.body;
         
@@ -382,16 +965,18 @@ app.post('/api/admin/restaurant-status', (req, res) => {
             });
         }
         
-        adminData.restaurantStatus.manualClosed = manualClosed;
-        adminData.restaurantStatus.lastUpdated = new Date().toISOString();
-        adminData.lastUpdated = new Date().toISOString();
+        const result = await updateRestaurantStatus(manualClosed);
         
-        saveAdminData();
+        if (!result.success) {
+            return res.status(500).json({ success: false, message: result.message || 'Error updating restaurant status' });
+        }
+        
+        const status = await getRestaurantStatus();
         
         res.json({ 
             success: true, 
             message: 'Restaurant status updated successfully', 
-            data: adminData.restaurantStatus 
+            data: status 
         });
         console.log(`Restaurant status updated: manualClosed=${manualClosed}`);
     } catch (error) {
@@ -400,7 +985,7 @@ app.post('/api/admin/restaurant-status', (req, res) => {
     }
 });
 
-app.post('/api/admin/hours', (req, res) => {
+app.post('/api/admin/hours', async (req, res) => {
     try {
         const { header, footer, businessHours, holidayHours } = req.body;
         
@@ -411,7 +996,6 @@ app.post('/api/admin/hours', (req, res) => {
                     message: 'Invalid header hours. Must be a string.' 
                 });
             }
-            adminData.hours.header = header;
         }
         
         if (footer !== undefined) {
@@ -421,9 +1005,9 @@ app.post('/api/admin/hours', (req, res) => {
                     message: 'Invalid footer hours. Must be a string.' 
                 });
             }
-            adminData.hours.footer = footer;
         }
         
+        let businessHoursObj = undefined;
         if (businessHours !== undefined) {
             if (!Array.isArray(businessHours) || businessHours.length !== 7) {
                 return res.status(400).json({ 
@@ -444,11 +1028,10 @@ app.post('/api/admin/hours', (req, res) => {
             }
             
             // Convert array to object with numeric keys (0-6) for frontend compatibility
-            const businessHoursObj = {};
+            businessHoursObj = {};
             businessHours.forEach((day, index) => {
                 businessHoursObj[index] = day;
             });
-            adminData.hours.businessHours = businessHoursObj;
         }
         
         if (holidayHours !== undefined) {
@@ -470,19 +1053,20 @@ app.post('/api/admin/hours', (req, res) => {
                     });
                 }
             }
-            
-            adminData.hours.holidayHours = holidayHours;
         }
         
-        adminData.hours.lastUpdated = new Date().toISOString();
-        adminData.lastUpdated = new Date().toISOString();
+        const result = await updateRestaurantHours(header, footer, businessHoursObj, holidayHours);
         
-        saveAdminData();
+        if (!result.success) {
+            return res.status(500).json({ success: false, message: result.message || 'Error updating hours' });
+        }
+        
+        const hours = await getRestaurantHours();
         
         res.json({ 
             success: true, 
             message: 'Hours updated successfully', 
-            data: adminData.hours 
+            data: hours 
         });
         console.log('Hours updated successfully');
     } catch (error) {
@@ -491,11 +1075,12 @@ app.post('/api/admin/hours', (req, res) => {
     }
 });
 
-app.get('/api/hours', (req, res) => {
+app.get('/api/hours', async (req, res) => {
     try {
+        const hours = await getRestaurantHours();
         res.json({
             success: true,
-            data: adminData.hours
+            data: hours
         });
     } catch (error) {
         console.error('Error fetching hours:', error);
@@ -503,7 +1088,7 @@ app.get('/api/hours', (req, res) => {
     }
 });
 
-app.post('/api/admin/closures', (req, res) => {
+app.post('/api/admin/closures', async (req, res) => {
     try {
         const { date, reason } = req.body;
         
@@ -514,26 +1099,18 @@ app.post('/api/admin/closures', (req, res) => {
             });
         }
         
-        // Check if closure already exists
-        const existingIndex = adminData.scheduledClosures.findIndex(c => c.date === date);
-        if (existingIndex !== -1) {
-            // Update existing closure
-            adminData.scheduledClosures[existingIndex] = { date, reason: reason || '' };
-        } else {
-            // Add new closure
-            adminData.scheduledClosures.push({ date, reason: reason || '' });
+        const result = await addScheduledClosure(date, reason);
+        
+        if (!result.success) {
+            return res.status(500).json({ success: false, message: result.message || 'Error adding closure' });
         }
         
-        // Sort closures by date
-        adminData.scheduledClosures.sort((a, b) => new Date(a.date) - new Date(b.date));
-        
-        adminData.lastUpdated = new Date().toISOString();
-        saveAdminData();
+        const closures = await getScheduledClosures();
         
         res.json({ 
             success: true, 
             message: 'Closure added successfully', 
-            data: adminData.scheduledClosures 
+            data: closures 
         });
         console.log(`Closure added/updated: ${date}`);
     } catch (error) {
@@ -542,27 +1119,25 @@ app.post('/api/admin/closures', (req, res) => {
     }
 });
 
-app.delete('/api/admin/closures/:date', (req, res) => {
+app.delete('/api/admin/closures/:date', async (req, res) => {
     try {
         const { date } = req.params;
         
-        const initialLength = adminData.scheduledClosures.length;
-        adminData.scheduledClosures = adminData.scheduledClosures.filter(c => c.date !== date);
+        const result = await deleteScheduledClosure(date);
         
-        if (adminData.scheduledClosures.length === initialLength) {
+        if (!result.success) {
             return res.status(404).json({ 
                 success: false, 
-                message: 'Closure not found' 
+                message: result.message || 'Closure not found' 
             });
         }
         
-        adminData.lastUpdated = new Date().toISOString();
-        saveAdminData();
+        const closures = await getScheduledClosures();
         
         res.json({ 
             success: true, 
             message: 'Closure deleted successfully', 
-            data: adminData.scheduledClosures 
+            data: closures 
         });
         console.log(`Closure deleted: ${date}`);
     } catch (error) {
@@ -571,71 +1146,9 @@ app.delete('/api/admin/closures/:date', (req, res) => {
     }
 });
 
-app.post('/api/admin/catering-menu', (req, res) => {
-    try {
-        const { menu } = req.body;
-        
-        if (!Array.isArray(menu)) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid menu data. Must be an array.' 
-            });
-        }
-        
-        // Process menu items
-        adminData.cateringMenu = menu.map(item => ({
-            id: item.id || `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            name: item.name || '',
-            smallPrice: item.smallPrice || null,
-            largePrice: item.largePrice || null,
-            singlePrice: item.singlePrice || null
-        }));
-        
-        adminData.lastUpdated = new Date().toISOString();
-        saveAdminData();
-        
-        res.json({ 
-            success: true, 
-            message: 'Catering menu updated successfully', 
-            data: adminData.cateringMenu 
-        });
-        console.log('Catering menu updated successfully');
-    } catch (error) {
-        console.error('Error updating catering menu:', error);
-        res.status(500).json({ success: false, message: 'Error updating catering menu' });
-    }
-});
+// Catering menu endpoints removed - no longer needed
 
-app.delete('/api/admin/catering-menu/:id', (req, res) => {
-    try {
-        const { id } = req.params;
-        
-        const initialLength = adminData.cateringMenu.length;
-        adminData.cateringMenu = adminData.cateringMenu.filter(item => item.id !== id);
-        
-        if (adminData.cateringMenu.length === initialLength) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Menu item not found' 
-            });
-        }
-        
-        adminData.lastUpdated = new Date().toISOString();
-        saveAdminData();
-        
-        res.json({ 
-            success: true, 
-            message: 'Menu item deleted successfully', 
-            data: adminData.cateringMenu 
-        });
-        console.log(`Menu item deleted: ${id}`);
-    } catch (error) {
-        console.error('Error deleting menu item:', error);
-        res.status(500).json({ success: false, message: 'Error deleting menu item' });
-    }
-});
-
-app.post('/api/admin/tv-controls', (req, res) => {
+app.post('/api/admin/tv-controls', async (req, res) => {
     try {
         const { piesSold, nyVotes, chicagoVotes } = req.body;
         
@@ -646,7 +1159,10 @@ app.post('/api/admin/tv-controls', (req, res) => {
                     message: 'Invalid pies sold value. Must be non-negative number.' 
                 });
             }
-            adminData.tvControls.piesSold = piesSold;
+            const result = await updatePizzasSold(piesSold);
+            if (!result.success) {
+                return res.status(500).json({ success: false, message: result.message || 'Error updating pizzas sold' });
+            }
         }
         
         if (nyVotes !== undefined || chicagoVotes !== undefined) {
@@ -663,41 +1179,52 @@ app.post('/api/admin/tv-controls', (req, res) => {
                 });
             }
             
-            if (nyVotes !== undefined) {
-                adminData.tvControls.nyVotes = nyVotes;
-                votingData.nyVotes = nyVotes;
-            }
-            if (chicagoVotes !== undefined) {
-                adminData.tvControls.chicagoVotes = chicagoVotes;
-                votingData.chicagoVotes = chicagoVotes;
-            }
+            const currentMetrics = await getRestaurantMetrics();
+            const newNyVotes = nyVotes !== undefined ? nyVotes : currentMetrics.nyVotes;
+            const newChicagoVotes = chicagoVotes !== undefined ? chicagoVotes : currentMetrics.chicagoVotes;
             
-            votingData.totalVotes = votingData.nyVotes + votingData.chicagoVotes;
-            saveVotingData();
+            const result = await setVotes(newNyVotes, newChicagoVotes);
+            if (!result.success) {
+                return res.status(500).json({ success: false, message: result.message || 'Error updating votes' });
+            }
             
             // Broadcast update to all connected clients
-            io.emit('voting-update', votingData);
+            const updatedMetrics = await getRestaurantMetrics();
+            io.emit('voting-update', {
+                nyVotes: updatedMetrics.nyVotes,
+                chicagoVotes: updatedMetrics.chicagoVotes,
+                totalVotes: updatedMetrics.totalVotes
+            });
         }
         
-        adminData.tvControls.lastUpdated = new Date().toISOString();
-        adminData.lastUpdated = new Date().toISOString();
-        saveAdminData();
+        // Get updated metrics for response
+        const metrics = await getRestaurantMetrics();
         
         // Emit admin update for TV controls
         io.emit('admin-update', {
             type: 'tv-controls',
-            data: adminData.tvControls
+            data: {
+                piesSold: metrics.pizzasSold,
+                nyVotes: metrics.nyVotes,
+                chicagoVotes: metrics.chicagoVotes,
+                lastUpdated: new Date().toISOString()
+            }
         });
         
         res.json({ 
             success: true, 
             message: 'TV controls updated successfully', 
             data: {
-                tvControls: adminData.tvControls,
+                tvControls: {
+                    piesSold: metrics.pizzasSold,
+                    nyVotes: metrics.nyVotes,
+                    chicagoVotes: metrics.chicagoVotes,
+                    lastUpdated: new Date().toISOString()
+                },
                 votingData: {
-                    nyVotes: votingData.nyVotes,
-                    chicagoVotes: votingData.chicagoVotes,
-                    totalVotes: votingData.totalVotes
+                    nyVotes: metrics.nyVotes,
+                    chicagoVotes: metrics.chicagoVotes,
+                    totalVotes: metrics.totalVotes
                 }
             }
         });
@@ -708,18 +1235,25 @@ app.post('/api/admin/tv-controls', (req, res) => {
     }
 });
 
-app.get('/api/admin/voting-data', (req, res) => {
-    res.json({
-        success: true,
-        data: {
-            ...votingData,
-            sessionVotes: Array.from(votingData.sessionVotes)
-        }
-    });
+app.get('/api/admin/voting-data', async (req, res) => {
+    try {
+        const metrics = await getRestaurantMetrics();
+        res.json({
+            success: true,
+            data: {
+                nyVotes: metrics.nyVotes,
+                chicagoVotes: metrics.chicagoVotes,
+                totalVotes: metrics.totalVotes
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching voting data:', error);
+        res.status(500).json({ success: false, message: 'Error fetching voting data' });
+    }
 });
 
 // Fallback voting endpoint for environments without WebSocket support
-app.post('/api/vote', (req, res) => {
+app.post('/api/vote', async (req, res) => {
     try {
         const { choice, sessionId } = req.body;
         
@@ -737,39 +1271,27 @@ app.post('/api/vote', (req, res) => {
             });
         }
         
-        // Check if this session has already voted
-        if (votingData.sessionVotes.has(sessionId)) {
+        const result = await recordVote(choice, sessionId);
+        
+        if (!result.success) {
             return res.json({ 
                 success: false, 
-                message: 'You have already voted in this session' 
+                message: result.message || 'Error recording vote' 
             });
         }
         
-        // Record the vote
-        if (choice === 'ny') {
-            votingData.nyVotes++;
-        } else if (choice === 'chicago') {
-            votingData.chicagoVotes++;
-        }
-        
-        votingData.totalVotes = votingData.nyVotes + votingData.chicagoVotes;
-        votingData.sessionVotes.add(sessionId);
-        
-        // Save data to file (only in non-Vercel environments)
-        saveVotingData();
-        
         // Broadcast to WebSocket clients if available
         if (io.engine.clientsCount > 0) {
-            io.emit('voting-update', votingData);
+            io.emit('voting-update', result.data);
         }
         
         res.json({ 
             success: true, 
             message: 'Vote recorded successfully!',
-            data: votingData
+            data: result.data
         });
         
-        console.log(`Vote received via API: ${choice}. NY: ${votingData.nyVotes}, Chicago: ${votingData.chicagoVotes}`);
+        console.log(`Vote received via API: ${choice}. NY: ${result.data.nyVotes}, Chicago: ${result.data.chicagoVotes}`);
     } catch (error) {
         console.error('Error processing vote:', error);
         res.status(500).json({ 
@@ -780,64 +1302,69 @@ app.post('/api/vote', (req, res) => {
 });
 
 // Get current voting data
-app.get('/api/voting-data', (req, res) => {
-    res.json({
-        success: true,
-        data: {
-            nyVotes: votingData.nyVotes,
-            chicagoVotes: votingData.chicagoVotes,
-            totalVotes: votingData.totalVotes
-        }
-    });
+app.get('/api/voting-data', async (req, res) => {
+    try {
+        const metrics = await getRestaurantMetrics();
+        res.json({
+            success: true,
+            data: {
+                nyVotes: metrics.nyVotes,
+                chicagoVotes: metrics.chicagoVotes,
+                totalVotes: metrics.totalVotes,
+                pizzasSold: metrics.pizzasSold
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching voting data:', error);
+        res.status(500).json({ success: false, message: 'Error fetching voting data' });
+    }
 });
 
 // WebSocket event handlers (only active in non-Vercel environments)
 if (!isVercel) {
-    io.on('connection', (socket) => {
-    console.log('New client connected:', socket.id);
-    
-    // Send current voting data to new clients
-    socket.emit('voting-data', votingData);
-    
-    // Handle votes
-    socket.on('vote', (data) => {
-        const sessionId = data.sessionId;
+    io.on('connection', async (socket) => {
+        console.log('New client connected:', socket.id);
         
-        // Check if this session has already voted
-        if (votingData.sessionVotes.has(sessionId)) {
-            socket.emit('vote-error', { message: 'You have already voted in this session' });
-            return;
+        // Send current voting data to new clients
+        try {
+            const metrics = await getRestaurantMetrics();
+            socket.emit('voting-data', {
+                nyVotes: metrics.nyVotes,
+                chicagoVotes: metrics.chicagoVotes,
+                totalVotes: metrics.totalVotes
+            });
+        } catch (error) {
+            console.error('Error sending initial voting data:', error);
+            socket.emit('voting-data', votingData); // Fallback
         }
         
-        // Record the vote
-        if (data.choice === 'ny') {
-            votingData.nyVotes++;
-        } else if (data.choice === 'chicago') {
-            votingData.chicagoVotes++;
-        }
-        
-        votingData.totalVotes = votingData.nyVotes + votingData.chicagoVotes;
-        votingData.sessionVotes.add(sessionId);
-        
-        // Save data to file (only in non-Vercel environments)
-        saveVotingData();
-        
-        // Broadcast updated voting data to all connected clients
-        io.emit('voting-update', votingData);
-        
-        // Send success confirmation to the voter
-        socket.emit('vote-success', { 
-            choice: data.choice, 
-            message: 'Vote recorded successfully!' 
+        // Handle votes
+        socket.on('vote', async (data) => {
+            const sessionId = data.sessionId;
+            
+            const result = await recordVote(data.choice, sessionId);
+            
+            if (!result.success) {
+                socket.emit('vote-error', { message: result.message || 'Error recording vote' });
+                return;
+            }
+            
+            // Broadcast updated voting data to all connected clients
+            io.emit('voting-update', result.data);
+            
+            // Send success confirmation to the voter
+            socket.emit('vote-success', { 
+                choice: data.choice, 
+                message: 'Vote recorded successfully!' 
+            });
+            
+            console.log(`Vote received: ${data.choice}. NY: ${result.data.nyVotes}, Chicago: ${result.data.chicagoVotes}`);
         });
         
-        console.log(`Vote received: ${data.choice}. NY: ${votingData.nyVotes}, Chicago: ${votingData.chicagoVotes}`);
-    });
-    
-    // Handle disconnection
-    socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id);
-    });
+        // Handle disconnection
+        socket.on('disconnect', () => {
+            console.log('Client disconnected:', socket.id);
+        });
     });
 }
 

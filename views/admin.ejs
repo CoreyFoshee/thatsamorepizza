@@ -257,31 +257,6 @@
                 </div>
             </div>
             
-            <!-- Catering Menu Pricing -->
-            <div class="admin-card">
-                <h2 class="text-2xl font-bold text-purple-400 mb-6">🍽️ Catering Menu Pricing</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-gray-600">
-                                <th class="text-left p-2">Item</th>
-                                <th class="text-center p-2">Small Price</th>
-                                <th class="text-center p-2">Large Price</th>
-                                <th class="text-center p-2">Single Price</th>
-                                <th class="text-center p-2">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="catering-menu">
-                            <!-- Menu items will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-4">
-                    <button id="save-catering-prices" class="btn-success">💾 Save All Prices</button>
-                    <button id="add-menu-item" class="btn-primary ml-2">➕ Add Item</button>
-                </div>
-            </div>
-            
             <!-- TV Page Controls -->
             <div class="admin-card">
                 <h2 class="text-2xl font-bold text-red-400 mb-6">📺 TV Page Controls</h2>
@@ -365,9 +340,6 @@
         const closureReason = document.getElementById('closure-reason');
         const addClosureBtn = document.getElementById('add-closure');
         const closuresList = document.getElementById('closures-list');
-        const cateringMenu = document.getElementById('catering-menu');
-        const saveCateringPricesBtn = document.getElementById('save-catering-prices');
-        const addMenuItemBtn = document.getElementById('add-menu-item');
         const piesSold = document.getElementById('pies-sold');
         const updatePiesSoldBtn = document.getElementById('update-pies-sold');
         const nyVotesOverride = document.getElementById('ny-votes-override');
@@ -395,7 +367,6 @@
                     updateRestaurantStatus(data.data.restaurantStatus);
                     updateHoursDisplay(data.data.hours);
                     updateClosuresDisplay(data.data.scheduledClosures);
-                    updateCateringMenu(data.data.cateringMenu);
                     updateTVControls(data.data.tvControls);
                 }
             } catch (error) {
@@ -519,33 +490,6 @@
             });
         }
         
-        // Update catering menu display
-        function updateCateringMenu(menu) {
-            cateringMenu.innerHTML = '';
-            menu.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = 'border-b border-gray-600';
-                row.innerHTML = `
-                    <td class="p-2">
-                        <input type="text" class="form-input" value="${item.name}" data-field="name" data-id="${item.id}">
-                    </td>
-                    <td class="p-2 text-center">
-                        <input type="number" class="form-input price-input" value="${item.smallPrice || ''}" data-field="smallPrice" data-id="${item.id}" step="0.01" min="0">
-                    </td>
-                    <td class="p-2 text-center">
-                        <input type="number" class="form-input price-input" value="${item.largePrice || ''}" data-field="largePrice" data-id="${item.id}" step="0.01" min="0">
-                    </td>
-                    <td class="p-2 text-center">
-                        <input type="number" class="form-input price-input" value="${item.singlePrice || ''}" data-field="singlePrice" data-id="${item.id}" step="0.01" min="0">
-                    </td>
-                    <td class="p-2 text-center">
-                        <button class="btn-danger text-sm" onclick="deleteMenuItem('${item.id}')">🗑️</button>
-                    </td>
-                `;
-                cateringMenu.appendChild(row);
-            });
-        }
-        
         // Update TV controls display
         function updateTVControls(controls) {
             piesSold.value = controls.piesSold || 0;
@@ -663,64 +607,6 @@
             }
         });
         
-        saveCateringPricesBtn.addEventListener('click', async () => {
-            const menuData = [];
-            const rows = cateringMenu.querySelectorAll('tr');
-            
-            rows.forEach(row => {
-                const inputs = row.querySelectorAll('input');
-                if (inputs.length > 0) {
-                    const item = {
-                        id: inputs[0].dataset.id,
-                        name: inputs[0].value,
-                        smallPrice: parseFloat(inputs[1].value) || null,
-                        largePrice: parseFloat(inputs[2].value) || null,
-                        singlePrice: parseFloat(inputs[3].value) || null
-                    };
-                    menuData.push(item);
-                }
-            });
-            
-            try {
-                const response = await fetch('/api/admin/catering-menu', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ menu: menuData })
-                });
-                
-                const result = await response.json();
-                if (result.success) {
-                    alert('Catering menu prices saved successfully!');
-                }
-            } catch (error) {
-                console.error('Error saving catering menu:', error);
-            }
-        });
-        
-        addMenuItemBtn.addEventListener('click', () => {
-            const row = document.createElement('tr');
-            row.className = 'border-b border-gray-600';
-            const newId = 'new_' + Date.now();
-            row.innerHTML = `
-                <td class="p-2">
-                    <input type="text" class="form-input" placeholder="Item name" data-field="name" data-id="${newId}">
-                </td>
-                <td class="p-2 text-center">
-                    <input type="number" class="form-input price-input" placeholder="0.00" data-field="smallPrice" data-id="${newId}" step="0.01" min="0">
-                </td>
-                <td class="p-2 text-center">
-                    <input type="number" class="form-input price-input" placeholder="0.00" data-field="largePrice" data-id="${newId}" step="0.01" min="0">
-                </td>
-                <td class="p-2 text-center">
-                    <input type="number" class="form-input price-input" placeholder="0.00" data-field="singlePrice" data-id="${newId}" step="0.01" min="0">
-                </td>
-                <td class="p-2 text-center">
-                    <button class="btn-danger text-sm" onclick="this.closest('tr').remove()">🗑️</button>
-                </td>
-            `;
-            cateringMenu.appendChild(row);
-        });
-        
         updatePiesSoldBtn.addEventListener('click', async () => {
             try {
                 const response = await fetch('/api/admin/tv-controls', {
@@ -834,24 +720,6 @@
                     }
                 } catch (error) {
                     console.error('Error deleting closure:', error);
-                }
-            }
-        };
-        
-        window.deleteMenuItem = async function(id) {
-            if (confirm('Are you sure you want to delete this menu item?')) {
-                try {
-                    const response = await fetch(`/api/admin/catering-menu/${id}`, {
-                        method: 'DELETE'
-                    });
-                    
-                    const result = await response.json();
-                    if (result.success) {
-                        updateCateringMenu(result.data);
-                        alert('Menu item deleted successfully!');
-                    }
-                } catch (error) {
-                    console.error('Error deleting menu item:', error);
                 }
             }
         };
