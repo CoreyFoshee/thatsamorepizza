@@ -60,11 +60,18 @@
             position: relative;
             z-index: 1;
             width: 100%;
-            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .main-content {
+            width: 100%;
             display: flex;
             flex-direction: row;
             gap: 2rem;
             padding: 2rem;
+            flex: 1;
         }
         
         .section {
@@ -127,6 +134,13 @@
             font-size: 3rem;
             font-weight: bold;
             color: black;
+        }
+        
+        .qr-section {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .progress-bar {
@@ -224,7 +238,7 @@
         }
         
         @media (max-width: 768px) {
-            .voting-results {
+            .main-content {
                 flex-direction: column;
             }
             .title { font-size: 2rem; }
@@ -242,49 +256,67 @@
     
     <div class="tv-container">
         <div class="voting-results">
-            <!-- Left Side: Pizzas Sold -->
-            <div class="section">
-                <h2 class="section-title">Pizzas Sold</h2>
-                
-                <!-- NY Style Lifetime Sales -->
-                <div class="lifetime-sales-item">
-                    <h3 style="color: #3b82f6;">New York Style</h3>
-                    <div class="lifetime-sales-value" id="lifetime-sales-ny">0</div>
-                </div>
-                
-                <!-- Chicago Style Lifetime Sales -->
-                <div class="lifetime-sales-item">
-                    <h3 style="color: #dc2626;">Chicago Deep Dish Style</h3>
-                    <div class="lifetime-sales-value" id="lifetime-sales-chicago">0</div>
-                </div>
-            </div>
+            <h1 class="title">Home Of The Great Debate</h1>
+            <p class="subtitle">You Decide...</p>
             
-            <!-- Right Side: Customer Vote -->
-            <div class="section">
-                <h2 class="section-title">Customer Vote</h2>
-                
-                <!-- NY Style Voting -->
-                <div class="pizza-style">
-                    <h2 style="color: #3b82f6;">New York Style</h2>
-                    <div class="vote-count" id="ny-votes">0</div>
-                    <div class="percentage" id="ny-percentage">0%</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill ny-progress" id="ny-progress" style="width: 0%"></div>
+            <div class="main-content">
+                <!-- Left Side: Pizzas Sold -->
+                <div class="section">
+                    <h2 class="section-title">Pizzas Sold</h2>
+                    
+                    <!-- NY Style Lifetime Sales -->
+                    <div class="lifetime-sales-item">
+                        <h3 style="color: #3b82f6;">New York Style</h3>
+                        <div class="lifetime-sales-value" id="lifetime-sales-ny">0</div>
+                    </div>
+                    
+                    <!-- Chicago Style Lifetime Sales -->
+                    <div class="lifetime-sales-item">
+                        <h3 style="color: #dc2626;">Chicago Deep Dish Style</h3>
+                        <div class="lifetime-sales-value" id="lifetime-sales-chicago">0</div>
                     </div>
                 </div>
                 
-                <!-- Chicago Style Voting -->
-                <div class="pizza-style">
-                    <h2 style="color: #dc2626;">Chicago Deep Dish Style</h2>
-                    <div class="vote-count" id="chicago-votes">0</div>
-                    <div class="percentage" id="chicago-percentage">0%</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill chicago-progress" id="chicago-progress" style="width: 0%"></div>
+                <!-- Center Section with QR Code -->
+                <div class="qr-section text-center">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="text-6xl mb-4">📱</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Scan QR Code To Vote!</h3>
+                        <p class="text-sm text-gray-600 mb-4">Help us settle the great pizza debate.</p>
+                        <div class="w-32 h-32 mx-auto flex items-center justify-center">
+                            <img src="/images/qr-code.svg" alt="QR Code to vote" class="w-full h-full object-contain" />
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">thatsamorepizzaonline.com</p>
                     </div>
                 </div>
                 
-                <div class="total-votes">
-                    Total Votes: <span id="total-votes">0</span>
+                <!-- Right Side: Customer Vote -->
+                <div class="section">
+                    <h2 class="section-title">Customer Vote</h2>
+                    
+                    <!-- NY Style Voting -->
+                    <div class="pizza-style">
+                        <h2 style="color: #3b82f6;">New York Style</h2>
+                        <div class="vote-count" id="ny-votes">0</div>
+                        <div class="percentage" id="ny-percentage">0%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ny-progress" id="ny-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chicago Style Voting -->
+                    <div class="pizza-style">
+                        <h2 style="color: #dc2626;">Chicago Deep Dish Style</h2>
+                        <div class="vote-count" id="chicago-votes">0</div>
+                        <div class="percentage" id="chicago-percentage">0%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill chicago-progress" id="chicago-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="total-votes">
+                        Total Votes: <span id="total-votes">0</span>
+                    </div>
                 </div>
             </div>
         </div>
