@@ -215,22 +215,6 @@
             50% { opacity: 0.5; }
         }
         
-        .last-vote {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(34, 197, 94, 0.9);
-            color: white;
-            padding: 1rem;
-            border-radius: 10px;
-            font-weight: bold;
-            transform: translateX(-100%);
-            transition: transform 0.5s ease-in-out;
-        }
-        
-        .last-vote.show {
-            transform: translateX(0);
-        }
         
         @media (max-width: 768px) {
             .title { font-size: 2rem; }
@@ -313,9 +297,6 @@
         </div>
     </div>
     
-    <div class="last-vote" id="last-vote">
-        New vote received!
-    </div>
     
     <script>
         // Initialize Supabase client
@@ -355,7 +336,6 @@
         
         // Other elements
         const totalVotesEl = document.getElementById('total-votes');
-        const lastVoteEl = document.getElementById('last-vote');
         
         // Load initial data from Supabase
         loadInitialData();
@@ -452,17 +432,6 @@
             }
         }
         
-        // Show last vote notification
-        function showLastVote(choice) {
-            const style = choice === 'ny' ? 'New York Style' : 'Chicago Style';
-            lastVoteEl.textContent = `New vote for ${style}!`;
-            lastVoteEl.classList.add('show');
-            
-            setTimeout(() => {
-                lastVoteEl.classList.remove('show');
-            }, 3000);
-        }
-        
         // Initialize Supabase Realtime subscription for TV display
         if (supabaseClient) {
             try {
@@ -492,12 +461,6 @@
                                 chicagoLifetimeSales: payload.new.chicago_lifetime_sales || 0
                             });
                             
-                            // Show notification for new vote
-                            if (payload.new.ny_votes > oldNyVotes) {
-                                showLastVote('ny');
-                            } else if (payload.new.chicago_votes > oldChicagoVotes) {
-                                showLastVote('chicago');
-                            }
                         }
                     })
                     .subscribe((status, err) => {
@@ -542,12 +505,6 @@
                                 chicagoLifetimeSales: data.data.chicagoLifetimeSales || 0
                             });
                             
-                            // Show notification for new vote
-                            if (data.data.nyVotes > currentNyVotes) {
-                                showLastVote('ny');
-                            } else if (data.data.chicagoVotes > currentChicagoVotes) {
-                                showLastVote('chicago');
-                            }
                         }
                     }
                 } catch (error) {
