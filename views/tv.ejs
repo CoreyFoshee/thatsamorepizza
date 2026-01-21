@@ -66,13 +66,14 @@
         
         .pizza-style {
             margin: 1rem 0;
-            padding: 2rem;
+            padding: 3rem;
             border-radius: 20px;
             background: white;
             border: 2px solid rgba(0, 0, 0, 0.1);
             color: black;
-            height: 100%;
-            min-height: 400px;
+            flex: 1;
+            min-height: 500px;
+            max-width: 28rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -80,22 +81,27 @@
         
         .pizza-style h2 {
             color: black;
-            font-size: 2rem;
-            margin-bottom: 1rem;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+        
+        .pizza-style h3 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
         }
         
         .pizza-style .vote-count {
             color: black;
-            font-size: 3rem;
+            font-size: 4.5rem;
         }
         
         .pizza-style .percentage {
             color: black;
-            font-size: 1.5rem;
+            font-size: 2.5rem;
         }
         
         .pizza-style .style-section {
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
         }
         
         .pizza-style .style-section:last-child {
@@ -105,17 +111,32 @@
         
         .qr-section {
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .qr-section .bg-white {
+            padding: 2rem;
+        }
+        
+        .qr-section h3 {
+            font-size: 1.75rem;
+        }
+        
+        .qr-section p {
+            font-size: 1.125rem;
         }
         
         
         .progress-bar {
             width: 100%;
-            height: 50px;
+            height: 60px;
             background: rgba(0, 0, 0, 0.15);
             border: 2px solid rgba(0, 0, 0, 0.2);
-            border-radius: 25px;
+            border-radius: 30px;
             overflow: hidden;
-            margin: 1rem 0;
+            margin: 1.5rem 0;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
@@ -135,26 +156,26 @@
         }
         
         .vote-count {
-            font-size: 4rem;
+            font-size: 4.5rem;
             font-weight: bold;
-            margin: 1rem 0;
+            margin: 1.5rem 0;
         }
         
         .percentage {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: bold;
             margin: 1rem 0;
         }
         
         .total-votes {
-            font-size: 1.5rem;
+            font-size: 2rem;
             margin: 2rem 0;
             color: #fbbf24;
             text-align: center;
         }
         
         .title {
-            font-size: 3rem;
+            font-size: 4rem;
             font-weight: bold;
             margin-bottom: 2rem;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -162,7 +183,7 @@
         }
         
         .subtitle {
-            font-size: 1.5rem;
+            font-size: 2rem;
             margin-bottom: 3rem;
             color: #fbbf24;
             text-align: center;
@@ -220,9 +241,9 @@
             <h1 class="title">Home Of The Great Debate</h1>
             <p class="subtitle">You Decide...</p>
             
-            <div class="flex flex-col lg:flex-row gap-8 items-center justify-center">
+            <div class="flex flex-col lg:flex-row gap-12 items-stretch justify-center">
                 <!-- Left Side: Lifetime Sales -->
-                <div class="pizza-style flex-1 max-w-md">
+                <div class="pizza-style">
                     <h2 class="text-3xl font-bold mb-6 text-center" style="color: black;">Pies Sold</h2>
                     <div class="style-section">
                         <h3 class="text-2xl font-bold mb-4" style="color: #3b82f6;">New York Style</h3>
@@ -246,7 +267,7 @@
                         <div class="text-6xl mb-4">📱</div>
                         <h3 class="text-xl font-bold text-gray-800 mb-2">Scan QR Code To Vote!</h3>
                         <p class="text-sm text-gray-600 mb-4">Help us settle the great pizza debate.</p>
-                        <div class="w-32 h-32 mx-auto flex items-center justify-center">
+                        <div class="w-64 h-64 mx-auto flex items-center justify-center">
                             <img src="/images/qr-code.svg" alt="QR Code to vote" class="w-full h-full object-contain" />
                         </div>
                         <p class="text-xs text-gray-500 mt-2">thatsamorepizzaonline.com</p>
@@ -254,7 +275,7 @@
                 </div>
                 
                 <!-- Right Side: Customer Vote -->
-                <div class="pizza-style flex-1 max-w-md">
+                <div class="pizza-style">
                     <h2 class="text-3xl font-bold mb-6 text-center" style="color: black;">Customer Vote</h2>
                     <div class="style-section">
                         <h3 class="text-2xl font-bold mb-4" style="color: #3b82f6;">New York Style</h3>
