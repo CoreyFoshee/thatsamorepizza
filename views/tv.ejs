@@ -77,31 +77,36 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            overflow: hidden;
         }
         
         .pizza-style h2 {
             color: black;
             font-size: 2.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
         
         .pizza-style h3 {
             font-size: 2rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
         
         .pizza-style .vote-count {
             color: black;
             font-size: 3.5rem;
+            margin: 0.5rem 0;
+            line-height: 1;
         }
         
         .pizza-style .percentage {
             color: black;
             font-size: 2rem;
+            margin: 0.25rem 0;
+            line-height: 1;
         }
         
         .pizza-style .style-section {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         
         .pizza-style .style-section:last-child {
@@ -136,8 +141,9 @@
             border: 2px solid rgba(0, 0, 0, 0.2);
             border-radius: 25px;
             overflow: hidden;
-            margin: 1rem 0;
+            margin: 0.75rem 0;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
         }
         
         .progress-fill {
@@ -158,13 +164,15 @@
         .vote-count {
             font-size: 3.5rem;
             font-weight: bold;
-            margin: 1rem 0;
+            margin: 0.5rem 0;
+            line-height: 1;
         }
         
         .percentage {
             font-size: 2rem;
             font-weight: bold;
-            margin: 0.5rem 0;
+            margin: 0.25rem 0;
+            line-height: 1;
         }
         
         .total-votes {
