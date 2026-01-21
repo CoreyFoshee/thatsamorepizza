@@ -65,14 +65,14 @@
         }
         
         .pizza-style {
-            margin: 1rem 0;
-            padding: 3rem;
+            margin: 0.5rem 0;
+            padding: 2rem;
             border-radius: 20px;
             background: white;
             border: 2px solid rgba(0, 0, 0, 0.1);
             color: black;
             flex: 1;
-            min-height: 500px;
+            max-height: 600px;
             max-width: 28rem;
             display: flex;
             flex-direction: column;
@@ -81,27 +81,27 @@
         
         .pizza-style h2 {
             color: black;
-            font-size: 3rem;
-            margin-bottom: 2rem;
-        }
-        
-        .pizza-style h3 {
             font-size: 2.5rem;
             margin-bottom: 1.5rem;
         }
         
+        .pizza-style h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
         .pizza-style .vote-count {
             color: black;
-            font-size: 4.5rem;
+            font-size: 3.5rem;
         }
         
         .pizza-style .percentage {
             color: black;
-            font-size: 2.5rem;
+            font-size: 2rem;
         }
         
         .pizza-style .style-section {
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
         
         .pizza-style .style-section:last-child {
@@ -131,12 +131,12 @@
         
         .progress-bar {
             width: 100%;
-            height: 60px;
+            height: 50px;
             background: rgba(0, 0, 0, 0.15);
             border: 2px solid rgba(0, 0, 0, 0.2);
-            border-radius: 30px;
+            border-radius: 25px;
             overflow: hidden;
-            margin: 1.5rem 0;
+            margin: 1rem 0;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
@@ -156,35 +156,35 @@
         }
         
         .vote-count {
-            font-size: 4.5rem;
-            font-weight: bold;
-            margin: 1.5rem 0;
-        }
-        
-        .percentage {
-            font-size: 2.5rem;
+            font-size: 3.5rem;
             font-weight: bold;
             margin: 1rem 0;
         }
         
-        .total-votes {
+        .percentage {
             font-size: 2rem;
-            margin: 2rem 0;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .total-votes {
+            font-size: 1.75rem;
+            margin: 1.5rem 0;
             color: #fbbf24;
             text-align: center;
         }
         
         .title {
-            font-size: 4rem;
+            font-size: 3.5rem;
             font-weight: bold;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
         
         .subtitle {
-            font-size: 2rem;
-            margin-bottom: 3rem;
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
             color: #fbbf24;
             text-align: center;
         }
@@ -241,7 +241,7 @@
             <h1 class="title">Home Of The Great Debate</h1>
             <p class="subtitle">You Decide...</p>
             
-            <div class="flex flex-col lg:flex-row gap-12 items-stretch justify-center">
+            <div class="flex flex-col lg:flex-row gap-8 items-stretch justify-center">
                 <!-- Left Side: Lifetime Sales -->
                 <div class="pizza-style">
                     <h2 class="text-3xl font-bold mb-6 text-center" style="color: black;">Pies Sold</h2>
@@ -253,7 +253,7 @@
                         </div>
                     </div>
                     <div class="style-section">
-                        <h3 class="text-2xl font-bold mb-4" style="color: #dc2626;">Chicago Deep Dish Style</h3>
+                        <h3 class="text-2xl font-bold mb-4" style="color: #dc2626;">Chicago Deep Dish</h3>
                         <div class="vote-count" id="lifetime-sales-chicago-display">0</div>
                         <div class="progress-bar">
                             <div class="progress-fill chicago-progress" id="lifetime-sales-chicago-progress" style="width: 0%"></div>
@@ -286,7 +286,7 @@
                         </div>
                     </div>
                     <div class="style-section">
-                        <h3 class="text-2xl font-bold mb-4" style="color: #dc2626;">Chicago Deep Dish Style</h3>
+                        <h3 class="text-2xl font-bold mb-4" style="color: #dc2626;">Chicago Deep Dish</h3>
                         <div class="vote-count" id="chicago-votes">0</div>
                         <div class="percentage" id="chicago-percentage">0%</div>
                         <div class="progress-bar">
