@@ -221,28 +221,27 @@
             <p class="subtitle">Voting Updates Daily</p>
             
             <div class="flex flex-col lg:flex-row gap-8 items-center justify-center">
-                <!-- NY Style - Left Side (Combined Card with both styles) -->
+                <!-- Left Side: Lifetime Sales -->
                 <div class="pizza-style flex-1 max-w-md">
+                    <h2 class="text-3xl font-bold mb-6 text-center" style="color: black;">Lifetime Sales</h2>
                     <div class="style-section">
-                        <h2 class="text-3xl font-bold mb-4" style="color: #3b82f6;">New York Style</h2>
-                        <div class="vote-count" id="ny-votes">0</div>
-                        <div class="percentage" id="ny-percentage">0%</div>
+                        <h3 class="text-2xl font-bold mb-4" style="color: #3b82f6;">New York Style</h3>
+                        <div class="vote-count" id="lifetime-sales-ny-display">0</div>
                         <div class="progress-bar">
-                            <div class="progress-fill ny-progress" id="ny-progress" style="width: 0%"></div>
+                            <div class="progress-fill ny-progress" id="lifetime-sales-ny-progress" style="width: 0%"></div>
                         </div>
                         <div class="text-sm text-gray-600 mt-2 text-center">
-                            Lifetime Sales: <span id="lifetime-sales"></span>
+                            <span id="lifetime-sales"></span>
                         </div>
                     </div>
                     <div class="style-section">
-                        <h2 class="text-3xl font-bold mb-4" style="color: #dc2626;">Chicago Deep Dish Style</h2>
-                        <div class="vote-count" id="chicago-votes">0</div>
-                        <div class="percentage" id="chicago-percentage">0%</div>
+                        <h3 class="text-2xl font-bold mb-4" style="color: #dc2626;">Chicago Deep Dish Style</h3>
+                        <div class="vote-count" id="lifetime-sales-chicago-display">0</div>
                         <div class="progress-bar">
-                            <div class="progress-fill chicago-progress" id="chicago-progress" style="width: 0%"></div>
+                            <div class="progress-fill chicago-progress" id="lifetime-sales-chicago-progress" style="width: 0%"></div>
                         </div>
                         <div class="text-sm text-gray-600 mt-2 text-center">
-                            Lifetime Sales: <span id="lifetime-sales-chicago"></span>
+                            <span id="lifetime-sales-chicago"></span>
                         </div>
                     </div>
                 </div>
@@ -260,28 +259,23 @@
                     </div>
                 </div>
                 
-                <!-- Chicago Style - Right Side (Same combined card) -->
+                <!-- Right Side: Customer Vote -->
                 <div class="pizza-style flex-1 max-w-md">
+                    <h2 class="text-3xl font-bold mb-6 text-center" style="color: black;">Customer Vote</h2>
                     <div class="style-section">
-                        <h2 class="text-3xl font-bold mb-4" style="color: #3b82f6;">New York Style</h2>
-                        <div class="vote-count" id="ny-votes-right">0</div>
-                        <div class="percentage" id="ny-percentage-right">0%</div>
+                        <h3 class="text-2xl font-bold mb-4" style="color: #3b82f6;">New York Style</h3>
+                        <div class="vote-count" id="ny-votes">0</div>
+                        <div class="percentage" id="ny-percentage">0%</div>
                         <div class="progress-bar">
-                            <div class="progress-fill ny-progress" id="ny-progress-right" style="width: 0%"></div>
-                        </div>
-                        <div class="text-sm text-gray-600 mt-2 text-center">
-                            Lifetime Sales: <span id="lifetime-sales-right-ny"></span>
+                            <div class="progress-fill ny-progress" id="ny-progress" style="width: 0%"></div>
                         </div>
                     </div>
                     <div class="style-section">
-                        <h2 class="text-3xl font-bold mb-4" style="color: #dc2626;">Chicago Deep Dish Style</h2>
-                        <div class="vote-count" id="chicago-votes-right">0</div>
-                        <div class="percentage" id="chicago-percentage-right">0%</div>
+                        <h3 class="text-2xl font-bold mb-4" style="color: #dc2626;">Chicago Deep Dish Style</h3>
+                        <div class="vote-count" id="chicago-votes">0</div>
+                        <div class="percentage" id="chicago-percentage">0%</div>
                         <div class="progress-bar">
-                            <div class="progress-fill chicago-progress" id="chicago-progress-right" style="width: 0%"></div>
-                        </div>
-                        <div class="text-sm text-gray-600 mt-2 text-center">
-                            Lifetime Sales: <span id="lifetime-sales-right-chicago"></span>
+                            <div class="progress-fill chicago-progress" id="chicago-progress" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
@@ -315,27 +309,25 @@
             });
         }
         
-        // DOM elements
+        // DOM elements - Customer Vote (right side)
         const nyVotesEl = document.getElementById('ny-votes');
         const chicagoVotesEl = document.getElementById('chicago-votes');
         const nyPercentageEl = document.getElementById('ny-percentage');
         const chicagoPercentageEl = document.getElementById('chicago-percentage');
         const nyProgressEl = document.getElementById('ny-progress');
         const chicagoProgressEl = document.getElementById('chicago-progress');
-        const totalVotesEl = document.getElementById('total-votes');
-        const lastVoteEl = document.getElementById('last-vote');
+        
+        // DOM elements - Lifetime Sales (left side)
         const lifetimeSalesEl = document.getElementById('lifetime-sales');
         const lifetimeSalesChicagoEl = document.getElementById('lifetime-sales-chicago');
+        const lifetimeSalesNyDisplayEl = document.getElementById('lifetime-sales-ny-display');
+        const lifetimeSalesChicagoDisplayEl = document.getElementById('lifetime-sales-chicago-display');
+        const lifetimeSalesNyProgressEl = document.getElementById('lifetime-sales-ny-progress');
+        const lifetimeSalesChicagoProgressEl = document.getElementById('lifetime-sales-chicago-progress');
         
-        // Right side elements (duplicate for combined cards)
-        const nyVotesRightEl = document.getElementById('ny-votes-right');
-        const chicagoVotesRightEl = document.getElementById('chicago-votes-right');
-        const nyPercentageRightEl = document.getElementById('ny-percentage-right');
-        const chicagoPercentageRightEl = document.getElementById('chicago-percentage-right');
-        const nyProgressRightEl = document.getElementById('ny-progress-right');
-        const chicagoProgressRightEl = document.getElementById('chicago-progress-right');
-        const lifetimeSalesRightNyEl = document.getElementById('lifetime-sales-right-ny');
-        const lifetimeSalesRightChicagoEl = document.getElementById('lifetime-sales-right-chicago');
+        // Other elements
+        const totalVotesEl = document.getElementById('total-votes');
+        const lastVoteEl = document.getElementById('last-vote');
         
         // Load initial data from Supabase
         loadInitialData();
@@ -366,38 +358,57 @@
         
         // Update display with voting data
         function updateDisplay(data) {
-            // Update left side
+            // Update Customer Vote section (right side)
             nyVotesEl.textContent = data.nyVotes || 0;
             chicagoVotesEl.textContent = data.chicagoVotes || 0;
-            if (lifetimeSalesEl) {
-                lifetimeSalesEl.textContent = data.nyLifetimeSales || '';
-            }
-            if (lifetimeSalesChicagoEl) {
-                lifetimeSalesChicagoEl.textContent = data.chicagoLifetimeSales || '';
-            }
-            
-            // Update right side (duplicate)
-            if (nyVotesRightEl) nyVotesRightEl.textContent = data.nyVotes || 0;
-            if (chicagoVotesRightEl) chicagoVotesRightEl.textContent = data.chicagoVotes || 0;
-            if (lifetimeSalesRightNyEl) lifetimeSalesRightNyEl.textContent = data.nyLifetimeSales || '';
-            if (lifetimeSalesRightChicagoEl) lifetimeSalesRightChicagoEl.textContent = data.chicagoLifetimeSales || '';
-            
             totalVotesEl.textContent = data.totalVotes || 0;
             
-            // Calculate percentages
+            // Calculate vote percentages
             const nyPercentage = data.totalVotes > 0 ? Math.round((data.nyVotes / data.totalVotes) * 100) : 0;
             const chicagoPercentage = data.totalVotes > 0 ? Math.round((data.chicagoVotes / data.totalVotes) * 100) : 0;
             
             nyPercentageEl.textContent = nyPercentage + '%';
             chicagoPercentageEl.textContent = chicagoPercentage + '%';
-            if (nyPercentageRightEl) nyPercentageRightEl.textContent = nyPercentage + '%';
-            if (chicagoPercentageRightEl) chicagoPercentageRightEl.textContent = chicagoPercentage + '%';
             
-            // Update progress bars
+            // Update vote progress bars
             nyProgressEl.style.width = nyPercentage + '%';
             chicagoProgressEl.style.width = chicagoPercentage + '%';
-            if (nyProgressRightEl) nyProgressRightEl.style.width = nyPercentage + '%';
-            if (chicagoProgressRightEl) chicagoProgressRightEl.style.width = chicagoPercentage + '%';
+            
+            // Update Lifetime Sales section (left side)
+            const nyLifetimeSales = data.nyLifetimeSales || '';
+            const chicagoLifetimeSales = data.chicagoLifetimeSales || '';
+            
+            if (lifetimeSalesEl) {
+                lifetimeSalesEl.textContent = nyLifetimeSales;
+            }
+            if (lifetimeSalesChicagoEl) {
+                lifetimeSalesChicagoEl.textContent = chicagoLifetimeSales;
+            }
+            
+            // Display lifetime sales values
+            if (lifetimeSalesNyDisplayEl) {
+                lifetimeSalesNyDisplayEl.textContent = nyLifetimeSales || '0';
+            }
+            if (lifetimeSalesChicagoDisplayEl) {
+                lifetimeSalesChicagoDisplayEl.textContent = chicagoLifetimeSales || '0';
+            }
+            
+            // Calculate lifetime sales percentages for progress bars
+            // Convert text values to numbers for comparison
+            const nySalesNum = parseFloat(nyLifetimeSales.toString().replace(/[^0-9.]/g, '')) || 0;
+            const chicagoSalesNum = parseFloat(chicagoLifetimeSales.toString().replace(/[^0-9.]/g, '')) || 0;
+            const totalSales = nySalesNum + chicagoSalesNum;
+            
+            const nySalesPercentage = totalSales > 0 ? Math.round((nySalesNum / totalSales) * 100) : 0;
+            const chicagoSalesPercentage = totalSales > 0 ? Math.round((chicagoSalesNum / totalSales) * 100) : 0;
+            
+            // Update lifetime sales progress bars
+            if (lifetimeSalesNyProgressEl) {
+                lifetimeSalesNyProgressEl.style.width = nySalesPercentage + '%';
+            }
+            if (lifetimeSalesChicagoProgressEl) {
+                lifetimeSalesChicagoProgressEl.style.width = chicagoSalesPercentage + '%';
+            }
         }
         
         // Show last vote notification
