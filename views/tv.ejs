@@ -31,7 +31,9 @@
         
         .tv-container {
             width: 100vw;
-            height: 100vh;
+            height: 56.25vw; /* 16:9 aspect ratio (9/16 = 0.5625) */
+            max-height: 100vh;
+            max-width: 177.78vh; /* Maintain 16:9 when height is limiting */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -43,6 +45,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            margin: 0 auto;
         }
         
         .tv-container::before {
@@ -94,26 +97,71 @@
             font-size: 1.5rem;
         }
         
-        .lifetime-sales-item {
-            margin: 1rem 0;
-            padding: 1.5rem;
-            border-radius: 15px;
+        .combined-card {
+            margin: 1.5rem 0;
+            padding: 2rem;
+            border-radius: 20px;
             background: white;
             border: 2px solid rgba(0, 0, 0, 0.1);
             color: black;
+            height: 100%;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .combined-card .style-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex: 1;
+        }
+        
+        .combined-card .style-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .combined-card .style-row > div {
+            width: 100%;
             text-align: center;
         }
         
-        .lifetime-sales-item h3 {
-            color: black;
+        .combined-card .style-label {
             font-size: 1.5rem;
+            font-weight: bold;
             margin-bottom: 0.5rem;
         }
         
-        .lifetime-sales-value {
+        .combined-card .style-value {
             font-size: 2.5rem;
             font-weight: bold;
             color: black;
+        }
+        
+        .combined-card .vote-row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.5rem;
+        }
+        
+        .combined-card .vote-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .combined-card .vote-count {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: black;
+            margin-bottom: 0.5rem;
+        }
+        
+        .combined-card .percentage {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: black;
+            margin-bottom: 0.5rem;
         }
         
         .qr-section {
@@ -124,6 +172,14 @@
         .customer-vote-section {
             flex: 1;
             max-width: 28rem;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .pizzas-sold-section .combined-card,
+        .customer-vote-section .combined-card {
+            flex: 1;
         }
         
         .progress-bar {
@@ -246,16 +302,20 @@
                 <div class="pizzas-sold-section text-center">
                     <h2 class="section-title">Pizzas Sold</h2>
                     
-                    <!-- NY Style Lifetime Sales -->
-                    <div class="lifetime-sales-item">
-                        <h3 style="color: #3b82f6;">New York Style</h3>
-                        <div class="lifetime-sales-value" id="lifetime-sales-ny">0</div>
-                    </div>
-                    
-                    <!-- Chicago Style Lifetime Sales -->
-                    <div class="lifetime-sales-item">
-                        <h3 style="color: #dc2626;">Chicago Deep Dish Style</h3>
-                        <div class="lifetime-sales-value" id="lifetime-sales-chicago">0</div>
+                    <!-- Combined Lifetime Sales Card -->
+                    <div class="combined-card">
+                        <div class="style-row">
+                            <div>
+                                <div class="style-label" style="color: #3b82f6;">New York Style</div>
+                                <div class="style-value" id="lifetime-sales-ny">0</div>
+                            </div>
+                        </div>
+                        <div class="style-row">
+                            <div>
+                                <div class="style-label" style="color: #dc2626;">Chicago Deep Dish Style</div>
+                                <div class="style-value" id="lifetime-sales-chicago">0</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -276,23 +336,23 @@
                 <div class="customer-vote-section text-center">
                     <h2 class="section-title">Customer Vote</h2>
                     
-                    <!-- NY Style Voting -->
-                    <div class="pizza-style">
-                        <h2 style="color: #3b82f6;">New York Style</h2>
-                        <div class="vote-count" id="ny-votes">0</div>
-                        <div class="percentage" id="ny-percentage">0%</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill ny-progress" id="ny-progress" style="width: 0%"></div>
+                    <!-- Combined Voting Card -->
+                    <div class="combined-card">
+                        <div class="vote-row">
+                            <div class="style-label" style="color: #3b82f6;">New York Style</div>
+                            <div class="vote-count" id="ny-votes">0</div>
+                            <div class="percentage" id="ny-percentage">0%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ny-progress" id="ny-progress" style="width: 0%"></div>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <!-- Chicago Style Voting -->
-                    <div class="pizza-style">
-                        <h2 style="color: #dc2626;">Chicago Deep Dish Style</h2>
-                        <div class="vote-count" id="chicago-votes">0</div>
-                        <div class="percentage" id="chicago-percentage">0%</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill chicago-progress" id="chicago-progress" style="width: 0%"></div>
+                        <div class="vote-row">
+                            <div class="style-label" style="color: #dc2626;">Chicago Deep Dish Style</div>
+                            <div class="vote-count" id="chicago-votes">0</div>
+                            <div class="percentage" id="chicago-percentage">0%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill chicago-progress" id="chicago-progress" style="width: 0%"></div>
+                            </div>
                         </div>
                     </div>
                     
