@@ -64,21 +64,18 @@
             z-index: 1;
         }
         
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 2rem;
-            text-align: center;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        
         .pizza-style {
-            margin: 1.5rem 0;
+            margin: 1rem 0;
             padding: 2rem;
             border-radius: 20px;
             background: white;
             border: 2px solid rgba(0, 0, 0, 0.1);
             color: black;
+            height: 100%;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         
         .pizza-style h2 {
@@ -97,90 +94,19 @@
             font-size: 1.5rem;
         }
         
-        .combined-card {
-            margin: 1.5rem 0;
-            padding: 2rem;
-            border-radius: 20px;
-            background: white;
-            border: 2px solid rgba(0, 0, 0, 0.1);
-            color: black;
-            height: 100%;
-            min-height: 400px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        
-        .combined-card .style-row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .pizza-style .style-section {
             margin-bottom: 2rem;
-            flex: 1;
         }
         
-        .combined-card .style-row:last-child {
+        .pizza-style .style-section:last-child {
             margin-bottom: 0;
         }
         
-        .combined-card .style-row > div {
-            width: 100%;
-            text-align: center;
-        }
-        
-        .combined-card .style-label {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        
-        .combined-card .style-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: black;
-        }
-        
-        .combined-card .vote-row {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 1.5rem;
-        }
-        
-        .combined-card .vote-row:last-child {
-            margin-bottom: 0;
-        }
-        
-        .combined-card .vote-count {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: black;
-            margin-bottom: 0.5rem;
-        }
-        
-        .combined-card .percentage {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: black;
-            margin-bottom: 0.5rem;
-        }
         
         .qr-section {
             flex-shrink: 0;
         }
         
-        .pizzas-sold-section,
-        .customer-vote-section {
-            flex: 1;
-            max-width: 28rem;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .pizzas-sold-section .combined-card,
-        .customer-vote-section .combined-card {
-            flex: 1;
-        }
         
         .progress-bar {
             width: 100%;
@@ -278,12 +204,9 @@
         
         @media (max-width: 768px) {
             .title { font-size: 2rem; }
-            .section-title { font-size: 2rem; }
             .vote-count { font-size: 2.5rem; }
-            .lifetime-sales-value { font-size: 2rem; }
             .percentage { font-size: 1.5rem; }
-            .pizza-style { margin: 1rem 0; padding: 1rem; }
-            .lifetime-sales-item { margin: 1rem 0; padding: 1rem; }
+            .pizza-style { margin: 1rem 0; padding: 1rem; min-height: 300px; }
             .flex-col.lg\:flex-row { gap: 2rem; }
             .qr-section { order: -1; margin-bottom: 1rem; }
         }
@@ -294,27 +217,32 @@
     
     <div class="tv-container">
         <div class="voting-results">
-            <h1 class="title">Home Of The Great Debate</h1>
-            <p class="subtitle">You Decide...</p>
+            <h1 class="title">🍕 The Great Pizza Debate</h1>
+            <p class="subtitle">Voting Updates Daily</p>
             
             <div class="flex flex-col lg:flex-row gap-8 items-center justify-center">
-                <!-- Left Side: Pizzas Sold -->
-                <div class="pizzas-sold-section text-center">
-                    <h2 class="section-title">Pizzas Sold</h2>
-                    
-                    <!-- Combined Lifetime Sales Card -->
-                    <div class="combined-card">
-                        <div class="style-row">
-                            <div>
-                                <div class="style-label" style="color: #3b82f6;">New York Style</div>
-                                <div class="style-value" id="lifetime-sales-ny">0</div>
-                            </div>
+                <!-- NY Style - Left Side (Combined Card with both styles) -->
+                <div class="pizza-style flex-1 max-w-md">
+                    <div class="style-section">
+                        <h2 class="text-3xl font-bold mb-4" style="color: #3b82f6;">New York Style</h2>
+                        <div class="vote-count" id="ny-votes">0</div>
+                        <div class="percentage" id="ny-percentage">0%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ny-progress" id="ny-progress" style="width: 0%"></div>
                         </div>
-                        <div class="style-row">
-                            <div>
-                                <div class="style-label" style="color: #dc2626;">Chicago Deep Dish Style</div>
-                                <div class="style-value" id="lifetime-sales-chicago">0</div>
-                            </div>
+                        <div class="text-sm text-gray-600 mt-2 text-center">
+                            Lifetime Sales: <span id="lifetime-sales"></span>
+                        </div>
+                    </div>
+                    <div class="style-section">
+                        <h2 class="text-3xl font-bold mb-4" style="color: #dc2626;">Chicago Deep Dish Style</h2>
+                        <div class="vote-count" id="chicago-votes">0</div>
+                        <div class="percentage" id="chicago-percentage">0%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill chicago-progress" id="chicago-progress" style="width: 0%"></div>
+                        </div>
+                        <div class="text-sm text-gray-600 mt-2 text-center">
+                            Lifetime Sales: <span id="lifetime-sales-chicago"></span>
                         </div>
                     </div>
                 </div>
@@ -332,34 +260,35 @@
                     </div>
                 </div>
                 
-                <!-- Right Side: Customer Vote -->
-                <div class="customer-vote-section text-center">
-                    <h2 class="section-title">Customer Vote</h2>
-                    
-                    <!-- Combined Voting Card -->
-                    <div class="combined-card">
-                        <div class="vote-row">
-                            <div class="style-label" style="color: #3b82f6;">New York Style</div>
-                            <div class="vote-count" id="ny-votes">0</div>
-                            <div class="percentage" id="ny-percentage">0%</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill ny-progress" id="ny-progress" style="width: 0%"></div>
-                            </div>
+                <!-- Chicago Style - Right Side (Same combined card) -->
+                <div class="pizza-style flex-1 max-w-md">
+                    <div class="style-section">
+                        <h2 class="text-3xl font-bold mb-4" style="color: #3b82f6;">New York Style</h2>
+                        <div class="vote-count" id="ny-votes-right">0</div>
+                        <div class="percentage" id="ny-percentage-right">0%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill ny-progress" id="ny-progress-right" style="width: 0%"></div>
                         </div>
-                        <div class="vote-row">
-                            <div class="style-label" style="color: #dc2626;">Chicago Deep Dish Style</div>
-                            <div class="vote-count" id="chicago-votes">0</div>
-                            <div class="percentage" id="chicago-percentage">0%</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill chicago-progress" id="chicago-progress" style="width: 0%"></div>
-                            </div>
+                        <div class="text-sm text-gray-600 mt-2 text-center">
+                            Lifetime Sales: <span id="lifetime-sales-right-ny"></span>
                         </div>
                     </div>
-                    
-                    <div class="total-votes">
-                        Total Votes: <span id="total-votes">0</span>
+                    <div class="style-section">
+                        <h2 class="text-3xl font-bold mb-4" style="color: #dc2626;">Chicago Deep Dish Style</h2>
+                        <div class="vote-count" id="chicago-votes-right">0</div>
+                        <div class="percentage" id="chicago-percentage-right">0%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill chicago-progress" id="chicago-progress-right" style="width: 0%"></div>
+                        </div>
+                        <div class="text-sm text-gray-600 mt-2 text-center">
+                            Lifetime Sales: <span id="lifetime-sales-right-chicago"></span>
+                        </div>
                     </div>
                 </div>
+            </div>
+            
+            <div class="total-votes">
+                Total Votes: <span id="total-votes">0</span>
             </div>
         </div>
     </div>
@@ -395,8 +324,18 @@
         const chicagoProgressEl = document.getElementById('chicago-progress');
         const totalVotesEl = document.getElementById('total-votes');
         const lastVoteEl = document.getElementById('last-vote');
-        const lifetimeSalesNyEl = document.getElementById('lifetime-sales-ny');
+        const lifetimeSalesEl = document.getElementById('lifetime-sales');
         const lifetimeSalesChicagoEl = document.getElementById('lifetime-sales-chicago');
+        
+        // Right side elements (duplicate for combined cards)
+        const nyVotesRightEl = document.getElementById('ny-votes-right');
+        const chicagoVotesRightEl = document.getElementById('chicago-votes-right');
+        const nyPercentageRightEl = document.getElementById('ny-percentage-right');
+        const chicagoPercentageRightEl = document.getElementById('chicago-percentage-right');
+        const nyProgressRightEl = document.getElementById('ny-progress-right');
+        const chicagoProgressRightEl = document.getElementById('chicago-progress-right');
+        const lifetimeSalesRightNyEl = document.getElementById('lifetime-sales-right-ny');
+        const lifetimeSalesRightChicagoEl = document.getElementById('lifetime-sales-right-chicago');
         
         // Load initial data from Supabase
         loadInitialData();
@@ -427,18 +366,23 @@
         
         // Update display with voting data
         function updateDisplay(data) {
-            // Update voting data (right side)
+            // Update left side
             nyVotesEl.textContent = data.nyVotes || 0;
             chicagoVotesEl.textContent = data.chicagoVotes || 0;
-            totalVotesEl.textContent = data.totalVotes || 0;
-            
-            // Update lifetime sales (left side)
-            if (lifetimeSalesNyEl) {
-                lifetimeSalesNyEl.textContent = data.nyLifetimeSales || '0';
+            if (lifetimeSalesEl) {
+                lifetimeSalesEl.textContent = data.nyLifetimeSales || '';
             }
             if (lifetimeSalesChicagoEl) {
-                lifetimeSalesChicagoEl.textContent = data.chicagoLifetimeSales || '0';
+                lifetimeSalesChicagoEl.textContent = data.chicagoLifetimeSales || '';
             }
+            
+            // Update right side (duplicate)
+            if (nyVotesRightEl) nyVotesRightEl.textContent = data.nyVotes || 0;
+            if (chicagoVotesRightEl) chicagoVotesRightEl.textContent = data.chicagoVotes || 0;
+            if (lifetimeSalesRightNyEl) lifetimeSalesRightNyEl.textContent = data.nyLifetimeSales || '';
+            if (lifetimeSalesRightChicagoEl) lifetimeSalesRightChicagoEl.textContent = data.chicagoLifetimeSales || '';
+            
+            totalVotesEl.textContent = data.totalVotes || 0;
             
             // Calculate percentages
             const nyPercentage = data.totalVotes > 0 ? Math.round((data.nyVotes / data.totalVotes) * 100) : 0;
@@ -446,10 +390,14 @@
             
             nyPercentageEl.textContent = nyPercentage + '%';
             chicagoPercentageEl.textContent = chicagoPercentage + '%';
+            if (nyPercentageRightEl) nyPercentageRightEl.textContent = nyPercentage + '%';
+            if (chicagoPercentageRightEl) chicagoPercentageRightEl.textContent = chicagoPercentage + '%';
             
             // Update progress bars
             nyProgressEl.style.width = nyPercentage + '%';
             chicagoProgressEl.style.width = chicagoPercentage + '%';
+            if (nyProgressRightEl) nyProgressRightEl.style.width = nyPercentage + '%';
+            if (chicagoProgressRightEl) chicagoProgressRightEl.style.width = chicagoPercentage + '%';
         }
         
         // Show last vote notification
