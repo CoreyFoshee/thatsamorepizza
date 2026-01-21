@@ -384,12 +384,17 @@
             }
         }
         
+        // Format number with commas
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        
         // Update display with voting data
         function updateDisplay(data) {
             // Update Customer Vote section (right side)
-            nyVotesEl.textContent = data.nyVotes || 0;
-            chicagoVotesEl.textContent = data.chicagoVotes || 0;
-            totalVotesEl.textContent = data.totalVotes || 0;
+            nyVotesEl.textContent = formatNumber(data.nyVotes || 0);
+            chicagoVotesEl.textContent = formatNumber(data.chicagoVotes || 0);
+            totalVotesEl.textContent = formatNumber(data.totalVotes || 0);
             
             // Calculate vote percentages
             const nyPercentage = data.totalVotes > 0 ? Math.round((data.nyVotes / data.totalVotes) * 100) : 0;
