@@ -1710,8 +1710,9 @@ if (!isVercel) {
         // Handle votes
         socket.on('vote', async (data) => {
             const sessionId = data.sessionId;
+            const clientIp = socket.handshake.address || socket.request.connection.remoteAddress || 'unknown';
             
-            const result = await recordVote(data.choice, sessionId);
+            const result = await recordVote(data.choice, sessionId, clientIp);
             
             if (!result.success) {
                 socket.emit('vote-error', { message: result.message || 'Error recording vote' });
