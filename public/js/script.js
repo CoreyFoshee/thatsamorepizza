@@ -65,7 +65,6 @@ function initPizzaPoll() {
         localStorage.setItem('pizzaPollSessionId', sessionId);
     }
     
-    let hasVoted = false;
     let useWebSocket = true; // Default to WebSocket, fallback to API
     
     // Current voting data
@@ -244,10 +243,8 @@ function initPizzaPoll() {
     // NY Style vote button
     if (nyVoteBtn) {
         nyVoteBtn.addEventListener('click', async function() {
-            if (hasVoted) {
-                showVoteError('You have already voted in this session');
-                return;
-            }
+            // Disable button temporarily to prevent rapid clicking
+            nyVoteBtn.disabled = true;
             
             try {
                 // Always use API endpoint (Socket.io not reliable on serverless)
@@ -265,19 +262,15 @@ function initPizzaPoll() {
                     showVoteConfirmation('NY Style', '🗽');
                 } else {
                     showVoteError(result.message);
-                    return;
                 }
-                
-                hasVoted = true;
-                
-                // Disable both buttons after voting
-                nyVoteBtn.disabled = true;
-                chicagoVoteBtn.disabled = true;
-                nyVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                chicagoVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
             } catch (error) {
                 console.error('Error casting vote:', error);
                 showVoteError('Error casting vote. Please try again.');
+            } finally {
+                // Re-enable button after a short delay
+                setTimeout(() => {
+                    nyVoteBtn.disabled = false;
+                }, 500);
             }
         });
     }
@@ -285,10 +278,8 @@ function initPizzaPoll() {
     // Chicago Style vote button
     if (chicagoVoteBtn) {
         chicagoVoteBtn.addEventListener('click', async function() {
-            if (hasVoted) {
-                showVoteError('You have already voted in this session');
-                return;
-            }
+            // Disable button temporarily to prevent rapid clicking
+            chicagoVoteBtn.disabled = true;
             
             try {
                 // Always use API endpoint (Socket.io not reliable on serverless)
@@ -306,67 +297,62 @@ function initPizzaPoll() {
                     showVoteConfirmation('Chicago Style', '🏙️');
                 } else {
                     showVoteError(result.message);
-                    return;
                 }
-                
-                hasVoted = true;
-                
-                // Disable both buttons after voting
-                nyVoteBtn.disabled = true;
-                chicagoVoteBtn.disabled = true;
-                nyVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                chicagoVoteBtn.classList.add('opacity-50', 'cursor-not-allowed');
             } catch (error) {
                 console.error('Error casting vote:', error);
                 showVoteError('Error casting vote. Please try again.');
+            } finally {
+                // Re-enable button after a short delay
+                setTimeout(() => {
+                    chicagoVoteBtn.disabled = false;
+                }, 500);
             }
         });
     }
     
     // WebSocket event handlers (only if socket is available)
     if (socket) {
-        socket.on('voting-data', (data) => {
-            console.log('Received initial voting data:', data);
-            updatePollDisplay(data);
-        });
-        
-        socket.on('voting-update', (data) => {
-            console.log('Received voting update:', data);
-            updatePollDisplay(data);
-        });
-        
-        // Handle vote success
-        socket.on('vote-success', (data) => {
-            console.log('Vote recorded successfully:', data);
-            if (data.choice === 'ny') {
-                showVoteConfirmation('NY Style', '🗽');
-            } else if (data.choice === 'chicago') {
-                showVoteConfirmation('Chicago Style', '🏙️');
-            }
-        });
-        
-        // Handle vote errors
-        socket.on('vote-error', (data) => {
-            console.log('Vote error:', data);
-            showVoteError(data.message);
-            // Re-enable voting if there was an error
-            hasVoted = false;
-            if (nyVoteBtn) {
-                nyVoteBtn.disabled = false;
-                nyVoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-            if (chicagoVoteBtn) {
-                chicagoVoteBtn.disabled = false;
-                chicagoVoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-        });
-        
-        // Handle connection errors
-        socket.on('connect_error', (error) => {
-            console.error('WebSocket connection error:', error);
+    socket.on('voting-data', (data) => {
+        console.log('Received initial voting data:', data);
+        updatePollDisplay(data);
+    });
+    
+    socket.on('voting-update', (data) => {
+        console.log('Received voting update:', data);
+        updatePollDisplay(data);
+    });
+    
+    // Handle vote success
+    socket.on('vote-success', (data) => {
+        console.log('Vote recorded successfully:', data);
+        if (data.choice === 'ny') {
+            showVoteConfirmation('NY Style', '🗽');
+        } else if (data.choice === 'chicago') {
+            showVoteConfirmation('Chicago Style', '🏙️');
+        }
+    });
+    
+    // Handle vote errors
+    socket.on('vote-error', (data) => {
+        console.log('Vote error:', data);
+        showVoteError(data.message);
+        // Re-enable voting if there was an error
+        if (nyVoteBtn) {
+            nyVoteBtn.disabled = false;
+            nyVoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+        if (chicagoVoteBtn) {
+            chicagoVoteBtn.disabled = false;
+            chicagoVoteBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    });
+    
+    // Handle connection errors
+    socket.on('connect_error', (error) => {
+        console.error('WebSocket connection error:', error);
             // Fallback to API polling if WebSocket fails
             loadInitialVotes();
-        });
+    });
     }
 }
 

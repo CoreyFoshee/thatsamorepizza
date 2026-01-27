@@ -72,6 +72,25 @@ let votingData = {
     sessionVotes: new Set() // Track session IDs that have voted
 };
 
+// Rate limiting: track votes per identifier (IP + sessionId) in the last minute
+// Format: { identifier: [timestamp1, timestamp2, ...] }
+const voteRateLimit = new Map();
+const MAX_VOTES_PER_MINUTE = 10;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+
+// Clean up old rate limit entries periodically
+setInterval(() => {
+    const now = Date.now();
+    for (const [identifier, timestamps] of voteRateLimit.entries()) {
+        const recentTimestamps = timestamps.filter(ts => now - ts < RATE_LIMIT_WINDOW_MS);
+        if (recentTimestamps.length === 0) {
+            voteRateLimit.delete(identifier);
+        } else {
+            voteRateLimit.set(identifier, recentTimestamps);
+        }
+    }
+}, 30000); // Clean up every 30 seconds
+
 // Load admin data from file or create default
 let adminData = {
     restaurantStatus: {
@@ -255,36 +274,39 @@ async function getRestaurantMetrics() {
     }
 }
 
-async function recordVote(choice, sessionId) {
+async function recordVote(choice, sessionId, clientIp) {
+    // Rate limiting check
+    const identifier = `${clientIp || 'unknown'}_${sessionId}`;
+    const now = Date.now();
+    const recentVotes = voteRateLimit.get(identifier) || [];
+    
+    // Filter to only votes in the last minute
+    const votesInLastMinute = recentVotes.filter(ts => now - ts < RATE_LIMIT_WINDOW_MS);
+    
+    if (votesInLastMinute.length >= MAX_VOTES_PER_MINUTE) {
+        return { 
+            success: false, 
+            message: `Rate limit exceeded. Please wait a moment before voting again. (Max ${MAX_VOTES_PER_MINUTE} votes per minute)` 
+        };
+    }
+    
+    // Add current vote timestamp
+    votesInLastMinute.push(now);
+    voteRateLimit.set(identifier, votesInLastMinute);
+    
     if (!supabase) {
         // Fallback to in-memory
-        if (votingData.sessionVotes.has(sessionId)) {
-            return { success: false, message: 'Already voted' };
-        }
-        
         if (choice === 'ny') {
             votingData.nyVotes++;
         } else if (choice === 'chicago') {
             votingData.chicagoVotes++;
         }
         votingData.totalVotes = votingData.nyVotes + votingData.chicagoVotes;
-        votingData.sessionVotes.add(sessionId);
         saveVotingData();
         return { success: true, data: votingData };
     }
     
     try {
-        // Check if session already voted
-        const { data: existingVote } = await supabase
-            .from('vote_records')
-            .select('id')
-            .eq('session_id', sessionId)
-            .limit(1)
-            .single();
-        
-        if (existingVote) {
-            return { success: false, message: 'You have already voted in this session' };
-        }
         
         // Insert vote record
         const { data: insertedVote, error: insertError } = await supabase
@@ -1584,7 +1606,10 @@ app.post('/api/vote', async (req, res) => {
             });
         }
         
-        const result = await recordVote(choice, sessionId);
+        // Get client IP for rate limiting
+        const clientIp = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || 'unknown';
+        
+        const result = await recordVote(choice, sessionId, clientIp);
         
         if (!result.success) {
             return res.json({ 
