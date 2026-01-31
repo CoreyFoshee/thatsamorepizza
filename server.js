@@ -711,12 +711,13 @@ async function deleteScheduledClosure(date) {
     }
 }
 
-// Helper function to add Supabase credentials to render data
+// Helper function to add Supabase credentials and optional CDN URLs to render data
 function addSupabaseToRender(data) {
     return {
         ...data,
         supabaseUrl: supabaseUrl || '',
-        supabaseAnonKey: supabaseAnonKey || ''
+        supabaseAnonKey: supabaseAnonKey || '',
+        heroVideoUrl: process.env.HERO_VIDEO_URL || '' // S3/CloudFront URL for hero video (optional)
     };
 }
 
