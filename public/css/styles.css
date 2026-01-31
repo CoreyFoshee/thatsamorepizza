@@ -36,6 +36,7 @@ body {
     }
     
     /* Prevent horizontal scrolling on mobile without interfering with vertical scroll */
+    html,
     body {
         overflow-x: hidden;
         overflow-y: auto;
