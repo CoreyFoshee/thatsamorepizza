@@ -234,6 +234,11 @@ function saveAdminData() {
 // Supabase Helper Functions
 // ============================================
 
+// In-memory cache for voting metrics (reduces Supabase calls from polling / repeated requests)
+const VOTING_METRICS_CACHE_MS = 25 * 1000; // 25 seconds
+let votingMetricsCache = null;
+let votingMetricsCacheTime = 0;
+
 // Restaurant Metrics Functions
 async function getRestaurantMetrics() {
     if (!supabase) {
@@ -246,6 +251,11 @@ async function getRestaurantMetrics() {
         };
     }
     
+    const now = Date.now();
+    if (votingMetricsCache && (now - votingMetricsCacheTime) < VOTING_METRICS_CACHE_MS) {
+        return votingMetricsCache;
+    }
+    
     try {
         const { data, error } = await supabase
             .from('restaurant_metrics')
@@ -255,7 +265,7 @@ async function getRestaurantMetrics() {
         
         if (error) throw error;
         
-        return {
+        const result = {
             nyVotes: data.ny_votes || 0,
             chicagoVotes: data.chicago_votes || 0,
             totalVotes: data.total_votes || 0,
@@ -263,6 +273,9 @@ async function getRestaurantMetrics() {
             nyLifetimeSales: data.ny_lifetime_sales || '',
             chicagoLifetimeSales: data.chicago_lifetime_sales || ''
         };
+        votingMetricsCache = result;
+        votingMetricsCacheTime = now;
+        return result;
     } catch (error) {
         console.error('Error fetching restaurant metrics:', error);
         return {
@@ -345,6 +358,7 @@ async function recordVote(choice, sessionId, clientIp) {
         
         if (updateError) throw updateError;
         
+        votingMetricsCache = null; // Invalidate cache so next read gets fresh counts
         return {
             success: true,
             data: {
@@ -382,6 +396,7 @@ async function updatePizzasSold(count) {
             .eq('id', metrics.id);
         
         if (error) throw error;
+        votingMetricsCache = null;
         return { success: true };
     } catch (error) {
         console.error('Error updating pizzas sold:', error);
@@ -422,6 +437,7 @@ async function updateLifetimeSales(nySales, chicagoSales) {
             .eq('id', metrics.id);
         
         if (error) throw error;
+        votingMetricsCache = null;
         return { success: true };
     } catch (error) {
         console.error('Error updating lifetime sales:', error);
@@ -819,10 +835,12 @@ async function migrateToSupabase() {
     }
 }
 
-// Run migration on startup (after a short delay to ensure Supabase is ready)
-setTimeout(() => {
-    migrateToSupabase();
-}, 2000);
+// Run migration on startup only when not on Vercel (on Vercel, cold starts run this per instance = huge Supabase usage)
+if (!isVercel) {
+    setTimeout(() => {
+        migrateToSupabase();
+    }, 2000);
+}
 
 // Set EJS as templating engine
 app.set('view engine', 'ejs');

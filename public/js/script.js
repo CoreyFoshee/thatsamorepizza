@@ -157,12 +157,12 @@ function initPizzaPoll() {
         startPolling();
     }
     
-    // Polling fallback function
+    // Polling fallback function (30s interval to reduce Supabase + Vercel invocations)
     function startPolling() {
-        console.log('🔄 Starting polling for vote updates');
+        console.log('🔄 Starting polling for vote updates (every 30s)');
         setInterval(() => {
             loadInitialVotes();
-        }, 5000); // Poll every 5 seconds
+        }, 30000); // Poll every 30 seconds
     }
     
     // Load initial data
