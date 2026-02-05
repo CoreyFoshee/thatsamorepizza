@@ -832,8 +832,14 @@ app.set('layout', 'layout');
 // Use express-ejs-layouts
 app.use(expressLayouts);
 
-// Serve static files from public directory
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files from public directory (no 304: long cache, no conditional responses)
+app.use(express.static(path.join(__dirname, 'public'), {
+    etag: false,
+    lastModified: false,
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+}));
 
 // Debug middleware
 app.use((req, res, next) => {
